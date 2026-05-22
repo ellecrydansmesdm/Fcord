@@ -1,0 +1,44 @@
+.vc-flood-content {
+    padding: 8px 16px 4px 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-flood-textarea {
+    width: 100%;
+    min-height: 60px;
+    max-height: 100px;
+    resize: vertical;
+    background: var(--input-background);
+    border: 1px solid var(--background-modifier-accent);
+    border-radius: 3px;
+    color: var(--text-normal);
+    font-size: 14px;
+    font-family: var(--font-primary);
+    padding: 8px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.vc-flood-textarea:focus {
+    border-color: var(--text-link);
+}
+
+.vc-flood-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.vc-flood-row {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+/* Compteur blanc et visible */
+.vc-flood-counter--active {
+    color: var(--white-500, #ffffff) !important;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 2px;
+}

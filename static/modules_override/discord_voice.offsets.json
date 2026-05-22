@@ -1,0 +1,218 @@
+{
+  "tool": "discord_voice_node_offset_finder",
+  "version": "5.1.3",
+  "file": "H:/DISCORD STEREO/Release/Updates/Nodes/Unpatched Nodes (For Patcher)/Windows/discord_voice.node",
+  "file_size": 14411192,
+  "md5": "e4bdf195be0190f210786483cb9373fb",
+  "format": "pe",
+  "arch": "x86_64",
+  "file_offset_adjustment": "0xc00",
+  "offsets": {
+    "AudioEncoderOpusConfigIsOk": "0x3a6410",
+    "AudioEncoderOpusConfigSetChannels": "0x3a6174",
+    "CreateAudioFrameStereo": "0x115bb1",
+    "DcReject": "0x8d2e30",
+    "Discord_EnableBuiltInAEC": "0x6df90",
+    "Discord_SetAecDump": "0x84ea0",
+    "Discord_SetAudioInputEnabled": "0x87600",
+    "Discord_SetAutomaticGainControl_1": "0x6ef60",
+    "Discord_SetAutomaticGainControl_2": "0x6f270",
+    "Discord_SetDuckingPreference": "0x7fae0",
+    "Discord_SetEchoCancellationPre": "0x6e590",
+    "Discord_SetEchoCancellation_1": "0x6e290",
+    "Discord_SetEchoCancellation_2": "0x6e8a0",
+    "Discord_SetHasFullbandPerformance": "0x89dd0",
+    "Discord_SetIdleJitterBufferFlush": "0x6dc80",
+    "Discord_SetNoiseCancellation": "0x6f280",
+    "Discord_SetNoiseCancellationAfter": "0x70120",
+    "Discord_SetNoiseCancellationDuring": "0x6fe10",
+    "Discord_SetNoiseCancellationStats": "0x6fb00",
+    "Discord_SetNoiseSuppression_1": "0x6e8b0",
+    "Discord_SetNoiseSuppression_2": "0x6ebb0",
+    "Discord_SetSidechainCompression": "0x87900",
+    "DownmixFunc": "0x8cefc0",
+    "Emulate48Khz": "0x531e33",
+    "EmulateBitrateModified": "0x53212a",
+    "EmulateStereoSuccess1": "0x531ccb",
+    "EmulateStereoSuccess2": "0x531cd7",
+    "EncoderConfigInit1": "0x3a617e",
+    "EncoderConfigInit2": "0x3a5a87",
+    "HighPassFilter": "0x53df40",
+    "HighpassCutoffFilter": "0x8d2c50",
+    "MonoDownmixer": "0xd533e",
+    "NetEqDelayMgr_MsPerLossPercent": "0xa9a94d",
+    "OpusPacketLossCvtt1": "0x53333a",
+    "OpusPacketLossCvtt2": "0x5334a7",
+    "Pacer_BlockAudio_Disable": "0x6d7462",
+    "SetsBitrateBitrateValue": "0x533f51",
+    "SetsBitrateBitwiseOr": "0x533f59",
+    "ThrowError": "0x2bc7a0"
+  },
+  "resolution_tiers": {
+    "EmulateStereoSuccess1": "primary",
+    "AudioEncoderOpusConfigSetChannels": "primary",
+    "MonoDownmixer": "primary",
+    "SetsBitrateBitrateValue": "primary",
+    "ThrowError": "primary",
+    "DownmixFunc": "primary",
+    "CreateAudioFrameStereo": "primary",
+    "HighpassCutoffFilter": "primary",
+    "EncoderConfigInit2": "primary",
+    "EmulateStereoSuccess2": "derived(EmulateStereoSuccess1+0xC)",
+    "Emulate48Khz": "derived(EmulateStereoSuccess1+0x168)",
+    "EmulateBitrateModified": "derived(EmulateStereoSuccess1+0x45F)",
+    "HighPassFilter": "derived(EmulateStereoSuccess1+0xC275)",
+    "SetsBitrateBitwiseOr": "derived(SetsBitrateBitrateValue+0x8)",
+    "AudioEncoderOpusConfigIsOk": "derived(AudioEncoderOpusConfigSetChannels+0x29C)",
+    "DcReject": "derived(HighpassCutoffFilter+0x1E0)",
+    "EncoderConfigInit1": "derived(AudioEncoderOpusConfigSetChannels+0xA)",
+    "NetEqDelayMgr_MsPerLossPercent": "extended(neteq-movabs)",
+    "Pacer_BlockAudio_Disable": "extended(pacer-blockaudio)",
+    "OpusPacketLossCvtt1": "extended(opus-cvtt-pair)",
+    "OpusPacketLossCvtt2": "extended(opus-cvtt-pair)",
+    "Discord_SetAutomaticGainControl_1": "extended(discord-api+ess-delta)",
+    "Discord_SetAutomaticGainControl_2": "extended(discord-api+ess-delta)",
+    "Discord_SetNoiseSuppression_1": "extended(discord-api+ess-delta)",
+    "Discord_SetNoiseSuppression_2": "extended(discord-api+ess-delta)",
+    "Discord_SetEchoCancellation_1": "extended(discord-api+ess-delta)",
+    "Discord_SetEchoCancellation_2": "extended(discord-api+ess-delta)",
+    "Discord_SetEchoCancellationPre": "extended(discord-api+ess-delta)",
+    "Discord_EnableBuiltInAEC": "extended(discord-api+ess-delta)",
+    "Discord_SetNoiseCancellation": "extended(discord-api+ess-delta)",
+    "Discord_SetNoiseCancellationAfter": "extended(discord-api+ess-delta)",
+    "Discord_SetNoiseCancellationDuring": "extended(discord-api+ess-delta)",
+    "Discord_SetNoiseCancellationStats": "extended(discord-api+ess-delta)",
+    "Discord_SetSidechainCompression": "extended(discord-api+ess-delta)",
+    "Discord_SetHasFullbandPerformance": "extended(discord-api+ess-delta)",
+    "Discord_SetDuckingPreference": "extended(discord-api+ess-delta)",
+    "Discord_SetIdleJitterBufferFlush": "extended(discord-api+ess-delta)",
+    "Discord_SetAudioInputEnabled": "extended(discord-api+ess-delta)",
+    "Discord_SetAecDump": "extended(discord-api+ess-delta)"
+  },
+  "total_found": 39,
+  "total_expected": 18,
+  "pe_timestamp": 1776704491,
+  "pe_build_time": "2026-04-20T17:01:31+00:00",
+  "image_base": "0x180000000",
+  "patches": [
+    {
+      "name": "CreateAudioFrameStereo",
+      "file_offset": 1134513,
+      "file_offset_hex": "0x114fb1",
+      "expected_original": null,
+      "length": 4
+    },
+    {
+      "name": "AudioEncoderOpusConfigSetChannels",
+      "file_offset": 3822964,
+      "file_offset_hex": "0x3a5574",
+      "expected_original": "01",
+      "length": 1
+    },
+    {
+      "name": "MonoDownmixer",
+      "file_offset": 870206,
+      "file_offset_hex": "0xd473e",
+      "expected_original": "84C0",
+      "length": 2
+    },
+    {
+      "name": "EmulateStereoSuccess1",
+      "file_offset": 5443787,
+      "file_offset_hex": "0x5310cb",
+      "expected_original": "01",
+      "length": 1
+    },
+    {
+      "name": "EmulateStereoSuccess2",
+      "file_offset": 5443799,
+      "file_offset_hex": "0x5310d7",
+      "expected_original": "75",
+      "length": 1
+    },
+    {
+      "name": "EmulateBitrateModified",
+      "file_offset": 5444906,
+      "file_offset_hex": "0x53152a",
+      "expected_original": null,
+      "length": 3
+    },
+    {
+      "name": "SetsBitrateBitrateValue",
+      "file_offset": 5452625,
+      "file_offset_hex": "0x533351",
+      "expected_original": null,
+      "length": 5
+    },
+    {
+      "name": "SetsBitrateBitwiseOr",
+      "file_offset": 5452633,
+      "file_offset_hex": "0x533359",
+      "expected_original": "4809C1",
+      "length": 3
+    },
+    {
+      "name": "Emulate48Khz",
+      "file_offset": 5444147,
+      "file_offset_hex": "0x531233",
+      "expected_original": "0F42C1",
+      "length": 3
+    },
+    {
+      "name": "HighPassFilter",
+      "file_offset": 5493568,
+      "file_offset_hex": "0x53d340",
+      "expected_original": null,
+      "length": 11
+    },
+    {
+      "name": "HighpassCutoffFilter",
+      "file_offset": 9248848,
+      "file_offset_hex": "0x8d2050",
+      "expected_original": null,
+      "length": 256
+    },
+    {
+      "name": "DcReject",
+      "file_offset": 9249328,
+      "file_offset_hex": "0x8d2230",
+      "expected_original": null,
+      "length": 438
+    },
+    {
+      "name": "DownmixFunc",
+      "file_offset": 9233344,
+      "file_offset_hex": "0x8ce3c0",
+      "expected_original": "41",
+      "length": 1
+    },
+    {
+      "name": "AudioEncoderOpusConfigIsOk",
+      "file_offset": 3823632,
+      "file_offset_hex": "0x3a5810",
+      "expected_original": "8B1131C0",
+      "length": 4
+    },
+    {
+      "name": "ThrowError",
+      "file_offset": 2866080,
+      "file_offset_hex": "0x2bbba0",
+      "expected_original": "41",
+      "length": 1
+    },
+    {
+      "name": "EncoderConfigInit1",
+      "file_offset": 3822974,
+      "file_offset_hex": "0x3a557e",
+      "expected_original": "007D0000",
+      "length": 4
+    },
+    {
+      "name": "EncoderConfigInit2",
+      "file_offset": 3821191,
+      "file_offset_hex": "0x3a4e87",
+      "expected_original": "007D0000",
+      "length": 4
+    }
+  ]
+}

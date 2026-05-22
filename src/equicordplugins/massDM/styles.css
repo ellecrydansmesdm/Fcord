@@ -1,0 +1,315 @@
+/* ── Mass DM Plugin ── */
+
+.mdm-modal {
+    width: 620px;
+    max-width: 90vw;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.mdm-idle-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.mdm-full-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.mdm-left-panel {
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+}
+
+.mdm-right-panel {
+    flex: 0.8;
+    display: flex;
+    flex-direction: column;
+    min-width: 220px;
+}
+
+.mdm-textarea-main {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 200px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.mdm-textarea-main:focus {
+    outline: none;
+    border-color: var(--brand-experiment);
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.mdm-mention-hint {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    background: var(--background-secondary-alt);
+    border: 1px solid var(--brand-experiment);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    overflow: hidden;
+    cursor: pointer;
+    animation: mdm-fade-in 0.15s ease-out;
+}
+
+.mdm-mention-hint-item {
+    padding: 10px 15px;
+    color: #fff;
+    font-size: 13px;
+    transition: background 0.1s;
+}
+
+.mdm-mention-hint-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.mdm-mention-hint-item strong {
+    color: var(--brand-experiment);
+}
+
+@keyframes mdm-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mdm-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--background-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mdm-content {
+    padding: 20px;
+    background: var(--background-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mdm-label {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.mdm-textarea {
+    width: 100%;
+    background: var(--background-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #fff;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.mdm-textarea:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.mdm-friend-list {
+    flex: 1;
+    max-height: 250px;
+    background: var(--background-tertiary);
+    border-radius: 8px;
+    padding: 0;
+}
+
+.mdm-friend-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.1s;
+    user-select: none;
+}
+
+.mdm-friend-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.mdm-friend-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 12px;
+}
+
+.mdm-friend-name {
+    flex: 1;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+}
+
+.mdm-no-friends {
+    padding: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+}
+
+.mdm-warn {
+    color: #fff;
+    font-size: 12px;
+    margin: 0;
+}
+
+.mdm-warn strong {
+    color: #fff;
+}
+
+/* ── Progression ── */
+
+.mdm-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.mdm-stats-count {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mdm-stats-pct {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+}
+
+.mdm-bar-bg {
+    height: 8px;
+    background: var(--background-modifier-accent);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.mdm-bar-fill {
+    height: 100%;
+    background: var(--brand-experiment);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+.mdm-done {
+    color: var(--status-positive-text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.mdm-log {
+    max-height: 150px;
+    background: var(--background-tertiary);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mdm-log-line {
+    color: #fff;
+    font-size: 12px;
+    font-family: var(--font-code);
+    margin-bottom: 2px;
+}
+
+.mdm-badge {
+    margin-right: 12px;
+    background: var(--brand-experiment);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    animation: mdm-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes mdm-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ── Editable Delay ── */
+
+.mdm-delay-value {
+    color: var(--text-link);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+    font-weight: bold;
+}
+
+.mdm-delay-value:hover {
+    text-decoration-style: solid;
+}
+
+.mdm-delay-input {
+    width: 60px;
+    background: var(--background-tertiary);
+    border: 1px solid var(--brand-experiment);
+    border-radius: 4px;
+    color: var(--text-normal);
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    text-align: center;
+    font-weight: bold;
+}
+
+.mdm-delay-input::-webkit-inner-spin-button,
+.mdm-delay-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

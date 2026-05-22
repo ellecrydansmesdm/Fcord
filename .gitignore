@@ -1,0 +1,62 @@
+dist
+node_modules
+.VSCodeCounter
+
+*.exe
+vencord_installer
+equicord_installer
+
+.idea
+.DS_Store
+
+yarn.lock
+bun.lock
+package-lock.json
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+
+.modules/
+src/userplugins
+
+ExtensionCache/
+/settings
+
+# vencord companion module cache
+.modules
+
+# wakatime related stuff
+.wakatime-project
+
+# build outputs & binaries
+release/
+build/
+dist/
+
+# IDE settings
+.vscode/
+
+# backup & temp files
+*.patch.txt
+
+# Test and local dev directories
+test-dist/
+test-userdata/
+test-app/
+
+# Environment & credentials
+.env
+.env.*
+*.env
+*.pem
+*.key
+certs/
+
+# System files
+Thumbs.db
+Desktop.ini

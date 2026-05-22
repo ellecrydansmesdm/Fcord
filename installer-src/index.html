@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nightcord Installer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+    :root {
+      --bg:        #0b0b18;
+      --surface:   #11112a;
+      --border:    #1e1e45;
+      --accent:    #7b6cff;
+      --accent2:   #c084fc;
+      --glow:      rgba(123,108,255,0.25);
+      --text:      #e2e0ff;
+      --muted:     #6b6a99;
+      --success:   #4ade80;
+      --error:     #f87171;
+      --warn:      #fbbf24;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-app-region: no-drag;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(123,108,255,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 80%, rgba(192,132,252,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(123,108,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,108,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 42px;
+      -webkit-app-region: drag;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11,11,24,0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .titlebar-left { display: flex; align-items: center; gap: 10px; }
+
+    .logo-mark {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .titlebar-title {
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+    }
+
+    .titlebar-controls { display: flex; gap: 8px; -webkit-app-region: no-drag; }
+    .titlebar-controls button {
+      width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; transition: opacity .2s;
+    }
+    .titlebar-controls button:hover { opacity: 0.8; }
+    .btn-close    { background: #ff5f57; }
+    .btn-minimize { background: #febc2e; }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 40px 24px;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    .header { display: flex; flex-direction: column; gap: 4px; }
+
+    .header h1 {
+      font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1;
+      background: linear-gradient(135deg, var(--text) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em;
+    }
+
+    .section-row {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+    }
+
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--muted);
+    }
+
+    .btn-manual {
+      font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      background: rgba(123,108,255,0.1); color: var(--accent);
+      border: 1px solid rgba(123,108,255,0.25); border-radius: 5px;
+      padding: 3px 10px; cursor: pointer; transition: background .15s;
+    }
+    .btn-manual:hover { background: rgba(123,108,255,0.2); }
+
+    .manual-input-row {
+      display: none; gap: 8px; margin-bottom: 10px;
+    }
+    .manual-input-row.visible { display: flex; }
+
+    .manual-input-row input {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px; color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: 10px; outline: none;
+      transition: border-color .15s;
+    }
+    .manual-input-row input:focus { border-color: var(--accent); }
+
+    .manual-input-row button {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer;
+    }
+
+    .discord-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 270px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .discord-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .discord-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .discord-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+    .discord-list::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+
+    .discord-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      cursor: pointer; transition: all .15s ease;
+      position: relative; overflow: hidden;
+      animation: fadeSlide .3s ease both;
+    }
+
+    .discord-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, var(--glow), transparent);
+      opacity: 0; transition: opacity .2s;
+    }
+
+    .discord-card:hover { border-color: var(--accent); }
+    .discord-card:hover::before { opacity: 1; }
+    .discord-card.selected { border-color: var(--accent); background: rgba(123,108,255,0.08); }
+    .discord-card.selected::before { opacity: 1; }
+
+    .card-left { display: flex; align-items: center; gap: 12px; }
+
+    .card-icon {
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    .card-icon.manual  { background: rgba(107,106,153,0.2); border-radius: 8px; }
+
+    .card-info h3 { font-size: 13px; font-weight: 700; color: var(--text); }
+
+    .card-path {
+      font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted);
+      margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px;
+    }
+
+    .card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    .badge {
+      font-family: 'Space Mono', monospace; font-size: 9px;
+      padding: 3px 8px; border-radius: 4px; font-weight: 700; letter-spacing: 0.05em;
+    }
+
+    .badge-version  { background: rgba(123,108,255,0.15); color: var(--accent); }
+    .badge-injected { background: rgba(74,222,128,0.15);  color: var(--success); }
+    .badge-clean    { background: rgba(107,106,153,0.15); color: var(--muted); }
+
+    .radio {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--border); transition: all .15s; flex-shrink: 0;
+    }
+
+    .discord-card.selected .radio {
+      border-color: var(--accent); background: var(--accent); box-shadow: 0 0 8px var(--glow);
+    }
+
+    .empty-state { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+    .actions { display: flex; gap: 12px; margin-top: auto; }
+
+    .btn {
+      flex: 1; padding: 13px 24px; border-radius: 10px; border: none;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.05em; cursor: pointer; transition: all .15s;
+    }
+
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; box-shadow: 0 4px 24px rgba(123,108,255,0.4);
+    }
+    .btn-primary:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(123,108,255,0.5); }
+    .btn-primary:not(:disabled):active { transform: translateY(0); }
+
+    .btn-danger {
+      background: rgba(248,113,113,0.1); color: var(--error);
+      border: 1px solid rgba(248,113,113,0.25);
+    }
+    .btn-danger:not(:disabled):hover { background: rgba(248,113,113,0.18); border-color: var(--error); }
+
+    .status-bar {
+      font-family: 'Space Mono', monospace; font-size: 10px;
+      padding: 10px 40px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(11,11,24,0.6);
+    }
+
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.idle    { background: var(--muted); }
+    .status-dot.success { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .status-dot.error   { background: var(--error); box-shadow: 0 0 6px var(--error); }
+    .status-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+    .status-text { color: var(--muted); }
+
+    .progress-overlay {
+      position: fixed; top: 42px; left: 0; right: 0; bottom: 0; background: rgba(11,11,24,0.85);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 100; backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .progress-overlay.visible { opacity: 1; pointer-events: all; }
+
+    .loading-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 6px;
+      margin-right: 2px;
+      vertical-align: middle;
+    }
+    .loading-dots span {
+      width: 4px;
+      height: 4px;
+      background-color: var(--accent2);
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+
+    .progress-container {
+      width: 65%;
+      background: rgba(17, 17, 42, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      text-align: center;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .progress-text {
+      font-size: 13px; font-weight: 700; color: var(--text);
+      margin-bottom: 16px; letter-spacing: 0.05em;
+    }
+
+    .progress-bar-bg {
+      width: 100%; height: 6px; background: rgba(123,108,255,0.1);
+      border-radius: 6px; overflow: hidden; position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0%; border-radius: 6px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px var(--glow);
+    }
+
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeSlide { from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none} }
+
+    .discord-card:nth-child(2) { animation-delay: .05s; }
+    .discord-card:nth-child(3) { animation-delay: .10s; }
+    .discord-card:nth-child(4) { animation-delay: .15s; }
+
+    /* Settings Titlebar and Modal Styles */
+    .titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      -webkit-app-region: no-drag;
+    }
+
+    .btn-settings {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    .btn-settings:hover {
+      color: var(--text);
+      background: rgba(123,108,255,0.15);
+      transform: rotate(45deg);
+    }
+
+    .settings-overlay {
+      position: fixed; top: 42px; left: 0; right: 0; bottom: 0; background: rgba(11,11,24,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 150; backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .settings-overlay.visible { opacity: 1; pointer-events: all; }
+
+    .settings-container {
+      width: 65%;
+      background: rgba(17, 17, 42, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .settings-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .settings-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.15s;
+    }
+    .settings-close-btn:hover {
+      color: var(--error);
+    }
+
+    .settings-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .settings-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-setting-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(30, 30, 69, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .btn-setting-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--glow);
+      border-color: var(--accent);
+    }
+    .btn-setting-link:active {
+      transform: translateY(0);
+    }
+
+    .btn-discord:hover {
+      background: rgba(123, 108, 255, 0.15);
+      border-color: #5865F2;
+    }
+    .btn-website:hover {
+      background: rgba(192, 132, 252, 0.15);
+      border-color: var(--accent2);
+    }
+    .btn-github:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #ffffff;
+    }
+
+    .btn-link-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="titlebar">
+      <div class="titlebar-left">
+        <img src="{{ICON_BASE64}}" class="logo-mark" />
+        <span class="titlebar-title" style="cursor: pointer;" onclick="window.nightcord.openUrl('https://nightcord.online/')">Nightcord Installer</span>
+      </div>
+      <div class="titlebar-right">
+        <button class="btn-settings" onclick="toggleSettingsModal()" title="Settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <div class="titlebar-controls">
+          <button class="btn-minimize" onclick="window.nightcord.minimizeApp()"></button>
+          <button class="btn-close" onclick="window.nightcord.closeApp()"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="header">
+        <h1>Nightcord</h1>
+        <p>// discord client mod — select your installation target</p>
+      </div>
+
+      <div>
+        <div class="section-row">
+          <div class="section-label">Detected Discord Installations</div>
+          <button class="btn-manual" onclick="toggleManual()">+ Manual Path</button>
+        </div>
+
+        <div class="manual-input-row" id="manual-row">
+          <input id="manual-path" type="text"
+            placeholder="C:\Users\You\AppData\Local\Discord\app-1.0.9171\resources" />
+          <button onclick="addManualPath()">OK</button>
+        </div>
+
+        <div class="discord-list" id="discord-list">
+          <div class="empty-state">Searching for Discord installations...</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btn-inject" disabled onclick="handleInject()">
+          Inject Nightcord
+        </button>
+        <button class="btn btn-danger" id="btn-uninject" disabled onclick="handleUninject()">
+          Uninject
+        </button>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot idle" id="status-dot"></div>
+      <span class="status-text" id="status-text">Waiting for selection...</span>
+    </div>
+  </div>
+
+  <div class="progress-overlay" id="progress-overlay">
+    <div class="progress-container">
+      <div class="progress-text" id="progress-text">Preparing injection...</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-overlay" id="settings-overlay" onclick="closeSettingsModal(event)">
+    <div class="settings-container" onclick="event.stopPropagation()">
+      <div class="settings-header">
+        <h2>Nightcord Links & Settings</h2>
+        <button class="settings-close-btn" onclick="toggleSettingsModal()">✕</button>
+      </div>
+      <div class="settings-content">
+        <p class="settings-desc">Access official Nightcord links and community resources.</p>
+        <div class="settings-buttons">
+          <button class="btn-setting-link btn-discord" onclick="window.nightcord.openUrl('https://discord.gg/nightcord')">
+            <img src="https://i.imgur.com/4TASmRB.png" class="btn-link-icon" style="object-fit:contain;" />
+            <span>Join Discord Server</span>
+          </button>
+          <button class="btn-setting-link btn-website" onclick="window.nightcord.openUrl('https://nightcord.online')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-link-icon">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span>Official Website</span>
+          </button>
+          <button class="btn-setting-link btn-github" onclick="window.nightcord.openUrl('https://github.com/nightcordoff/nightcord')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="btn-link-icon">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.11.82-.26.82-.577v-2.17c-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.73.083-.73 1.205.084 1.84 1.237 1.84 1.237 1.07 1.835 2.807 1.305 3.492.998.108-.775.42-1.305.763-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.467-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.98-.398 3-.403 1.02.005 2.043.137 3 .403 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.24 2.873.118 3.176.77.84 1.233 1.91 1.233 3.22 0 4.61-2.803 5.625-5.475 5.92.43.37.823 1.102.823 2.222v3.293c0 .32.218.694.825.577C20.565 21.797 24 17.298 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            <span>GitHub Repository</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ICONS = {
+      'Discord':        { html: '<img src="https://i.imgur.com/4TASmRB.png" style="width:38px;height:38px;object-fit:contain;" />', cls: 'stable' },
+      'Discord PTB':    { html: '<img src="https://i.imgur.com/4TASmRB.png" style="width:38px;height:38px;object-fit:contain;" />', cls: 'ptb' },
+      'Discord Canary': { html: '<img src="https://i.imgur.com/7aI9oWr.png" style="width:28px;height:28px;object-fit:contain;" />', cls: 'canary' },
+      'Discord Dev':    { html: '<img src="https://i.imgur.com/7aI9oWr.png" style="width:28px;height:28px;object-fit:contain;" />', cls: 'dev' },
+    };
+
+    let discords = [];
+    let selected = null;
+
+    function setStatus(type, text) {
+      document.getElementById('status-dot').className = `status-dot ${type}`;
+      document.getElementById('status-text').textContent = text;
+    }
+
+    function setLoading(v, text = "Loading...", percent = 100) {
+      document.getElementById('progress-overlay').classList.toggle('visible', v);
+      if (v) {
+        document.getElementById('progress-text').innerHTML = `
+          <span style="vertical-align: middle;">${text}</span>
+          <span class="loading-dots"><span></span><span></span><span></span></span>
+          <span style="color: var(--accent2); font-weight: 800; font-family: 'Space Mono', monospace; margin-left: 8px; vertical-align: middle;">${Math.round(percent)}%</span>
+        `;
+        document.getElementById('progress-fill').style.width = percent + '%';
+      } else {
+        setTimeout(() => { document.getElementById('progress-fill').style.width = '0%'; }, 300);
+      }
+    }
+
+    function toggleManual() {
+      const row = document.getElementById('manual-row');
+      row.classList.toggle('visible');
+      if (row.classList.contains('visible')) document.getElementById('manual-path').focus();
+    }
+
+    async function addManualPath() {
+      const input = document.getElementById('manual-path');
+      const p = input.value.trim();
+      if (!p) return;
+
+      const injected = await window.nightcord.isInjected(p);
+      const entry = {
+        name: 'Manual',
+        path: p,
+        asarPath: p + '\\app.asar',
+        exePath: null,
+        version: '?'
+      };
+      discords.push(entry);
+      renderCard(entry, discords.length - 1, injected, 'manual');
+      selectDiscord(discords.length - 1);
+      input.value = '';
+      document.getElementById('manual-row').classList.remove('visible');
+    }
+
+    async function loadDiscords() {
+      setStatus('loading', 'Detecting Discord installations...');
+
+      try {
+        const found = await window.nightcord.detectDiscord();
+        discords = found || [];
+      } catch(e) {
+        discords = [];
+      }
+
+      const list = document.getElementById('discord-list');
+      list.innerHTML = '';
+
+      if (discords.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            ⚠️ No Discord installations found automatically.<br>
+            <span style="font-size:11px;margin-top:6px;display:block;">
+              Use the <strong style="color:var(--accent)">+ Manual Path</strong> button to enter the path manually.
+            </span>
+          </div>`;
+        setStatus('error', 'No installations auto-detected — use manual path.');
+        return;
+      }
+
+      for (let i = 0; i < discords.length; i++) {
+        const d = discords[i];
+        const icon = ICONS[d.name] || { emoji: '⚪', cls: 'stable' };
+        let injected = false;
+        try { injected = await window.nightcord.isInjected(d.path); } catch {}
+        renderCard(d, i, injected, icon.cls);
+      }
+
+      setStatus('idle', 'Select an installation target.');
+    }
+
+    function renderCard(d, i, injected, iconCls) {
+      const list = document.getElementById('discord-list');
+      const icon = ICONS[d.name] || { emoji: '⚙️', cls: iconCls };
+
+      const card = document.createElement('div');
+      card.className = 'discord-card';
+      card.dataset.index = i;
+      card.innerHTML = `
+        <div class="card-left">
+          <div class="card-icon ${icon.cls || iconCls}">${icon.html || icon.emoji || '⚙️'}</div>
+          <div class="card-info">
+            <h3>${d.name}</h3>
+            <div class="card-path">${d.path}</div>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="badge badge-version">v${d.version}</span>
+          <span class="badge ${injected ? 'badge-injected' : 'badge-clean'}">${injected ? '✓ injected' : 'clean'}</span>
+          <div class="radio"></div>
+        </div>
+      `;
+      card.addEventListener('click', () => selectDiscord(i));
+      list.appendChild(card);
+    }
+
+    function selectDiscord(index) {
+      selected = discords[index];
+      document.querySelectorAll('.discord-card').forEach((c, i) => {
+        c.classList.toggle('selected', i === index);
+      });
+      document.getElementById('btn-inject').disabled = false;
+      document.getElementById('btn-uninject').disabled = false;
+      setStatus('idle', `Selected: ${selected.name} — ${selected.path}`);
+    }
+
+    function toggleSettingsModal() {
+      const overlay = document.getElementById('settings-overlay');
+      overlay.classList.toggle('visible');
+    }
+
+    function closeSettingsModal(event) {
+      const overlay = document.getElementById('settings-overlay');
+      overlay.classList.remove('visible');
+    }
+
+    async function handleInject() {
+      if (!selected) return;
+      
+      setLoading(true, "Preparing installation...", 5);
+      setStatus('loading', `Injecting into ${selected.name}...`);
+      
+      // Real C# injection call
+      const result = await window.nightcord.inject(selected.path);
+      
+      if (result.success) {
+        setLoading(true, "Finalizing installation...", 100);
+        setTimeout(async () => {
+          setLoading(false);
+          setStatus('success', `✓ Nightcord injected into ${selected.name}! Restart Discord.`);
+          await loadDiscords();
+          const idx = discords.findIndex(d => d.path === selected.path);
+          if (idx !== -1) selectDiscord(idx);
+        }, 700);
+      } else {
+        setLoading(false);
+        setStatus('error', `Error: ${result.error}`);
+      }
+    }
+
+    async function handleUninject() {
+      if (!selected) return;
+      
+      setLoading(true, "Preparing uninjection...", 5);
+      setStatus('loading', `Uninjecting from ${selected.name}...`);
+      
+      // Real C# uninjection call
+      const result = await window.nightcord.uninject(selected.path);
+      
+      if (result.success) {
+        setLoading(true, "Completed", 100);
+        setTimeout(async () => {
+          setLoading(false);
+          setStatus('success', `✓ Nightcord uninjected from ${selected.name}.`);
+          await loadDiscords();
+        }, 600);
+      } else {
+        setLoading(false);
+        setStatus('error', `Error: ${result.error}`);
+      }
+    }
+
+    // Init
+    loadDiscords();
+  </script>
+</body>
+</html>

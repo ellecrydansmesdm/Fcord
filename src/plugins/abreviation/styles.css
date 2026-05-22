@@ -1,0 +1,11 @@
+/* Force white/light text in Abreviation plugin settings */
+[class*="plugin-Abreviation"] [class*="description"],
+[class*="plugin-Abreviation"] [class*="title"],
+[class*="plugin-Abreviation"] [class*="labelRow"],
+[class*="plugin-Abreviation"] [class*="note"],
+[class*="plugin-Abreviation"] [class*="formText"],
+[class*="plugin-Abreviation"] label,
+[class*="plugin-Abreviation"] p,
+[class*="plugin-Abreviation"] span {
+    color: var(--text-normal) !important;
+}

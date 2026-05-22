@@ -1,0 +1,49 @@
+name: Build & Release Nightcord
+
+on:
+  push:
+    tags:
+      - "v*"          # déclenché sur : git tag v1.0.0 && git push --tags
+
+permissions:
+  contents: write    # nécessaire pour créer la GitHub Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Equicord renderer (standalone)
+        run: pnpm buildStandalone
+
+      - name: Build & Package Electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node electron-builder.config.cjs || true
+          npx electron-builder --config electron-builder.config.cjs --win --publish always
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightcord-windows
+          path: release/*.exe
+          retention-days: 7
