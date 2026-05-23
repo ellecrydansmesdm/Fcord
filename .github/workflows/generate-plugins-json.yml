@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - "src/nightcordplugins/**"
+      - "src/plugins/**"
       - "src/utils/constants.ts"
       - "scripts/generatePluginList.ts"
       - "scripts/utils.ts"
@@ -35,7 +36,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate plugins.json
-        run: pnpm generateEquicordPluginJson plugins.json
+        run: pnpm generatePluginJson plugins.json
 
       - name: Commit and push plugins.json
         uses: stefanzweifel/git-auto-commit-action@v5
