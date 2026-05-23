@@ -47,8 +47,12 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
             readdirSync(dir, { withFileTypes: true })
                 .filter(isPluginFile)
                 .map(async dirent => {
-                    const [data] = await parseFile(await getEntryPoint(dir, dirent));
-                    plugins.sort().push(data);
+                    try {
+                        const [data] = await parseFile(await getEntryPoint(dir, dirent));
+                        plugins.sort().push(data);
+                    } catch (e) {
+                        console.warn(`[SKIP] ${dir}/${dirent.name}: ${(e as Error).message}`);
+                    }
                 })
         )
     );
