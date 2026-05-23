@@ -131,13 +131,26 @@ const patchMessageContextMenu: NavContextMenuPatchCallback = (
                         id,
                         mlDeleted: true,
                     });
-                    // Force immediate UI re-render — without this the message
-                    // stays visible until the user navigates away and back.
-                    // We schedule after the dispatch so the store has already
-                    // processed the removal before we trigger the update.
-                    Promise.resolve().then(() => updateMessage(channel_id, id));
+                    // Two microtask ticks: first lets MessageStore's handler process the deletion,
+                    // second ensures React has batched it, then we call updateMessage to force
+                    // the component to re-render and remove the message from view immediately.
+                    Promise.resolve().then(() =>
+                        Promise.resolve().then(() => updateMessage(channel_id, id))
+                    );
                 } else {
-                    updateMessage(channel_id, id, { editHistory: [] });
+                    // Clear all edit-related state on the cached message object directly
+                    // so React sees the change immediately without needing a channel switch.
+                    const cached = MessageStore.getMessage(channel_id, id) as any;
+                    if (cached) {
+                        delete cached.__messageloggerAggregated;
+                        delete cached.__messageloggerLastAppliedKey;
+                        delete cached.customRenderedContent;
+                    }
+                    // Two microtask ticks: first clears state, second forces the re-render.
+                    updateMessage(channel_id, id, { editHistory: [], customRenderedContent: null });
+                    Promise.resolve().then(() =>
+                        Promise.resolve().then(() => updateMessage(channel_id, id))
+                    );
                 }
             }}
         />,
@@ -829,12 +842,12 @@ export default definePlugin({
             find: '"ReferencedMessageStore"',
             replacement: [
                 {
-                    match: /(?<=MESSAGE_DELETE:function\(\i\)\{)/,
-                    replace: "return;"
+                    match: /(?<=MESSAGE_DELETE:function\((\i)\)\{)/,
+                    replace: "if($1.mlDeleted) return;"
                 },
                 {
-                    match: /(?<=MESSAGE_DELETE_BULK:function\(\i\)\{)/,
-                    replace: "return;"
+                    match: /(?<=MESSAGE_DELETE_BULK:function\((\i)\)\{)/,
+                    replace: "if($1.mlDeleted) return;"
                 }
             ]
         },
