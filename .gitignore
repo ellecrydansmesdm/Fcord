@@ -37,6 +37,8 @@ ExtensionCache/
 release/
 build/
 dist/
+# Exception : scripts/build/ contient les scripts de compilation et doit être versionné
+!scripts/build/
 
 # IDE settings
 .vscode/
