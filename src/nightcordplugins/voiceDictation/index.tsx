@@ -153,10 +153,9 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
                     }
                 }
                 
-                const webDevs = await navigator.mediaDevices.enumerateDevices();
+                let webDevs = await navigator.mediaDevices.enumerateDevices();
                 
                 if (!targetName) return "default";
-                let webDevs = await navigator.mediaDevices.enumerateDevices();
                 if (webDevs.some(d => d.kind === "audioinput" && !d.label)) {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     stream.getTracks().forEach(t => t.stop());
@@ -215,6 +214,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
                 } else {
                     throw firstErr;
                 }
+            }
             }
         } catch (err) {
             console.error("[VoiceDictation] Error getting specific device:", err);
