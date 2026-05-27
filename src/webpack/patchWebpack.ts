@@ -308,7 +308,7 @@ function updateExistingFactory(moduleFactories: AnyWebpackRequire["m"], moduleId
     let existingFactory: AnyModuleFactory | undefined;
     let moduleFactoriesWithFactory: AnyWebpackRequire["m"] | undefined;
     for (const wreq of allWebpackInstances) {
-        const instanceModuleFactories = wreq.m[SYM_ORIGINAL_MODULE_FACTORIES] ?? wreq.m;
+        const instanceModuleFactories = (wreq.m as any)[SYM_ORIGINAL_MODULE_FACTORIES] ?? wreq.m;
 
         if (ignoreExistingInTarget && instanceModuleFactories === moduleFactories) {
             continue;

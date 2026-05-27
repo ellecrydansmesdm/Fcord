@@ -5,14 +5,14 @@
  */
 
 import { openPluginModal } from "@components/settings/tabs/plugins/PluginModal";
-import { ModalContent, ModalFooter,ModalRoot, openModal } from "@utils/modal";
+import { ModalContent, ModalFooter, ModalRoot, ModalSize, openModal } from "@utils/modal";
 import { React } from "@webpack/common";
 
 import Plugins from "~plugins";
 
 function ApiKeyWarningModal({ pluginName, onClose }: { pluginName: string; onClose: () => void; }) {
     return (
-        <ModalRoot transitionState={1 as any} size="small">
+        <ModalRoot transitionState={1 as any} size={ModalSize.SMALL}>
             <ModalContent style={{ padding: "24px 20px 8px" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, textAlign: "center" }}>
                     <svg width={40} height={40} viewBox="0 0 24 24" fill="none">
@@ -28,40 +28,42 @@ function ApiKeyWarningModal({ pluginName, onClose }: { pluginName: string; onClo
                     </div>
                 </div>
             </ModalContent>
-            <ModalFooter style={{ display: "flex", justifyContent: "center", gap: 8, padding: "12px 20px 20px" }}>
-                <button
-                    style={{
-                        background: "var(--brand-experiment)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        padding: "8px 20px",
-                        fontSize: 14,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                    }}
-                    onClick={() => {
-                        onClose();
-                        const plugin = Plugins.NightcordAI;
-                        if (plugin) openPluginModal(plugin);
-                    }}
-                >
-                    Configurer NightcordAI
-                </button>
-                <button
-                    style={{
-                        background: "var(--background-modifier-hover)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        padding: "8px 16px",
-                        fontSize: 14,
-                        cursor: "pointer",
-                    }}
-                    onClick={onClose}
-                >
-                    Annuler
-                </button>
+            <ModalFooter>
+                <div style={{ display: "flex", justifyContent: "center", gap: 8, padding: "12px 20px 20px", width: "100%" }}>
+                    <button
+                        style={{
+                            background: "var(--brand-experiment)",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 4,
+                            padding: "8px 20px",
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                        }}
+                        onClick={() => {
+                            onClose();
+                            const plugin = Plugins.NightcordAI;
+                            if (plugin) openPluginModal(plugin);
+                        }}
+                    >
+                        Configurer NightcordAI
+                    </button>
+                    <button
+                        style={{
+                            background: "var(--background-modifier-hover)",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 4,
+                            padding: "8px 16px",
+                            fontSize: 14,
+                            cursor: "pointer",
+                        }}
+                        onClick={onClose}
+                    >
+                        Annuler
+                    </button>
+                </div>
             </ModalFooter>
         </ModalRoot>
     );
