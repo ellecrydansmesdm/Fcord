@@ -25,7 +25,7 @@ import { serializeErrors } from "./common";
 
 if (!IS_UPDATER_DISABLED) {
     // Nightcord utilise toujours le mode HTTP (GitHub Releases)
-    // IS_STANDALONE est false quand injecté dans Discord, mais on veut quand même http.ts
+    // IS_STANDALONE is false when injected into Discord, but we still want http.ts
     require("./http");
 } else {
     ipcMain.handle(IpcEvents.GET_REPO, serializeErrors(() => `https://github.com/${gitRemote}`));

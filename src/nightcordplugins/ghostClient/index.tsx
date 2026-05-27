@@ -325,8 +325,8 @@ function useStreamPoller(userId: string | null, active: boolean) {
                     body: JSON.stringify({ userId }),
                 });
                 const d = await r.json();
-                if (d.state === "resolving") setStatus("🔍 Résolution de l'URL...");
-                else if (d.state === "starting") setStatus("⏳ Démarrage du stream...");
+                if (d.state === "resolving") setStatus("🔍 Resolving URL...");
+                else if (d.state === "starting") setStatus("⏳ Starting stream...");
                 else if (d.state === "active") {
                     setStatus("🎥 Stream active");
                     // Stop polling une fois active
@@ -447,7 +447,7 @@ function GhostPopover({ onClose, anchorRect }: { onClose: () => void; anchorRect
         }
         if (added > 0) {
             await saveAccounts(updated);
-            Toasts.show({ message: `${added} account${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""}${failed > 0 ? `, ${failed} failed` : ""}`, type: Toasts.Type.SUCCESS, id: Toasts.genId() });
+            Toasts.show({ message: `${added} account${added > 1 ? "s" : ""} added${failed > 0 ? `, ${failed} failed` : ""}`, type: Toasts.Type.SUCCESS, id: Toasts.genId() });
         } else {
             Toasts.show({ message: `All tokens invalid (${failed})`, type: Toasts.Type.FAILURE, id: Toasts.genId() });
         }
@@ -465,7 +465,7 @@ function GhostPopover({ onClose, anchorRect }: { onClose: () => void; anchorRect
     // Le polling useStreamPoller prend le relais et affiche la progression.
     async function startStream(url: string, userId: string) {
         if (!url.trim()) return;
-        setStreamStatus("Envoi de la requête...");
+        setStreamStatus("Sending request...");
         setIsPolling(false);
         try {
             const r = await fetch("http://127.0.0.1:47821/stream-start", {

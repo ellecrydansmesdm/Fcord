@@ -45,8 +45,8 @@ If you want to dig into the code or build it yourself:
 - [pnpm](https://pnpm.io/installation) — `npm install -g pnpm`
 
 ```bash
-git clone https://github.com/nightcordoff/nightcordclient.git
-cd nightcordclient
+git clone https://github.com/nightcordoff/nightcord.git
+cd nightcord
 pnpm install
 pnpm build
 ```

@@ -124,5 +124,5 @@ function createNightcordMenuItems(): MenuItemConstructorOptions[] {
 }
 
 export function patchTrayMenu(): void {
-    // On ne patch plus le menu tray — Nightcord gère son propre tray dans patcher.ts
+    // No longer patching tray menu — Nightcord manages its own tray in patcher.ts
 }

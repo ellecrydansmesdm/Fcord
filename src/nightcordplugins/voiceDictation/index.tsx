@@ -123,7 +123,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
             streamRef.current = stream;
         } catch (e: any) {
             const msg = e.name === "NotAllowedError" || e.name === "PermissionDeniedError"
-                ? "Permission micro refusée — vérifiez les permissions dans les paramètres de Discord"
+                ? "Microphone permission denied — check permissions in Discord settings"
                 : "Mic unavailable: " + e.message;
             setErrorMsg(msg);
             activeRef.current = false;

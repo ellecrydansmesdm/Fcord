@@ -39,8 +39,8 @@ function FakeDeafenIcon({ className }: { className?: string }) {
 function GhostContextMenu() {
     const [, forceUpdate] = React.useReducer((x: number) => x + 1, 0);
     return (
-        <Menu.Menu navId="fake-voice-menu" aria-label="Configuration Fake Voice">
-            <Menu.MenuGroup label="Options du Fantôme">
+        <Menu.Menu navId="fake-voice-menu" aria-label="Fake Voice Configuration">
+            <Menu.MenuGroup label="Ghost Options">
                 <Menu.MenuCheckboxItem
                     id="opt-both"
                     label="Fake Mute & Deafen"
@@ -86,7 +86,7 @@ function FakeDeafenUserButton({ iconForeground, hideTooltips, nameplate }: UserA
                 forceUpdate();
             }}
             onContextMenu={(e: React.MouseEvent) => ContextMenuApi.openContextMenu(e, () => <GhostContextMenu />)}
-            tooltipText={hideTooltips ? undefined : isGhostActive ? "Désactiver Fake Voice" : "Activer Fake Voice (Droit: Config)"}
+            tooltipText={hideTooltips ? undefined : isGhostActive ? "Disable Fake Voice" : "Enable Fake Voice (Right: Config)"}
             icon={<FakeDeafenIcon className={iconForeground} />}
             role="switch"
             aria-checked={isGhostActive}
@@ -136,7 +136,7 @@ export default definePlugin({
                 configFakeMute = !configFakeMute;
                 isGhostActive = configFakeMute;
                 syncState();
-                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Mute** est ${isGhostActive ? "activé" : "désactivé"}.` });
+                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Mute** is ${isGhostActive ? "enabled" : "disabled"}.` });
             },
         },
         {
@@ -147,20 +147,20 @@ export default definePlugin({
                 configFakeDeafen = !configFakeDeafen;
                 isGhostActive = configFakeDeafen;
                 syncState();
-                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen** est ${isGhostActive ? "activé" : "désactivé"}.` });
+                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen** is ${isGhostActive ? "enabled" : "disabled"}.` });
             },
         },
         {
             inputType: ApplicationCommandInputType.BUILT_IN,
             name: "fakedeafen_mute",
-            description: "Toggle Fake Deafen & Mute simultanément",
+            description: "Toggle Fake Deafen & Mute simultaneously",
             execute: async (_, ctx) => {
                 const next = !(configFakeMute && configFakeDeafen);
                 configFakeMute = next;
                 configFakeDeafen = next;
                 isGhostActive = next;
                 syncState();
-                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen & Mute** sont ${isGhostActive ? "activés" : "désactivés"}.` });
+                sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen & Mute** are ${isGhostActive ? "enabled" : "disabled"}.` });
             },
         },
     ],

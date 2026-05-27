@@ -57,7 +57,7 @@ function patchLatest() {
             name: "discord",
             main: "index.js"
         }));
-        // Chemin relatif pour la portabilité (fonctionne sur n'importe quelle machine)
+        // Relative path for portability (works on any machine)
         writeFileSync(join(app, "index.js"), "// Nightcord repatch\n\"use strict\";\nconst path = require(\"path\");\nrequire(path.join(__dirname, \"..\", \"app\", \"dist\", \"desktop\", \"patcher.js\"));");
     } catch (err) {
         console.error("[Nightcord] Failed to repatch latest host update", err);

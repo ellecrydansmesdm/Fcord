@@ -116,7 +116,7 @@ if (watch) {
 		}
 	}
 
-	// Obfuscation post-build (désactivée en mode dev)
+	// Post-build obfuscation (disabled in dev mode)
 	if (!isDev) {
 		await obfuscateDistJs();
 	}

@@ -793,7 +793,7 @@ function subscribeToEvents() {
     });
 
     // Capture logout/disconnect (partiel car le plugin s'arrête si déco totale)
-    sub("LOGOUT", () => { pushLog({ type: "user_disconnect", content: t("Déconnexion du account"), authorName: "Système" }); });
+    sub("LOGOUT", () => { pushLog({ type: "user_disconnect", content: t("Déconnexion du account"), authorName: "System" }); });
 }
 
 export default definePlugin({

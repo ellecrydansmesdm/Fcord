@@ -143,7 +143,7 @@ export default definePlugin({
                     if (anchorState && typeof res === "string" &&
                         (res.toLowerCase().includes("disconnected") || res.toLowerCase().includes("location") || res.includes("déconnecté")) &&
                         (res.includes("autre") || res.includes("location") || res.includes("another"))) {
-                        return "Canal ancré. Pour rester dans 2 salons, rejoignez un second canal !";
+                        return "Channel anchored. To stay in 2 channels, join a second channel!";
                     }
                     return res;
                 };

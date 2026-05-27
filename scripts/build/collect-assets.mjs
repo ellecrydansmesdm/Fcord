@@ -104,7 +104,7 @@ for (const c of nodeCandidates) {
 }
 if (!foundNode) console.warn("[collect] ⚠️ node.exe NOT FOUND");
 
-// ── modules (discord_voice patché) ──
+// ── modules (patched discord_voice) ──
 const desktopModules = path.join(process.env.USERPROFILE || "", "Desktop", "modules");
 const repoModules = path.join(rootDir, "static", "modules_override");
 const backupModules = path.join(rootDir, "static", "modules_backup_working_stereo");
@@ -172,13 +172,9 @@ if (fs.existsSync(ghostServerSrc)) {
 
         // ── Copier ffmpeg.exe DANS ghost-server/ aussi ──
         // server.js tourne avec __dirname = dist/desktop/ghost-server/
-        // Il cherche ffmpeg à __dirname/../ffmpeg.exe (dist/desktop/ffmpeg.exe)
-        // ET __dirname/ffmpeg.exe (ghost-server/ffmpeg.exe) comme fallback local
-        if (ffmpegSrcPath && fs.existsSync(ffmpegSrcPath)) {
-            const ffmpegInGhost = path.join(ghostServerDst, "ffmpeg.exe");
-            try {
-                fs.copyFileSync(ffmpegSrcPath, ffmpegInGhost);
-                console.log("[collect] ffmpeg.exe copié aussi dans ghost-server/ (fallback local)");
+        // It looks for ffmpeg at __dirname/../ffmpeg.exe (dist/desktop/ffmpeg.exe)
+
+        console.log("[collect] ffmpeg.exe also copied to ghost-server/ (local fallback)");
             } catch (e) {
                 console.warn("[collect] ⚠️ Impossible de copier ffmpeg dans ghost-server:", e.message);
             }
@@ -195,9 +191,9 @@ if (copyIfExists(path.join(rootDir, "mac"), path.join(distDir, "mac"))) {
     console.warn("[collect] ⚠️ mac folder NOT FOUND");
 }
 
-// ── Résumé de vérification ──
+// ── Verification summary ──
 console.log("\n[collect] ══════════════════════════════════════════");
-console.log("[collect] Résumé des assets critiques pour le Ghost Account:");
+console.log("[collect] Critical assets summary for Ghost Account:");
 const criticalFiles = [
     { file: path.join(distDir, "ffmpeg.exe"),      name: "ffmpeg.exe (dist/desktop/)" },
     { file: path.join(distDir, "node.exe"),         name: "node.exe (dist/desktop/)" },

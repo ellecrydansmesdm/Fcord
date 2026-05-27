@@ -42,7 +42,7 @@ interface UpdateInfo {
 
 let pendingUpdate: UpdateInfo | null = null;
 let listeners: Array<() => void> = [];
-// Anti-boucle : si l'user a déjà cliqué "Mettre à jour" dans cette session, on cache la bannière
+// Anti-loop: if the user already clicked "Update" in this session, hide the banner
 let updateAttempted = false;
 
 function notify() { listeners.forEach(f => f()); }
@@ -93,29 +93,29 @@ function UpdateBanner() {
         if (loading || !info) return;
         setLoading(true);
         updateAttempted = true; // Marquer immédiatement pour éviter les double-clics
-        setStatus("Téléchargement en cours...");
+        setStatus("Downloading...");
 
         try {
             const { VencordNative } = (window as any);
             const ipc = VencordNative?.updater;
-            if (!ipc) throw new Error("VencordNative.updater non disponible");
+            if (!ipc) throw new Error("VencordNative.updater not available");
 
             // Étape 1 : fetch GitHub metadata → stocke l'URL du zip dans le main process
             const updateRes: { ok: boolean; value?: boolean; error?: any; } = await ipc.update();
             if (!updateRes?.ok) {
-                throw new Error(updateRes?.error?.message ?? "Échec de la vérification des mises à jour");
+                throw new Error(updateRes?.error?.message ?? "Update check failed");
             }
 
             // Étape 2 : télécharge le zip + extrait dans dist/ (PowerShell)
-            setStatus("✓ Téléchargé ! Extraction en cours...");
+            setStatus("✓ Downloaded! Extracting...");
             const buildRes: { ok: boolean; value?: boolean; error?: any; } = await ipc.rebuild();
             if (!buildRes?.ok) {
                 // IpcRes ok=false → l'erreur est dans buildRes.error
-                const errMsg = buildRes?.error?.message ?? JSON.stringify(buildRes?.error) ?? "Échec de l'installation";
+                const errMsg = buildRes?.error?.message ?? JSON.stringify(buildRes?.error) ?? "Installation failed";
                 throw new Error(errMsg);
             }
 
-            setStatus("✓ Mise à jour appliquée — redémarrage dans 2s...");
+            setStatus("✓ Update applied — restarting in 2s...");
 
             // Redémarrage propre via le handler RELAUNCH_APP du main process
             setTimeout(() => {
@@ -128,9 +128,9 @@ function UpdateBanner() {
                 }
             }, 2000);
         } catch (e: any) {
-            console.error("[NightcordUpdater] Error mise à jour:", e);
-            const msg = e?.message ? e.message.substring(0, 120) : "Erreur inconnue";
-            setStatus(`❌ ${msg}. Vérifie ta connexion ou redémarre manuellement.`);
+            console.error("[NightcordUpdater] Update error:", e);
+            const msg = e?.message ? e.message.substring(0, 120) : "Unknown error";
+            setStatus(`❌ ${msg}. Check your connection or restart manually.`);
             setLoading(false);
             updateAttempted = false; // Permet un retry
         }
@@ -182,7 +182,7 @@ function UpdateBanner() {
                     fontWeight: 700,
                     fontFamily: "inherit",
                 }
-            }, loading ? "..." : "⬇ Mettre à jour"),
+            }, loading ? "..." : "⬇ Update"),
             React.createElement("button", {
                 onClick: () => setDismissed(true),
                 style: {

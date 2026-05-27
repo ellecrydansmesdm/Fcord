@@ -28,7 +28,7 @@ import("@dank074/discord-video-stream").then(m => {
     console.log("[GhostServer] DVS OK");
     import("fluent-ffmpeg").then(m2 => {
         _fluentFfmpeg = m2.default ?? m2;
-        console.log("[GhostServer] fluent-ffmpeg pré-chargé OK");
+        console.log("[GhostServer] fluent-ffmpeg pre-loaded OK");
     }).catch(() => { });
 }).catch(e => console.error("[GhostServer] DVS introuvable: " + e.message));
 
@@ -37,9 +37,9 @@ catch (e) { console.error("[GhostServer] opusscript introuvable: " + e.message);
 
 try {
     os.setPriority(process.pid, os.constants.priority.PRIORITY_ABOVE_NORMAL);
-    console.log("[GhostServer] Priorité processeur augmentée ✓");
-} catch (e) {
-    console.warn("[GhostServer] Impossible de régler la priorité process:", e.message);
+    console.log("[GhostServer] Process priority increased ✓");
+    } catch (e) {
+    console.warn("[GhostServer] Could not set process priority:", e.message);
 }
 
 function findFfmpeg() {
@@ -115,16 +115,16 @@ async function findYtDlp() {
     if (_ytdlpDownloadPromise) return _ytdlpDownloadPromise;
 
     const target = path.join(__dirname, "yt-dlp.exe");
-    console.log("[GhostServer] yt-dlp.exe introuvable, téléchargement automatique...");
+    console.log("[GhostServer] yt-dlp.exe not found, downloading automatically...");
     _ytdlpDownloadPromise = (async () => {
         try {
             await downloadFile("https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe", target);
-            console.log("[GhostServer] yt-dlp.exe téléchargé ✓");
+            console.log("[GhostServer] yt-dlp.exe downloaded ✓");
             _ytdlpCache = target;
             _ytdlpDownloadPromise = null;
             return target;
         } catch (e) {
-            console.error("[GhostServer] Échec téléchargement yt-dlp:", e.message);
+            console.error("[GhostServer] yt-dlp download failed:", e.message);
             _ytdlpDownloadPromise = null;
             return null;
         }
@@ -141,8 +141,8 @@ async function resolveVideoUrl(url) {
     const cached = _resolvedUrlCache.get(url);
     if (cached && (Date.now() - cached.ts) < 5 * 60 * 1000) return cached.resolved;
     const ytdlp = await findYtDlp();
-    if (!ytdlp) throw new Error("yt-dlp manquant (échec du téléchargement)");
-    if (typeof ytdlp !== "string") throw new Error("yt-dlp en cours de téléchargement, réessaie dans 10 secondes...");
+    if (!ytdlp) throw new Error("yt-dlp missing (download failed)");
+    if (typeof ytdlp !== "string") throw new Error("yt-dlp still downloading, retry in 10 seconds...");
     return new Promise((resolve, reject) => {
         const proc = spawn(ytdlp, [
             "-g",
@@ -158,7 +158,7 @@ async function resolveVideoUrl(url) {
         proc.on("close", code => {
             clearTimeout(timer);
             const lines = out.trim().split("\n").filter(Boolean);
-            if (!lines.length || code !== 0) { reject(new Error("yt-dlp échoué code=" + code)); return; }
+            if (!lines.length || code !== 0) { reject(new Error("yt-dlp failed code=" + code)); return; }
             const resolved = lines[0].trim();
             if (_resolvedUrlCache.size >= MAX_CACHE_SIZE) {
                 const firstKey = _resolvedUrlCache.keys().next().value;
@@ -196,8 +196,8 @@ async function preconnectGhost({ userId, token, micLabel, micDevice }) {
             if (DVS) break;
         }
     }
-    if (!DVS) return { ok: false, error: "DVS non chargé" };
-    if (!OpusScript) return { ok: false, error: "opusscript non chargé" };
+    if (!DVS) return { ok: false, error: "DVS not loaded" };
+    if (!OpusScript) return { ok: false, error: "opusscript not loaded" };
 
     const client = new Client({ checkUpdate: false });
     const streamer = new DVS.Streamer(client);
@@ -211,7 +211,7 @@ async function preconnectGhost({ userId, token, micLabel, micDevice }) {
         client.once("error", e => { clearTimeout(t); reject(e); });
         client.login(token).catch(reject);
     });
-    console.log("[GhostServer] Pré-connecté: " + client.user.tag);
+    console.log("[GhostServer] Pre-connected: " + client.user.tag);
 
     const session = {
         client, streamer, userId,
@@ -242,7 +242,7 @@ async function connectGhost({ userId, token, guildId, channelId, micLabel, micDe
 
 async function joinVoice(userId, guildId, channelId, micLabel, micDevice) {
     const s = sessions.get(userId);
-    if (!s) return { ok: false, error: "Session introuvable" };
+    if (!s) return { ok: false, error: "Session not found" };
 
     if (s.udpConn) {
         await leaveVoice(userId);
@@ -254,7 +254,7 @@ async function joinVoice(userId, guildId, channelId, micLabel, micDevice) {
         await doJoinVoice(s, guildId, channelId);
         return { ok: true };
     } catch (e) {
-        console.error("[GhostServer] joinVoice erreur: " + e.message);
+        console.error("[GhostServer] joinVoice error: " + e.message);
         return { ok: false, error: e.message };
     }
 }
@@ -264,8 +264,8 @@ async function doJoinVoice(session, guildId, channelId) {
 
     const guild = session.client.guilds.cache.get(guildId);
     const channel = guild?.channels.cache.get(channelId);
-    if (channel) console.log("[GhostServer] Rejoindre: " + channel.name);
-    else console.log("[GhostServer] Rejoindre salon ID: " + channelId);
+    if (channel) console.log("[GhostServer] Joining: " + channel.name);
+    else console.log("[GhostServer] Joining channel ID: " + channelId);
 
     if (session.udpConn) {
         const pipe = audioPipelines.get(session.userId);
@@ -280,14 +280,14 @@ async function doJoinVoice(session, guildId, channelId) {
     while (attempts < 2) {
         attempts++;
         try {
-            console.log("[GhostServer] Appel joinVoice tentative " + attempts + " pour " + guildId + "/" + channelId);
+            console.log("[GhostServer] Calling joinVoice attempt " + attempts + " for " + guildId + "/" + channelId);
             udpConn = await Promise.race([
                 session.streamer.joinVoice(guildId, channelId, { receiveAudio: true }).then(u => { console.log("[GhostServer] joinVoice resolved! ready=" + u?.ready); return u; }),
-                new Promise((_, r) => setTimeout(() => r(new Error("Timeout connexion WebRTC")), 15000))
+                new Promise((_, r) => setTimeout(() => r(new Error("WebRTC connection timeout")), 15000))
             ]);
             break;
         } catch (e) {
-            console.error(`[GhostServer] ❌ joinVoice tentative ${attempts} a echoue:`, e.message);
+            console.error(`[GhostServer] ❌ joinVoice attempt ${attempts} failed:`, e.message);
             if (attempts >= 2) throw e;
             try { session.streamer.voiceConnection?.stop(); } catch { }
             try { session.streamer._voiceConnection = undefined; } catch { }
@@ -299,7 +299,7 @@ async function doJoinVoice(session, guildId, channelId) {
 
     session.udpConn = udpConn;
     try { udpConn.setPacketizer("H264"); } catch { }
-    console.log("[GhostServer] Voice connecte (avec reception audio) ✓");
+    console.log("[GhostServer] Voice connected (with audio receive) ✓");
 
     function setSpeaking(udpTarget, session, enabled) {
         try {
@@ -310,19 +310,19 @@ async function doJoinVoice(session, guildId, channelId) {
             } else if (session?.client?.voice?.setSpeaking) {
                 session.client.voice.setSpeaking(enabled);
             } else {
-                console.warn("[GhostServer] Aucun moyen d'appeler setSpeaking pour " + session?.userId);
+                console.warn("[GhostServer] No setSpeaking method available for " + session?.userId);
             }
         } catch { }
     }
 
     function activateAudio() {
-        console.log("[GhostServer] ✅ WebRTC connected — audio + speaking actifs pour " + session.userId);
+        console.log("[GhostServer] ✅ WebRTC connected — audio + speaking active for " + session.userId);
         setSpeaking(udpConn, session, true);
 
         audioPipelines.set(session.userId, { udpTarget: udpConn });
         const audioOk = startPermanentAudio(session, udpConn);
         if (!audioOk) {
-            console.error("[GhostServer] Échec du démarrage du pipeline audio pour " + session.userId);
+            console.error("[GhostServer] Audio pipeline startup failed for " + session.userId);
         }
     }
 
@@ -345,12 +345,12 @@ async function doJoinVoice(session, guildId, channelId) {
             if (udpConn.ready && !activated) {
                 clearInterval(poll);
                 activated = true;
-                console.log('[GhostServer] udpConn.ready=true apres ' + (polls*200) + 'ms');
+                console.log('[GhostServer] udpConn.ready=true after ' + (polls*200) + 'ms');
                 activateAudio();
             } else if (polls >= 50 && !activated) {
                 clearInterval(poll);
                 activated = true;
-                console.warn('[GhostServer] Timeout 10s - activation forcee (ready=' + udpConn.ready + ')');
+                console.warn('[GhostServer] Timeout 10s - forcing activation (ready=' + udpConn.ready + ')');
                 activateAudio();
             }
         }, 200);
@@ -359,7 +359,8 @@ async function doJoinVoice(session, guildId, channelId) {
 
 async function joinVoiceSilent(userId, guildId, channelId, micLabel, micDevice, retryCount = 0) {
     const s = sessions.get(userId);
-    if (!s) return { ok: false, error: "Session introuvable" };
+    if (!s) return { ok: false, error: "Session not found" };
+
     if (micLabel || micDevice) s.micLabel = micLabel || micDevice;
 
     let guild = s.client.guilds.cache.get(guildId);
@@ -403,7 +404,7 @@ async function joinVoiceSilent(userId, guildId, channelId, micLabel, micDevice, 
             audioPipelines.set(userId, { udpTarget: udpConn });
             const audioOk = startPermanentAudio(s, udpConn);
             if (!audioOk) {
-                console.error("[GhostServer] Échec du démarrage du pipeline audio pour " + userId);
+                console.error("[GhostServer] Audio pipeline startup failed for " + userId);
             }
         }
 
@@ -448,7 +449,7 @@ async function leaveVoice(userId) {
 
     await new Promise(r => setTimeout(r, 200));
 
-    console.log("[GhostServer] " + userId + " quitté le salon");
+    console.log("[GhostServer] " + userId + " left the channel");
 }
 
 async function destroyGhost(userId) {
@@ -494,12 +495,12 @@ function startPermanentAudio(session, initialUdpConn) {
         const shared = sharedAudios.get(device);
         if (shared) {
             shared.users.set(session.userId, initialUdpConn);
-            console.log(`[GhostServer] Micro ${device} déjà actif, ajout de l'utilisateur ${session.userId} au flux partagé`);
+            console.log(`[GhostServer] Mic ${device} already active, adding user ${session.userId} to shared stream`);
             return true;
         }
     }
 
-    console.log("[GhostServer] Nouveau flux ffmpeg pour micro: " + device);
+    console.log("[GhostServer] New ffmpeg stream for mic: " + device);
 
     const proc = spawn(ffmpeg, [
         "-fflags", "nobuffer+fastseek", "-flags", "low_delay", "-probesize", "32", "-analyzeduration", "0",
@@ -513,7 +514,7 @@ function startPermanentAudio(session, initialUdpConn) {
 
     const shared = { proc, encoder, users: usersMap };
     sharedAudios.set(device, shared);
-    console.log("[GhostServer] Pipeline partagé créé pour device:", device);
+    console.log("[GhostServer] Shared pipeline created for device:", device);
 
     proc.stderr.on("data", d => {
         const msg = d.toString().trim();
@@ -569,7 +570,7 @@ function startPermanentAudio(session, initialUdpConn) {
         }
     });
 
-    console.log("[GhostServer] Pipeline audio partagé actif ✓");
+    console.log("[GhostServer] Shared audio pipeline active ✓");
     return true;
 }
 
@@ -578,11 +579,11 @@ function stopMic(session) {
     for (const [device, shared] of sharedAudios) {
         if (shared.users.has(session.userId)) {
             shared.users.delete(session.userId);
-            console.log(`[GhostServer] Retrait de ${session.userId} du micro ${device}`);
+            console.log(`[GhostServer] Removed ${session.userId} from mic ${device}`);
             if (shared.users.size === 0) {
                 try { shared.proc.kill("SIGKILL"); } catch { }
                 sharedAudios.delete(device);
-                console.log(`[GhostServer] Plus d'auditeurs pour ${device}, arrêt du flux`);
+                console.log(`[GhostServer] No more listeners for ${device}, stopping stream`);
             }
             break;
         }
@@ -613,10 +614,10 @@ function stopAll(session) {
 }
 
 async function startVideoStream(session, videoUrl) {
-    if (!session.udpConn) throw new Error("Pas connecté au vocal");
-    if (!DVS) throw new Error("DVS non chargé");
+    if (!session.udpConn) throw new Error("Not connected to voice");
+    if (!DVS) throw new Error("DVS not loaded");
     const ffmpeg = findFfmpeg();
-    if (!ffmpeg) throw new Error("ffmpeg introuvable");
+    if (!ffmpeg) throw new Error("ffmpeg not found");
     stopStream(session);
     const resolvedUrl = await resolveVideoUrl(videoUrl);
     if (typeof DVS.prepareStream === "function" && typeof DVS.playStream === "function") {
@@ -739,7 +740,7 @@ http.createServer(async (req, res) => {
 
         if (req.url === "/stream-start") {
             const s = sessions.get(body.userId);
-            if (!s) { send(res, 200, { ok: false, error: "Session introuvable" }); return; }
+            if (!s) { send(res, 200, { ok: false, error: "Session not found" }); return; }
 
             const jobId = Date.now().toString();
             streamJobs.set(body.userId, { state: "resolving", jobId });
@@ -750,9 +751,9 @@ http.createServer(async (req, res) => {
                     streamJobs.set(body.userId, { state: "starting", jobId });
                     await startVideoStream(s, body.url);
                     streamJobs.set(body.userId, { state: "active", jobId });
-                    console.log("[GhostServer] Stream démarré pour " + body.userId);
+                    console.log("[GhostServer] Stream started for " + body.userId);
                 } catch (e) {
-                    console.error("[GhostServer] stream-start erreur: " + (e?.message ?? e));
+                    console.error("[GhostServer] stream-start error: " + (e?.message ?? e));
                     streamJobs.set(body.userId, { state: "error", error: e?.message ?? String(e), jobId });
                     if (s) s.streaming = false;
                 }
@@ -762,7 +763,7 @@ http.createServer(async (req, res) => {
 
         if (req.url === "/stream-status") {
             const s = sessions.get(body.userId);
-            if (!s) { send(res, 200, { ok: false, error: "Session introuvable" }); return; }
+            if (!s) { send(res, 200, { ok: false, error: "Session not found" }); return; }
             const job = streamJobs.get(body.userId);
             if (!job) {
                 send(res, 200, { ok: true, state: s.streaming ? "active" : "idle" });
@@ -774,15 +775,15 @@ http.createServer(async (req, res) => {
 
         if (req.url === "/stream-stop") {
             const s = sessions.get(body.userId);
-            if (!s) { send(res, 200, { ok: false, error: "Session introuvable" }); return; }
+            if (!s) { send(res, 200, { ok: false, error: "Session not found" }); return; }
             stopStream(s); send(res, 200, { ok: true }); return;
         }
         if (req.url?.startsWith("/playback/")) {
             const uid = req.url.split("/").pop();
             const s = sessions.get(uid);
-            if (!s?.udpConn) { send(res, 404, { error: "Non connecté" }); return; }
+            if (!s?.udpConn) { send(res, 404, { error: "Not connected" }); return; }
 
-            console.log("[GhostServer] Début streaming WAV playback pour " + uid);
+            console.log("[GhostServer] Starting WAV playback stream for " + uid);
             res.writeHead(200, {
                 "Content-Type": "audio/wav",
                 "Access-Control-Allow-Origin": "*",
@@ -840,7 +841,7 @@ http.createServer(async (req, res) => {
         send(res, 500, { ok: false, error: e.message });
     }
 }).listen(PORT, "127.0.0.1", () => {
-    console.log("[GhostServer] Prêt sur port " + PORT + " ✓");
+    console.log("[GhostServer] Ready on port " + PORT + " ✓");
 });
 
 process.on("uncaughtException", e => console.error("[GhostServer] Uncaught: " + e.message));

@@ -5,19 +5,19 @@
  */
 
 /**
- * groqManager.ts — Gestionnaire de clé Groq partagé entre les plugins
+ * groqManager.ts — Shared Groq key manager for all plugins
  *
- * Fonctionnalités :
- * - Clé API stockée dans DataStore (un seul endroit)
- * - Rotation automatique de modèle sur 429 (rate limit)
+ * Features:
+ * - API key stored in DataStore (single location)
+ * - Automatic model rotation on 429 (rate limit)
  *   llama-3.3-70b-versatile → llama-3.1-8b-instant → gemma2-9b-it
- * - Retry avec backoff exponentiel
- * - File d'attente pour éviter les bursts simultanés
+ * - Retry with exponential backoff
+ * - Queue to prevent simultaneous bursts
  */
 
 import { DataStore } from "@api/index";
 
-// ── Clés DataStore ─────────────────────────────────────────────────────────────
+// ── DataStore keys ────────────────────────────────────────────────────────────
 
 const DS_API_KEY = "groq-shared-api-key";
 
@@ -121,8 +121,8 @@ export interface GroqCallOptions {
 }
 
 /**
- * Appelle l'API Groq avec rotation automatique de modèle sur rate limit.
- * Retourne le contenu texte de la réponse.
+ * Calls the Groq API with automatic model rotation on rate limit.
+ * Returns the text content of the response.
  */
 export async function groqChat(opts: GroqCallOptions): Promise<string> {
     return enqueue(() => _groqChat(opts));
@@ -132,7 +132,7 @@ async function _groqChat(opts: GroqCallOptions, attempt = 0): Promise<string> {
     const { messages, temperature = 0.7, maxTokens = 1000, forceModel, maxRetries = 3 } = opts;
 
     const apiKey = await getGroqKey();
-    if (!apiKey) throw new Error("Clé API Groq missinge — configure-la dans Settings → NightcordAI");
+    if (!apiKey) throw new Error("Groq API key missing — configure it in Settings → NightcordAI");
 
     const model = forceModel ?? getAvailableModel();
 
@@ -152,7 +152,7 @@ async function _groqChat(opts: GroqCallOptions, attempt = 0): Promise<string> {
 
     // Gestion du rate limit
     if (res.status === 429) {
-        if (attempt >= maxRetries) throw new Error("Rate limit Groq — réessaie dans quelques instants");
+        if (attempt >= maxRetries) throw new Error("Groq rate limit — try again in a moment");
 
         // Lire le header Retry-After si présent
         const retryAfterSec = parseInt(res.headers.get("retry-after") ?? "60", 10);
@@ -170,11 +170,11 @@ async function _groqChat(opts: GroqCallOptions, attempt = 0): Promise<string> {
     }
 
     const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim() ?? "(réponse vide)";
+    return data.choices?.[0]?.message?.content?.trim() ?? "(empty response)";
 }
 
 /**
- * Retourne le modèle actuellement active (utile pour l'affichage)
+ * Returns the currently active model (useful for display)
  */
 export function getCurrentModel(): string {
     return GROQ_MODELS[currentModelIdx] ?? GROQ_MODELS[0];

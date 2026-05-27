@@ -73,7 +73,7 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_TYPE, async (event, text: string, delay: num
     const { tmpdir } = require("os");
 
     if (!/^[\x20-\x7E]*$/.test(text)) {
-        throw new Error("WorldBombType: caractères non autorisés");
+        throw new Error("WorldBombType: disallowed characters");
     }
     const safeDelay = Math.max(0, Math.min(10000, delay));
 
@@ -177,7 +177,7 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_SEQUENCE, async (
     const { tmpdir } = require("os");
 
     if (!/^[\x20-\x7E]+$/.test(word)) {
-        throw new Error("WorldBombSequence: caractères non autorisés");
+        throw new Error("WorldBombSequence: disallowed characters");
     }
     const safeLps = Math.max(1, Math.min(100, lps));
     const safeHumanChance = Math.max(0, Math.min(100, humanChance));
@@ -387,7 +387,7 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_OPEN_WINDOW, (event, lps: number = 50, human
     try {
         streamProofWindow.setContentProtection(true);
     } catch (e) {
-        console.error("Erreur setContentProtection:", e);
+        console.error("setContentProtection error:", e);
     }
 
     const htmlContent = `
@@ -419,11 +419,11 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
         <div id="alphabet"></div>
         <div style="display: flex; gap: 8px;">
             <input type="text" id="syllable" placeholder="Syllabe..." autofocus autocomplete="off" spellcheck="false" />
-            <button id="btn-find">TROUVER</button>
+            <button id="btn-find">FIND</button>
         </div>
-        <div id="status">Chargement...</div>
+        <div id="status">Loading...</div>
         <div id="definition-container" style="display: none; margin-top: 10px; font-size: 11px; color: #d1d5db; font-style: italic; background: #374151; padding: 8px; border-radius: 8px; max-height: 80px; overflow-y: auto;">
-            <strong style="color: #60a5fa">Définition:</strong> <span id="definition-text"></span>
+            <strong style="color: #60a5fa">Definition:</strong> <span id="definition-text"></span>
         </div>
     </div>
 </div>
@@ -458,9 +458,9 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
             const allWords = results.flat();
             dictionary = Array.from(new Set(allWords.map(w => w.toLowerCase())))
                 .filter(w => /^[a-zœæéèêëàâäîïôöùûüç]+$/i.test(w));
-            document.getElementById('status').innerText = "Prêt (" + dictionary.length + " mots)";
+            document.getElementById('status').innerText = "Ready (" + dictionary.length + " words)";
         }).catch(err => {
-            document.getElementById('status').innerText = "Erreur réseau";
+            document.getElementById('status').innerText = "Network error";
             document.getElementById('status').style.color = "#ef4444";
         });
 
@@ -486,7 +486,7 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
                         });
                         if (themeWords.size > 0) {
                             const st = document.getElementById('status');
-                            st.innerText = st.innerText + " (+ Thème)";
+                            st.innerText = st.innerText + " (+ Theme)";
                         }
                     }
                 }
@@ -552,7 +552,7 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
             return true;
         });
         if (validWords.length === 0) {
-            document.getElementById('status').innerText = "Aucun mot trouvé !";
+            document.getElementById('status').innerText = "No word found!";
             document.getElementById('status').style.color = "#ef4444";
             return;
         }
@@ -561,7 +561,7 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
         validWords.sort((a, b) => computeScore(b, currentMissing) - computeScore(a, currentMissing));
         
         const bestWord = validWords[0];
-        document.getElementById('status').innerText = "Saisie: " + bestWord + "...";
+        document.getElementById('status').innerText = "Typing: " + bestWord + "...";
         document.getElementById('status').style.color = "#10b981";
         
         let newMissing = currentMissing.filter(c => !bestWord.includes(c));
@@ -577,10 +577,10 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
             const defContainer = document.getElementById('definition-container');
             const defText = document.getElementById('definition-text');
             defContainer.style.display = 'block';
-            defText.innerText = 'Génération de la définition par IA...';
+            defText.innerText = 'Generating AI definition...';
             
             if (!groqKey) {
-                defText.innerText = "Erreur: Clé API Groq introuvable.";
+                defText.innerText = "Error: Groq API key not found.";
             } else {
                 fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
@@ -594,7 +594,7 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
                         max_tokens: 150,
                         messages: [{
                             role: "user",
-                            content: 'Donne une définition très courte (1 seule phrase simple) pour le mot suivant, en expliquant ce que c\\'est concrètement, sans donner sa nature grammaticale. Mot : "' + bestWord + '"'
+                            content: 'Give a very short definition (1 simple sentence) for the following word, explaining what it is concretely, without stating its part of speech. Word: "' + bestWord + '"'
                         }]
                     }),
                 })
@@ -604,20 +604,20 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
                     if (ans) {
                         defText.innerText = ans.trim();
                     } else {
-                        defText.innerText = "L'IA n'a pas pu définir ce mot.";
+                        defText.innerText = "AI could not define this word.";
                     }
                 })
-                .catch(() => defText.innerText = "Erreur réseau.");
+                .catch(() => defText.innerText = "Network error.");
             }
         }
         
 
         window.worldBombAPI.sequence(bestWord, lps, humanChance)
             .then(() => {
-                document.getElementById('status').innerText = "Prêt !";
+                document.getElementById('status').innerText = "Ready!";
             })
             .catch(err => {
-                document.getElementById('status').innerText = "Erreur de saisie";
+                document.getElementById('status').innerText = "Input error";
                 document.getElementById('status').style.color = "#ef4444";
             })
             .finally(() => {
@@ -902,7 +902,7 @@ const OFFICIAL_UPDATE_URL = "https://github.com/nightcordoff/nightcord/releases/
 
 ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
     if (url !== OFFICIAL_UPDATE_URL) {
-        throw new Error("URL de mise à jour non autorisée");
+        throw new Error("Unauthorized update URL");
     }
 
     const https = require("https");
@@ -933,11 +933,11 @@ ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
 
     const { response } = await dialog.showMessageBox({
         type: "info",
-        buttons: ["Installer la mise à jour", "Annuler"],
+        buttons: ["Install update", "Cancel"],
         defaultId: 0,
-        title: "Mise à jour Nightcord",
-        message: "Une mise à jour de Nightcord est disponible.",
-        detail: "Voulez-vous installer la mise à jour maintenant ?"
+        title: "Nightcord Update",
+        message: "A Nightcord update is available.",
+        detail: "Do you want to install the update now?"
     });
     if (response === 1) return false;
 
@@ -997,13 +997,13 @@ ipcMain.handle(IpcEvents.INSTALL_VB_CABLE, async () => {
 
         const { response } = await dialog.showMessageBox({
             type: "info",
-            buttons: ["Installer VB-Cable", "Annuler"],
+            buttons: ["Install VB-Cable", "Cancel"],
             defaultId: 0,
-            title: "Installation VB-Cable",
-            message: "VB-Cable doit être installé avec les droits administrateur.",
-            detail: "Une fenêtre UAC va s'ouvrir pour confirmer l'installation."
+            title: "VB-Cable Installation",
+            message: "VB-Cable must be installed with administrator privileges.",
+            detail: "A UAC window will open to confirm the installation."
         });
-        if (response === 1) return { success: false, error: "Annulé par l'utilisateur" };
+        if (response === 1) return { success: false, error: "Cancelled by user" };
 
         await new Promise<void>((resolve, reject) => {
             const child = spawn("powershell", [

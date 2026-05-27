@@ -13,7 +13,7 @@ const DICT_URLS = [
     "https://raw.githubusercontent.com/nightcordoff/dicofr/refs/heads/main/dico.txt"
 ];
 
-// Quelques mots de secours au cas où le chargement échoue
+// A few fallback words in case loading fails
 const FALLBACK_WORDS = ["maison", "chat", "chien", "soleil", "pomme", "banane", "ordinateur", "clavier", "souris", "ecran", "table", "chaise", "fenetre", "porte", "voiture", "avion", "bateau", "train", "velo", "moto"];
 
 let overlayRoot: any = null;
@@ -78,7 +78,7 @@ export function WordBombOverlay() {
     const dragOffset = useRef({ x: 0, y: 0 });
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Calibrage supprimé — le clic est toujours au centre dynamique de la fenêtre Discord
+    // Calibration removed — click is always at the dynamic center of the Discord window
     const [lps, setLps] = useState(() => parseFloat(getSetting("wb_lps", "50")));
     const [humanChance, setHumanChance] = useState(() => parseInt(getSetting("wb_humanChance", "0")));
     const [safeMode, setSafeMode] = useState(() => getSetting("wb_safeMode", "true") === "true");
@@ -102,17 +102,17 @@ export function WordBombOverlay() {
                 const allWords = results.flat() as string[];
                 const uniqueWords = Array.from(new Set(allWords))
                     .filter(w => {
-                        // 1. Filtrage par longueur (les mots trop longs sont souvent des lieux ou techniques)
+                        // 1. Length filter (very long words are often place names or technical terms)
                         if (w.length < 3 || w.length > 15) return false;
 
-                        // 2. Filtrage des Noms Propres : si le mot commence par une Majuscule dans la source
-                        // c'est presque toujours un nom de lieu, de personne ou une marque.
+                        // 2. Proper noun filter: if the word starts with an uppercase letter in the source
+                        // it's almost always a place name, person name, or brand.
                         if (w[0] === w[0].toUpperCase()) return false;
 
-                        // 3. Filtrage des abréviations (tout en majuscule)
+                        // 3. Abbreviation filter (all uppercase)
                         if (w === w.toUpperCase() && w.length > 1) return false;
 
-                        // 4. Caractères français uniquement
+                        // 4. French characters only
                         return /^[a-zœæéèêëàâäîïôöùûüç]+$/i.test(w);
                     })
                     .map(w => w.toLowerCase());
@@ -206,7 +206,7 @@ export function WordBombOverlay() {
 
     const startCalibrate = async () => {
         setIsCalibrating(true);
-        setStatus("Place ta souris sur la zone de texte du jeu, puis appuie sur Espace...");
+        setStatus("Place your mouse on the game's text area, then press Space...");
 
         const onKeyDown = async (e: KeyboardEvent) => {
             if (e.code !== "Space") return;
@@ -222,25 +222,25 @@ export function WordBombOverlay() {
                 if (cursorPos && typeof cursorPos.x === "number" && typeof cursorPos.y === "number") {
                     setCalibratedPos(cursorPos);
                     setSetting("wb_calibPos", JSON.stringify(cursorPos));
-                    setStatus(`✅ Calibré: (${cursorPos.x}, ${cursorPos.y})`);
+                    setStatus(`✅ Calibrated: (${cursorPos.x}, ${cursorPos.y})`);
                 } else {
-                    // Fallback: essayer via ipcRenderer directement
+                    // Fallback: try via ipcRenderer directly
                     const { ipcRenderer } = (window as any).require?.("electron") ?? {};
                     if (ipcRenderer) {
                         const pos = await ipcRenderer.invoke("WorldBombGetCursorPos");
                         if (pos && typeof pos.x === "number") {
                             setCalibratedPos(pos);
                             setSetting("wb_calibPos", JSON.stringify(pos));
-                            setStatus(`✅ Calibré: (${pos.x}, ${pos.y})`);
+                            setStatus(`✅ Calibrated: (${pos.x}, ${pos.y})`);
                         } else {
-                            setStatus("❌ Position invalide reçue: " + JSON.stringify(pos));
+                            setStatus("❌ Invalid position received: " + JSON.stringify(pos));
                         }
                     } else {
-                        setStatus("❌ getCursorPos indisponible (nc=" + typeof nc + ")");
+                        setStatus("❌ getCursorPos unavailable (nc=" + typeof nc + ")");
                     }
                 }
             } catch (err) {
-                setStatus("❌ Erreur calibrage: " + String(err));
+                setStatus("❌ Calibration error: " + String(err));
             } finally {
                 setIsCalibrating(false);
                 setTimeout(() => inputRef.current?.focus(), 100);
@@ -369,7 +369,7 @@ export function WordBombOverlay() {
                         max_tokens: 150,
                         messages: [{
                             role: "user",
-                            content: `Donne une très courte définition (1 phrase simple) pour le mot suivant, en expliquant ce que c'est concrètement, sans donner sa nature grammaticale. Fais-le obligatoirement en français. Mot: "${word}"`
+                            content: `Give a very short definition (1 simple sentence) for the following word, explaining what it is concretely, without stating its part of speech. Reply in French. Word: "${word}"`
                         }]
                     }),
                 })
@@ -391,10 +391,10 @@ export function WordBombOverlay() {
 
         try {
             if (wbNative?.sequence) {
-                // Toujours -1,-1 : le main process calcule le centre de la fenêtre dynamiquement
+                // Always -1,-1: the main process calculates the window center dynamically
                 await wbNative.sequence(word, lps, humanChance, -1, -1);
             } else {
-                // Fallback : mode chat Discord classique (pas en jeu)
+                // Fallback: classic Discord chat mode (not in-game)
                 if (document.activeElement instanceof HTMLElement) {
                     document.activeElement.blur();
                 }
@@ -407,10 +407,10 @@ export function WordBombOverlay() {
                 }
                 ComponentDispatch.dispatchToLastSubscribed("SUBMIT");
             }
-            setStatus("Prêt !");
+            setStatus("Ready!");
         } catch (e) {
-            console.error("[WordBomb] Erreur saisie:", e);
-            setStatus("Erreur de saisie");
+            console.error("[WordBomb] Input error:", e);
+            setStatus("Input error");
         } finally {
             isTypingRef.current = false;
             setIsTyping(false);

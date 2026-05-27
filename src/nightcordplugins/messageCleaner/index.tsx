@@ -147,8 +147,8 @@ async function cleanChannel(channelId: string) {
         const currentUserId = UserStore.getCurrentUser()?.id;
         if (!channel || !currentUserId) return;
 
-        const channelName = channel.name || "Canal privé";
-        log(`🧹 Début du nettoyage de "${channelName}"`);
+        const channelName = channel.name || "Private channel";
+        log(`🧹 Starting cleanup of "${channelName}"`);
 
         isCleaningInProgress = true;
         shouldStopCleaning = false;

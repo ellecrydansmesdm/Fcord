@@ -17,7 +17,7 @@ function cancelRequest(userId: string) {
     try {
         RelationshipActions.removeFriend(userId);
         Toasts.show({
-            message: "Request d'friend annulée ✓",
+            message: "Friend request cancelled ✓",
             type: Toasts.Type.SUCCESS,
             id: Toasts.genId(),
         });

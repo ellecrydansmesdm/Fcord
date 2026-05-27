@@ -123,10 +123,10 @@ async function applyUpdates(): Promise<boolean> {
 }
 
 // ─── Auto-update on quit ─────────────────────────────────────────────────────
-// Si une mise à jour est en attente quand Discord se ferme, on l'installe
-// silencieusement avant de quitter (timeout de sécurité 45s).
+// If an update is pending when Discord closes, install it
+// silently before quitting (safety timeout 45s).
 app.on("before-quit", event => {
-    // Ne tenter l'update que si une URL est en attente ET qu'on n'est pas déjà en train
+    // Only attempt update if an URL is pending AND not already in progress
     if (!pendingDownloadUrl || isApplying) return;
 
     event.preventDefault();
@@ -134,7 +134,7 @@ app.on("before-quit", event => {
 
     const safetyTimeout = setTimeout(() => {
         console.error("[Nightcord] Update on quit timed out — forcing exit.");
-        // Nettoyer pour éviter la boucle infinie au prochain démarrage
+        // Clean up to avoid infinite loop on next startup
         pendingDownloadUrl = null;
         pendingVersion = null;
         app.exit(0);
@@ -147,7 +147,7 @@ app.on("before-quit", event => {
         })
         .catch(err => {
             console.error("[Nightcord] Update on quit failed:", err);
-            // En cas d'échec, nettoyer pour éviter la boucle infinie
+            // On failure, clean up to avoid infinite loop
             pendingDownloadUrl = null;
             pendingVersion = null;
         })

@@ -85,18 +85,18 @@ async function leaveGroupDM(channelId: string) {
         if (settings.store.showNotifications) {
             showNotification({
                 title: "🛡️ AntiGroup - Group left",
-                body: `Vous avez automatiquement quitté le groupe "${channelName}"`,
+                body: `You have automatically left the group "${channelName}"`,
                 icon: undefined
             });
         }
     } catch (error) {
         const channel = ChannelStore.getChannel(channelId);
-        const channelName = channel?.name || "Groupe inconnu";
+        const channelName = channel?.name || "Unknown group";
         log(`❌ ERREUR lors de la sortie du groupe "${channelName}" (${channelId}): ${error}`, "error");
         if (settings.store.showNotifications) {
             showNotification({
                 title: "❌ AntiGroup - Error",
-                body: `Impossible de quitter automatiquement le groupe "${channelName}"`,
+                body: `Could not automatically leave the group "${channelName}"`,
                 icon: undefined
             });
         }
@@ -143,7 +143,7 @@ export default definePlugin({
             if (settings.store.showNotifications) {
                 showNotification({
                     title: "🚨 AntiGroup - Groupe detected",
-                    body: `Ajouté au groupe "${channel.name || "Sans nom"}" - Sortie automatique dans ${settings.store.delay / 1000}s`,
+                    body: `Added to group "${channel.name || "Unnamed"}" — Auto leaving in ${settings.store.delay / 1000}s`,
                     icon: undefined
                 });
             }

@@ -240,7 +240,7 @@ await Promise.all([
     }))
 ]);
 
-// ── Obfuscation désactivée définitivement ───────────────────
+// ── Obfuscation permanently disabled ────────────────────────
 /*
 if (!watch && !IS_DEV) {
     await Promise.all([
@@ -248,10 +248,10 @@ if (!watch && !IS_DEV) {
         obfuscateDir("dist/nightcord"),
     ]);
 } else {
-    console.log("[build] Obfuscation ignorée en mode dev/watch.");
+    console.log("[build] Obfuscation skipped in dev/watch mode.");
 }
 */
-console.log("[build] Obfuscation désactivée (Code Source en clair).");
+console.log("[build] Obfuscation disabled (plain source code).");
 
 await Promise.all([
     createPackage("dist/desktop", "dist/desktop.asar"),
