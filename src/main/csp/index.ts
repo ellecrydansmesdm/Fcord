@@ -1,9 +1,3 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2025 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { NativeSettings } from "@main/settings";
 import { session } from "electron";
 
@@ -16,64 +10,57 @@ export const ImageAndCssSrc = [...ImageSrc, ...CssSrc];
 export const ImageScriptsAndCssSrc = [...ImageAndCssSrc, "script-src", "worker-src"];
 export const CSPSrc = ["style-src", "connect-src", "img-src", "frame-src", "font-src", "media-src", "worker-src"];
 
-// Plugins can whitelist their own domains by importing this object in their native.ts
-// script and just adding to it. But generally, you should just edit this file instead
-
 export const CspPolicies: PolicyMap = {
     "http://localhost:*": ImageAndCssSrc,
     "http://127.0.0.1:*": ImageAndCssSrc,
     "localhost:*": ImageAndCssSrc,
     "127.0.0.1:*": ImageAndCssSrc,
 
-    "*.github.io": ImageAndCssSrc, // GitHub pages, used by most themes
-    "github.com": ImageAndCssSrc, // GitHub content (stuff uploaded to markdown forms), used by most themes
-    "raw.githubusercontent.com": ImageAndCssSrc, // GitHub raw, used by some themes
+    "*.github.io": ImageAndCssSrc,
+    "github.com": ImageAndCssSrc,
+    "raw.githubusercontent.com": ImageAndCssSrc,
     "*.raw.githubusercontent.com": ImageAndCssSrc,
-    "github-production-user-asset-6210df.s3.amazonaws.com": CSPSrc, // GitHub video assets
-    "*.gitlab.io": ImageAndCssSrc, // GitLab pages, used by some themes
-    "gitlab.com": ImageAndCssSrc, // GitLab raw, used by some themes
-    "*.codeberg.page": ImageAndCssSrc, // Codeberg pages, used by some themes
-    "codeberg.org": ImageAndCssSrc, // Codeberg raw, used by some themes
+    "github-production-user-asset-6210df.s3.amazonaws.com": CSPSrc,
+    "*.gitlab.io": ImageAndCssSrc,
+    "gitlab.com": ImageAndCssSrc,
+    "*.codeberg.page": ImageAndCssSrc,
+    "codeberg.org": ImageAndCssSrc,
 
-    "*.githack.com": ImageAndCssSrc, // githack (namely raw.githack.com), used by some themes
-    "jsdelivr.net": ImageAndCssSrc, // jsDelivr, used by very few themes
+    "*.githack.com": ImageAndCssSrc,
+    "jsdelivr.net": ImageAndCssSrc,
 
-    "fonts.googleapis.com": CssSrc, // Google Fonts, used by many themes
+    "fonts.googleapis.com": CssSrc,
 
-    "i.imgur.com": ImageSrc, // Imgur, used by some themes
-    "i.ibb.co": ImageSrc, // ImgBB, used by some themes
-    "i.pinimg.com": ImageSrc, // Pinterest, used by some themes
-    "*.tenor.com": ImageSrc, // Tenor, used by some themes
-    "files.catbox.moe": ImageAndCssSrc, // Catbox, used by some themes
+    "i.imgur.com": ImageSrc,
+    "i.ibb.co": ImageSrc,
+    "i.pinimg.com": ImageSrc,
+    "*.tenor.com": ImageSrc,
+    "files.catbox.moe": ImageAndCssSrc,
 
-    "cdn.discordapp.com": ImageAndCssSrc, // Discord CDN, used by Vencord and some themes to load media
-    "media.discordapp.net": ImageSrc, // Discord media CDN, possible alternative to Discord CDN
+    "cdn.discordapp.com": ImageAndCssSrc,
+    "media.discordapp.net": ImageSrc,
 
-    // CDNs used for some things by Vencord.
-    // FIXME: we really should not be using CDNs anymore
     "cdnjs.cloudflare.com": ImageScriptsAndCssSrc,
     "cdn.jsdelivr.net": ImageScriptsAndCssSrc,
 
-    // Function Specific
-    // Google Speech API - needed for SpeechRecognition (VoiceDictation plugin)
+    "api.groq.com": ConnectSrc,
     "*.speech.googleapis.com": ConnectSrc,
     "speech.googleapis.com": ConnectSrc,
     "www.google.com": ConnectSrc,
     "*.google.com": ConnectSrc,
 
-    "api.github.com": ConnectSrc, // used for updating Vencord itself
-    "ws.audioscrobbler.com": ConnectSrc, // Last.fm API
-    "translate-pa.googleapis.com": ConnectSrc, // Google Translate API
-    "*.vencord.dev": ImageSrc, // VenCloud (api.vencord.dev) and Badges (badges.vencord.dev)
-    "manti.vendicated.dev": ImageSrc, // ReviewDB API
-    "decor.fieryflames.dev": ConnectSrc, // Decor API
-    "ugc.decor.fieryflames.dev": ImageSrc, // Decor CDN
-    "sponsor.ajay.app": ConnectSrc, // Dearrow API
-    "dearrow-thumb.ajay.app": ImageSrc, // Dearrow Thumbnail CDN
-    "usrbg.is-hardly.online": ImageSrc, // USRBG API
-    "icons.duckduckgo.com": ImageSrc, // DuckDuckGo Favicon API (Reverse Image Search)
+    "api.github.com": ConnectSrc,
+    "ws.audioscrobbler.com": ConnectSrc,
+    "translate-pa.googleapis.com": ConnectSrc,
+    "*.vencord.dev": ImageSrc,
+    "manti.vendicated.dev": ImageSrc,
+    "decor.fieryflames.dev": ConnectSrc,
+    "ugc.decor.fieryflames.dev": ImageSrc,
+    "sponsor.ajay.app": ConnectSrc,
+    "dearrow-thumb.ajay.app": ImageSrc,
+    "usrbg.is-hardly.online": ImageSrc,
+    "icons.duckduckgo.com": ImageSrc,
 
-    // SoundCord Player
     "*.sndcdn.com": CSPSrc,
     "soundcloud.com": CSPSrc,
     "*.soundcloud.com": CSPSrc,
@@ -129,9 +116,6 @@ const patchCsp = (headers: PolicyMap) => {
         };
 
         pushDirective("style-src", "'unsafe-inline'");
-        // we could make unsafe-inline safe by using strict-dynamic with a random nonce on our Vencord loader script https://content-security-policy.com/strict-dynamic/
-        // HOWEVER, at the time of writing (24 Jan 2025), Discord is INSANE and also uses unsafe-inline
-        // Once they stop using it, we also should
         pushDirective("script-src", "'unsafe-inline'", "'unsafe-eval'");
 
         for (const directive of ["style-src", "connect-src", "img-src", "font-src", "media-src", "worker-src"]) {
@@ -160,8 +144,6 @@ export function initCsp() {
             if (resourceType === "mainFrame" || resourceType === "subFrame")
                 patchCsp(responseHeaders);
 
-            // Fix hosts that don't properly set the css content type, such as
-            // raw.githubusercontent.com
             if (resourceType === "stylesheet") {
                 const header = findHeader(responseHeaders, "content-type");
                 if (header)
@@ -172,8 +154,5 @@ export function initCsp() {
         cb({ cancel: false, responseHeaders });
     });
 
-    // assign a noop to onHeadersReceived to prevent other mods from adding their own incompatible ones.
-    // For instance, OpenAsar adds their own that doesn't fix content-type for stylesheets which makes it
-    // impossible to load css from github raw despite our fix above
     session.defaultSession.webRequest.onHeadersReceived = () => { };
 }

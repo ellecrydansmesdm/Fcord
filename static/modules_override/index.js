@@ -46,7 +46,7 @@ if (isLogDirAvailable) {
   console.warn('Unable to find log directory');
 }
 
-const defaultAudioSubsystem = process.platform === 'win32' ? 'experimental' : 'standard';
+const defaultAudioSubsystem = 'standard';
 const audioSubsystem = appSettings
   ? appSettings.getSync('audioSubsystem', defaultAudioSubsystem)
   : defaultAudioSubsystem;

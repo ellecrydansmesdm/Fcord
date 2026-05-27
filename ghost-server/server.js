@@ -1,16 +1,3 @@
-/**
- * ghost-server.js — Nightcord Ghost Client
- * Architecture "always-on" + optimisé performance :
- *   - Cache ffmpeg/device au démarrage (plus de execSync pendant l'audio)
- *   - Buffer pré-alloué (plus de Buffer.concat à chaque frame)
- *   - Priorité process élevée (ABOVE_NORMAL)
- *
- * FIX streaming infini :
- *   - /stream-start répond IMMÉDIATEMENT (202) puis résout en arrière-plan
- *   - /stream-status permet à l'UI de poller l'état de la résolution
- *   - Plus de blocage HTTP pendant yt-dlp (30s) ou le démarrage ffmpeg
- */
-
 import http from "http";
 import https from "https";
 import { Client } from "discord.js-selfbot-v13";
@@ -39,7 +26,6 @@ let _fluentFfmpeg = null;
 import("@dank074/discord-video-stream").then(m => {
     DVS = m;
     console.log("[GhostServer] DVS OK");
-    // Pré-charger fluent-ffmpeg dès que DVS est prêt — évite le dynamic import au moment du stream
     import("fluent-ffmpeg").then(m2 => {
         _fluentFfmpeg = m2.default ?? m2;
         console.log("[GhostServer] fluent-ffmpeg pré-chargé OK");
@@ -50,7 +36,6 @@ try { OpusScript = require("opusscript"); console.log("[GhostServer] opusscript 
 catch (e) { console.error("[GhostServer] opusscript introuvable: " + e.message); }
 
 try {
-    // Utilise os.setPriority (natif Node.js) au lieu de wmic (obsolète/lent)
     os.setPriority(process.pid, os.constants.priority.PRIORITY_ABOVE_NORMAL);
     console.log("[GhostServer] Priorité processeur augmentée ✓");
 } catch (e) {
@@ -60,9 +45,9 @@ try {
 function findFfmpeg() {
     if (_ffmpegCache !== null) return _ffmpegCache;
     const candidates = [
-        path.join(__dirname, "..", "..", "ffmpeg.exe"), // Racine (production)
-        path.join(__dirname, "..", "ffmpeg.exe"),        // Resources (dev/dist)
-        path.join(__dirname, "ffmpeg.exe")              // Local
+        path.join(__dirname, "..", "..", "ffmpeg.exe"),
+        path.join(__dirname, "..", "ffmpeg.exe"),
+        path.join(__dirname, "ffmpeg.exe")
     ];
     for (const c of candidates) { if (fs.existsSync(c)) { _ffmpegCache = c; return c; } }
     try { let p = require("ffmpeg-static"); p = p?.default ?? p; if (p && fs.existsSync(p)) { _ffmpegCache = p; return p; } } catch { }
@@ -127,7 +112,6 @@ async function findYtDlp() {
         } catch { }
     }
 
-    // Si on arrive ici, il est vraiment absent. On tente le téléchargement.
     if (_ytdlpDownloadPromise) return _ytdlpDownloadPromise;
 
     const target = path.join(__dirname, "yt-dlp.exe");
@@ -149,21 +133,17 @@ async function findYtDlp() {
     return _ytdlpDownloadPromise;
 }
 
-// Cache des URLs résolues — évite de relancer yt-dlp pour la même URL
-// Limité à 100 entrées pour éviter les fuites mémoire
 const _resolvedUrlCache = new Map();
 const MAX_CACHE_SIZE = 100;
 
 async function resolveVideoUrl(url) {
     if (/\.(mp4|mkv|webm|m3u8|mov|avi)(\?|$)/i.test(url)) return url;
-    // Cache : si déjà résolue récemment (< 5 min) on retourne directement
     const cached = _resolvedUrlCache.get(url);
     if (cached && (Date.now() - cached.ts) < 5 * 60 * 1000) return cached.resolved;
     const ytdlp = await findYtDlp();
     if (!ytdlp) throw new Error("yt-dlp manquant (échec du téléchargement)");
     if (typeof ytdlp !== "string") throw new Error("yt-dlp en cours de téléchargement, réessaie dans 10 secondes...");
     return new Promise((resolve, reject) => {
-        // Timeout étendu à 30s pour les connexions lentes
         const proc = spawn(ytdlp, [
             "-g",
             "--no-playlist",
@@ -201,12 +181,9 @@ setImmediate(() => {
 });
 
 const sessions = new Map();
-const audioPipelines = new Map(); // Legacy: userId -> { udpTarget }
-const sharedAudios = new Map(); // micDevice -> { proc, encoder, users: Map<userId, udpConn> }
-
-// FIX streaming infini : état de chaque stream en cours de démarrage
-// Permet à l'UI de poller /stream-status sans bloquer la requête /stream-start
-const streamJobs = new Map(); // userId → { state: "resolving"|"starting"|"active"|"error", error?: string }
+const audioPipelines = new Map();
+const sharedAudios = new Map();
+const streamJobs = new Map();
 
 async function preconnectGhost({ userId, token, micLabel, micDevice }) {
     micLabel = micLabel || micDevice || "default";
@@ -267,7 +244,6 @@ async function joinVoice(userId, guildId, channelId, micLabel, micDevice) {
     const s = sessions.get(userId);
     if (!s) return { ok: false, error: "Session introuvable" };
 
-    // Si déjà connecté, on force un leave propre d'abord pour reset l'audio
     if (s.udpConn) {
         await leaveVoice(userId);
         await new Promise(r => setTimeout(r, 500));
@@ -286,7 +262,6 @@ async function joinVoice(userId, guildId, channelId, micLabel, micDevice) {
 async function doJoinVoice(session, guildId, channelId) {
     stopStream(session);
 
-    // Tentative de récupération des noms pour les logs (optionnel)
     const guild = session.client.guilds.cache.get(guildId);
     const channel = guild?.channels.cache.get(channelId);
     if (channel) console.log("[GhostServer] Rejoindre: " + channel.name);
@@ -310,12 +285,10 @@ async function doJoinVoice(session, guildId, channelId) {
                 session.streamer.joinVoice(guildId, channelId, { receiveAudio: true }).then(u => { console.log("[GhostServer] joinVoice resolved! ready=" + u?.ready); return u; }),
                 new Promise((_, r) => setTimeout(() => r(new Error("Timeout connexion WebRTC")), 15000))
             ]);
-            break; // Succès
+            break;
         } catch (e) {
             console.error(`[GhostServer] ❌ joinVoice tentative ${attempts} a echoue:`, e.message);
             if (attempts >= 2) throw e;
-            // NE PAS appeler leaveVoice() — ça efface les listeners VOICE_SERVER_UPDATE
-            // Juste stopper la VoiceConnection WebSocket si elle existe
             try { session.streamer.voiceConnection?.stop(); } catch { }
             try { session.streamer._voiceConnection = undefined; } catch { }
             try { session.streamer._gatewayEmitter.removeAllListeners("VOICE_STATE_UPDATE"); } catch { }
@@ -328,24 +301,35 @@ async function doJoinVoice(session, guildId, channelId) {
     try { udpConn.setPacketizer("H264"); } catch { }
     console.log("[GhostServer] Voice connecte (avec reception audio) ✓");
 
-    // Activer l'audio ET setSpeaking seulement quand WebRTC est vraiment "connected"
-    // sendAudioFrame retourne silencieusement si udpConn.ready === false
-    // Sur les PCs lents/connexions lentes, WebRTC peut prendre 2-10s a devenir "connected"
-    function activateAudio() {
-        console.log("[GhostServer] ✅ WebRTC connected — audio + speaking actifs pour " + session.userId);
-        try { udpConn.mediaConnection?.setSpeaking(true); } catch { }
-
-        // On s'enregistre dans le pipeline audio (partagé ou non)
-        audioPipelines.set(session.userId, { udpTarget: udpConn });
-        startPermanentAudio(session, udpConn);
+    function setSpeaking(udpTarget, session, enabled) {
+        try {
+            if (udpTarget?.mediaConnection?.setSpeaking) {
+                udpTarget.mediaConnection.setSpeaking(enabled);
+            } else if (session?.streamer?.voiceConnection?.setSpeaking) {
+                session.streamer.voiceConnection.setSpeaking(enabled);
+            } else if (session?.client?.voice?.setSpeaking) {
+                session.client.voice.setSpeaking(enabled);
+            } else {
+                console.warn("[GhostServer] Aucun moyen d'appeler setSpeaking pour " + session?.userId);
+            }
+        } catch { }
     }
 
-    // DVS v5/v6 compatible: polling sur udpConn.ready
+    function activateAudio() {
+        console.log("[GhostServer] ✅ WebRTC connected — audio + speaking actifs pour " + session.userId);
+        setSpeaking(udpConn, session, true);
+
+        audioPipelines.set(session.userId, { udpTarget: udpConn });
+        const audioOk = startPermanentAudio(session, udpConn);
+        if (!audioOk) {
+            console.error("[GhostServer] Échec du démarrage du pipeline audio pour " + session.userId);
+        }
+    }
+
     if (udpConn.ready) {
         activateAudio();
     } else {
         let activated = false;
-        // Essayer onStateChange (DVS v6)
         try {
             const webRtcConn = udpConn?.webRtcConn?.webRtcConn ?? udpConn?.webRtcConn;
             if (webRtcConn && typeof webRtcConn.onStateChange === 'function') {
@@ -355,7 +339,6 @@ async function doJoinVoice(session, guildId, channelId) {
                 });
             }
         } catch {}
-        // Polling universel
         let polls = 0;
         const poll = setInterval(() => {
             polls++;
@@ -416,9 +399,12 @@ async function joinVoiceSilent(userId, guildId, channelId, micLabel, micDevice, 
         try { udpConn.setPacketizer("H264"); } catch { }
 
         function activateAudio() {
-            try { udpConn.mediaConnection?.setSpeaking(true); } catch { }
+            setSpeaking(udpConn, s, true);
             audioPipelines.set(userId, { udpTarget: udpConn });
-            startPermanentAudio(s, udpConn);
+            const audioOk = startPermanentAudio(s, udpConn);
+            if (!audioOk) {
+                console.error("[GhostServer] Échec du démarrage du pipeline audio pour " + userId);
+            }
         }
 
         if (udpConn.ready) {
@@ -451,17 +437,15 @@ async function leaveVoice(userId) {
     const s = sessions.get(userId);
     if (!s) return;
 
-    // On coupe l'audio AVANT de quitter WebRTC pour éviter des frames corrompues
     stopMic(s);
     stopStream(s);
 
     if (s.udpConn) {
-        try { s.udpConn.mediaConnection?.setSpeaking(false); } catch { }
+        setSpeaking(s.udpConn, s, false);
         try { s.streamer.leaveVoice(); } catch { }
         s.udpConn = null;
     }
 
-    // Petit délai de sécurité pour que le matériel audio soit relâché proprement par ffmpeg
     await new Promise(r => setTimeout(r, 200));
 
     console.log("[GhostServer] " + userId + " quitté le salon");
@@ -488,7 +472,6 @@ function resolveDevice(session) {
     const devs = listDshowDevices(ffmpeg);
     let device = (session.micLabel && session.micLabel !== "default") ? session.micLabel : null;
 
-    // Correspondance intelligente (casse, espaces, accents)
     if (device && devs.length > 0 && !devs.includes(device)) {
         const clean = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
         const targetClean = clean(device);
@@ -504,17 +487,15 @@ function startPermanentAudio(session, initialUdpConn) {
     const { ffmpeg, device } = resolveDevice(session);
     if (!ffmpeg || !OpusScript || !device) {
         console.warn("[GhostServer] Pipeline impossible: ffmpeg=" + !!ffmpeg + " opus=" + !!OpusScript + " device=" + device);
-        return;
+        return false;
     }
 
-    // Gestion du Pipeline Partagé par micro
-    // Vérifier à nouveau après résolution du device (évite race condition)
     if (sharedAudios.has(device)) {
         const shared = sharedAudios.get(device);
         if (shared) {
             shared.users.set(session.userId, initialUdpConn);
             console.log(`[GhostServer] Micro ${device} déjà actif, ajout de l'utilisateur ${session.userId} au flux partagé`);
-            return;
+            return true;
         }
     }
 
@@ -541,7 +522,6 @@ function startPermanentAudio(session, initialUdpConn) {
 
     proc.on("exit", code => {
         sharedAudios.delete(device);
-        // Reset l'encodeur Opus pour libérer la mémoire native
         try { encoder.delete(); } catch { }
         if (code !== 0 && code !== null) console.log("[GhostServer] ffmpeg micro " + device + " exit: " + code);
     });
@@ -578,12 +558,10 @@ function startPermanentAudio(session, initialUdpConn) {
             dataLen -= PCM_BYTES;
 
             const opusFrame = encoder.encode(frame, FRAME_SIZE);
-            // Broadcast aux utilisateurs actifs
             for (const [uid, target] of shared.users) {
                 if (target?.ready) {
                     try { target.sendAudioFrame(opusFrame, FRAME_DUR); } catch { }
                 } else {
-                    // Update target si joinVoice a fini entre temps
                     const pipe = audioPipelines.get(uid);
                     if (pipe?.udpTarget) shared.users.set(uid, pipe.udpTarget);
                 }
@@ -592,16 +570,15 @@ function startPermanentAudio(session, initialUdpConn) {
     });
 
     console.log("[GhostServer] Pipeline audio partagé actif ✓");
+    return true;
 }
 
 function stopMic(session) {
     audioPipelines.delete(session.userId);
-    // Retrait de l'utilisateur du flux partagé
     for (const [device, shared] of sharedAudios) {
         if (shared.users.has(session.userId)) {
             shared.users.delete(session.userId);
             console.log(`[GhostServer] Retrait de ${session.userId} du micro ${device}`);
-            // Si plus personne n'écoute ce micro, on coupe ffmpeg
             if (shared.users.size === 0) {
                 try { shared.proc.kill("SIGKILL"); } catch { }
                 sharedAudios.delete(device);
@@ -628,7 +605,7 @@ function stopAll(session) {
     stopMic(session);
     stopStream(session);
     if (session.udpConn) {
-        try { session.udpConn.mediaConnection?.setSpeaking(false); } catch { }
+        setSpeaking(session.udpConn, session, false);
         try { session.streamer.leaveVoice(); } catch { }
         session.udpConn = null;
     }
@@ -747,7 +724,7 @@ http.createServer(async (req, res) => {
                     const pipe = audioPipelines.get(userId);
                     if (s?.udpConn && pipe) {
                         pipe.udpTarget = s.udpConn;
-                        try { s.udpConn.mediaConnection?.setSpeaking(true); } catch { }
+                        setSpeaking(s.udpConn, s, true);
                     }
                 }
                 console.log(`[GhostServer] Audio sync ${joined.length}/${ids.length} ✓`);
@@ -760,24 +737,14 @@ http.createServer(async (req, res) => {
         if (req.url === "/disconnect") { await leaveVoice(body.userId); send(res, 200, { ok: true }); return; }
         if (req.url === "/destroy") { await destroyGhost(body.userId); send(res, 200, { ok: true }); return; }
 
-        // FIX STREAMING INFINI :
-        // Avant ce fix, /stream-start attendait la résolution yt-dlp (jusqu'à 30s) DANS la requête HTTP.
-        // Pendant ce temps, le serveur HTTP ne répondait plus à RIEN (Node.js single-thread),
-        // donc l'UI Discord voyait toutes ses requêtes bloquer → "chargement infini" partout.
-        //
-        // Solution : répondre IMMÉDIATEMENT avec { ok: true, resolving: true }
-        // et traiter la résolution + le démarrage ffmpeg en arrière-plan.
-        // L'UI peut poller /stream-status pour suivre l'état.
         if (req.url === "/stream-start") {
             const s = sessions.get(body.userId);
             if (!s) { send(res, 200, { ok: false, error: "Session introuvable" }); return; }
 
-            // Répondre immédiatement — ne pas bloquer le serveur HTTP
             const jobId = Date.now().toString();
             streamJobs.set(body.userId, { state: "resolving", jobId });
             send(res, 200, { ok: true, resolving: true, jobId });
 
-            // Traitement asynchrone EN ARRIÈRE-PLAN
             setImmediate(async () => {
                 try {
                     streamJobs.set(body.userId, { state: "starting", jobId });
@@ -793,14 +760,11 @@ http.createServer(async (req, res) => {
             return;
         }
 
-        // Nouveau endpoint : l'UI polle cet endpoint pour savoir si le stream a démarré
-        // { state: "resolving"|"starting"|"active"|"error", error?: string }
         if (req.url === "/stream-status") {
             const s = sessions.get(body.userId);
             if (!s) { send(res, 200, { ok: false, error: "Session introuvable" }); return; }
             const job = streamJobs.get(body.userId);
             if (!job) {
-                // Pas de job en cours — vérifier si le stream est actif
                 send(res, 200, { ok: true, state: s.streaming ? "active" : "idle" });
             } else {
                 send(res, 200, { ok: true, ...job });
@@ -826,19 +790,18 @@ http.createServer(async (req, res) => {
                 "Connection": "keep-alive"
             });
 
-            // Header WAV pour stream "infini" (Data size = 0xFFFFFFFF)
             const wavHeader = Buffer.alloc(44);
             wavHeader.write("RIFF", 0);
             wavHeader.writeUInt32LE(0xFFFFFFFF, 4);
             wavHeader.write("WAVE", 8);
             wavHeader.write("fmt ", 12);
             wavHeader.writeUInt32LE(16, 16);
-            wavHeader.writeUInt16LE(1, 20); // PCM
-            wavHeader.writeUInt16LE(2, 22); // Channels
-            wavHeader.writeUInt32LE(48000, 24); // Rate
-            wavHeader.writeUInt32LE(48000 * 2 * 2, 28); // Byte rate
-            wavHeader.writeUInt16LE(4, 32); // Block align
-            wavHeader.writeUInt16LE(16, 34); // Bits per sample
+            wavHeader.writeUInt16LE(1, 20);
+            wavHeader.writeUInt16LE(2, 22);
+            wavHeader.writeUInt32LE(48000, 24);
+            wavHeader.writeUInt32LE(48000 * 2 * 2, 28);
+            wavHeader.writeUInt16LE(4, 32);
+            wavHeader.writeUInt16LE(16, 34);
             wavHeader.write("data", 36);
             wavHeader.writeUInt32LE(0xFFFFFFFF, 40);
 
@@ -846,7 +809,6 @@ http.createServer(async (req, res) => {
 
             const decoder = new OpusScript(48000, 2, OpusScript.Application.VOIP);
 
-            // On s'abonne via le streamer si possible (plus propre sur DVS)
             const udp = s.udpConn;
             if (udp?.mediaConnection?.on) {
                 udp.mediaConnection.on("audio", (id, frame) => {
@@ -857,7 +819,6 @@ http.createServer(async (req, res) => {
                     } catch { }
                 });
             } else {
-                // Fallback silence pour tester si pas d'audio
                 const silence = Buffer.alloc(960 * 4, 0);
                 const int = setInterval(() => { if (!res.writable) clearInterval(int); else res.write(silence); }, 20);
                 req.on("close", () => clearInterval(int));

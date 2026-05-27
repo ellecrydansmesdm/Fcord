@@ -1,18 +1,9 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2026 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { definePluginSettings } from "@api/Settings";
-import { showApiKeyWarning } from "@utils/apiKeyWarning";
 import definePlugin, { OptionType } from "@utils/types";
-import { ComponentDispatch, MediaEngineStore, React, showToast, Toasts,useEffect, useRef, useState } from "@webpack/common";
-
+import { ComponentDispatch, React, useEffect, useRef, useState, MediaEngineStore, showToast, Toasts } from "@webpack/common";
 import { getGroqKey } from "../nightcordAI/groqManager";
-
-// ── Settings ──────────────────────────────────────────────────────────────────
+import { showApiKeyWarning } from "@utils/apiKeyWarning";
 
 const settings = definePluginSettings({
     language: {
@@ -38,8 +29,6 @@ const settings = definePluginSettings({
     },
 });
 
-// ── SVG Icon ──────────────────────────────────────────────────────────────────
-
 const DictationIcon: React.FC<{ recording?: boolean; processing?: boolean; height?: string | number; width?: string | number; className?: string; }> = ({ recording = false, processing = false, height = 20, width = 20, className }) => (
     <svg
         aria-hidden="true"
@@ -57,8 +46,6 @@ const DictationIcon: React.FC<{ recording?: boolean; processing?: boolean; heigh
         <path fill="currentColor" d="m9.2 3.86-.46-.17-.91-.34a2 2 0 0 1-1.18-1.18L6.14.79a1.21 1.21 0 0 0-2.28 0l-.5 1.38a2 2 0 0 1-1.19 1.18l-1.38.51a1.21 1.21 0 0 0 0 2.28l1.38.5a2 2 0 0 1 1.18 1.19l.51 1.38a1.21 1.21 0 0 0 2.28 0l.5-1.38a2 2 0 0 1 1.19-1.18L8 6.59l1.2-.45a1.21 1.21 0 0 0 0-2.28Z" />
     </svg>
 );
-
-// ── Transcription ─────────────────────────────────────────────────────────────
 
 function insertText(text: string) {
     ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
@@ -80,7 +67,6 @@ async function transcribe(blob: Blob): Promise<string> {
     form.append("file", blob, "audio.webm");
     form.append("model", "whisper-large-v3-turbo");
     form.append("response_format", "text");
-    // Prompt pour orienter Whisper vers du français et éviter les hallucinations "Thank you"
     form.append("prompt", "Ceci est une dictée vocale en français. Ne pas traduire en anglais. Ne pas générer de texte si il n'y a que du silence.");
     if (language) form.append("language", language);
 
@@ -99,8 +85,6 @@ async function transcribe(blob: Blob): Promise<string> {
     return text.trim();
 }
 
-// ── Chat Bar Button ───────────────────────────────────────────────────────────
-
 const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
     const [recording, setRecording] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -109,6 +93,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
     const recorderRef = useRef<MediaRecorder | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const activeRef = useRef(false);
+    const stoppingRef = useRef(false);
     const chunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -124,35 +109,33 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
         setErrorMsg(null);
         activeRef.current = true;
 
-        // Helper to map Discord input device to real WebAudio device
         async function getRealInputDeviceId(discordId: string): Promise<string> {
             if (!discordId || discordId === "default") return "default";
             try {
                 const devs = MediaEngineStore.getInputDevices();
                 const selected = devs[discordId];
                 if (!selected || !selected.name) return "default";
-
+                
                 let webDevs = await navigator.mediaDevices.enumerateDevices();
-                // trigger permissions if empty labels
                 if (webDevs.some(d => d.kind === "audioinput" && !d.label)) {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     stream.getTracks().forEach(t => t.stop());
                     webDevs = await navigator.mediaDevices.enumerateDevices();
                 }
-
+                
                 let match = webDevs.find(d => d.kind === "audioinput" && d.deviceId === discordId);
-
+                
                 if (!match) {
-                    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+                    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
                     const normSelected = normalize(selected.name);
-
+                    
                     match = webDevs.find(d => {
                         if (d.kind !== "audioinput" || !d.label) return false;
                         const normLabel = normalize(d.label);
                         return normLabel.includes(normSelected) || normSelected.includes(normLabel);
                     });
                 }
-
+                
                 if (match) {
                     console.log(`[VoiceDictation] Mapped Discord device "${selected.name}" to WebAudio deviceId "${match.deviceId}"`);
                     showToast(`Dictation: Using mic "${match.label || selected.name}"`, Toasts.Type.SUCCESS);
@@ -167,14 +150,12 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
             return "default";
         }
 
-        // Open microphone
         let stream: MediaStream;
         try {
             const discordDeviceId = MediaEngineStore.getInputDeviceId();
             const realDeviceId = await getRealInputDeviceId(discordDeviceId);
-
+            
             try {
-                // Premier essai : avec le deviceId spécifique (fonctionne si permission ok)
                 stream = await navigator.mediaDevices.getUserMedia({
                     audio: realDeviceId && realDeviceId !== "default"
                         ? { deviceId: { exact: realDeviceId } }
@@ -182,7 +163,6 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
                 });
             } catch (firstErr: any) {
                 if (firstErr.name === "NotAllowedError" || firstErr.name === "PermissionDeniedError") {
-                    // Fallback: permission pas encore accordée, demander sans deviceId
                     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 } else {
                     throw firstErr;
@@ -198,7 +178,6 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
             return;
         }
 
-        // Choose audio format
         const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"]
             .find(m => MediaRecorder.isTypeSupported(m)) ?? "";
 
@@ -213,7 +192,6 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
         recorder.start();
         setRecording(true);
 
-        // Flush and transcribe at regular intervals
         const chunkMs = (settings.store.chunkSeconds ?? 5) * 1000;
         timerRef.current = setInterval(() => flushAndTranscribe(), chunkMs);
     }
@@ -221,7 +199,6 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
     async function flushAndTranscribe() {
         if (!recorderRef.current || recorderRef.current.state !== "recording") return;
 
-        // Stop briefly to get a complete blob
         recorderRef.current.stop();
 
         await new Promise<void>(resolve => {
@@ -231,45 +208,34 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
         const chunks = [...chunksRef.current];
         chunksRef.current = [];
 
-        if (chunks.length === 0 || !activeRef.current) {
-            // Restart if still active
-            if (activeRef.current && streamRef.current) restartRecorder();
+        if (chunks.length === 0 || !activeRef.current || stoppingRef.current) {
+            if (activeRef.current && !stoppingRef.current && streamRef.current) restartRecorder();
             return;
         }
 
         const mimeType = recorderRef.current?.mimeType || "audio/webm";
         const blob = new Blob(chunks, { type: mimeType });
 
-        // Debug log
         console.log("[VoiceDictation] Blob size:", blob.size);
 
         if (blob.size < 500) {
-            if (activeRef.current) restartRecorder();
-            return; // Silence / too short
+            if (activeRef.current && !stoppingRef.current) restartRecorder();
+            return;
         }
 
         setProcessing(true);
         try {
             const text = await transcribe(blob);
-            // Debug log
             console.log("[VoiceDictation] Transcribed text:", text);
             if (text && text.length > 0) {
-                // Filter common Whisper hallucinations (silence → phantom text)
                 const t = text.trim();
                 const isHallucination =
-                    // Simple exact patterns
                     /^(merci|thanks?|thank you|music|♪|🎵|\.\.\.|\.\s*)+$/i.test(t) ||
-                    // Subtitling / subtitles
                     /sous[- ]?titr/i.test(t) ||
-                    // Radio-Canada, SRC, etc.
                     /radio[- ]?canada|société radio/i.test(t) ||
-                    // "Thanks for watching", etc.
                     /merci .*(regard|écouter|suivi)|thanks? .*watch/i.test(t) ||
-                    // "Transcription by...", "Transcribed by..."
                     /transcri(ption|t)\s*(par|by)/i.test(t) ||
-                    // Repetitive text (same word/syllable 3+ times)
                     /^(.{1,15})\1{2,}$/i.test(t.replace(/\s+/g, "")) ||
-                    // Too short and punctuation only
                     /^[\s.,!?…\-–—]+$/.test(t);
                 if (!isHallucination) insertText(text + " ");
             }
@@ -280,7 +246,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
             setProcessing(false);
         }
 
-        if (activeRef.current) restartRecorder();
+        if (activeRef.current && !stoppingRef.current) restartRecorder();
     }
 
     function restartRecorder() {
@@ -304,6 +270,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
 
     function stopDictation() {
         activeRef.current = false;
+        stoppingRef.current = false;
 
         if (timerRef.current) {
             clearInterval(timerRef.current);
@@ -324,7 +291,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
 
     function toggle() {
         if (recording) {
-            // Flush immediate transcription on stop
+            stoppingRef.current = true;
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
@@ -338,11 +305,13 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
 
     if (!isMainChat) return null;
 
-    const tooltip = errorMsg || (processing
+    const tooltip = errorMsg
+        ? errorMsg
+        : processing
             ? "Transcribing..."
             : recording
                 ? "Stop dictation"
-                : "Voice dictation");
+                : "Voice dictation";
 
     return (
         <ChatBarButton tooltip={tooltip} onClick={toggle}>
@@ -350,8 +319,6 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
         </ChatBarButton>
     );
 };
-
-// ── Plugin ────────────────────────────────────────────────────────────────────
 
 export default definePlugin({
     name: "VoiceDictation",

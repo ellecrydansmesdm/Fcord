@@ -1,9 +1,3 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2026 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import definePlugin from "@utils/types";
 import { findByPropsLazy } from "@webpack";
 
@@ -30,11 +24,16 @@ function resetKrispPipeline() {
         // Step 1: switch to Studio (full noise suppression — resets the pipeline)
         MediaSettingsStore.setNoiseSuppressionLevel?.("studio");
 
-        // Step 2: switch back to Voice Isolation (Krisp) — now correctly initialised
+        // Step 2: restore user's original setting (don't force 'krisp')
         setTimeout(() => {
             try {
-                MediaSettingsStore.setNoiseSuppressionLevel?.("krisp");
-                console.log("[FixKrisp] Pipeline reset complete — Krisp correctly initialised.");
+                if (original && original !== "studio") {
+                    MediaSettingsStore.setNoiseSuppressionLevel?.(original);
+                    console.log("[FixKrisp] Pipeline reset complete — restored '" + original + "'.");
+                } else {
+                    MediaSettingsStore.setNoiseSuppressionLevel?.("krisp");
+                    console.log("[FixKrisp] Pipeline reset complete — Krisp initialised.");
+                }
             } catch { }
         }, 400);
     } catch { }
@@ -101,11 +100,12 @@ export default definePlugin({
         `;
         document.head.appendChild(script);
 
-        // Auto-reset pipeline when user joins a voice channel
-        // This replaces the manual Studio → Isolation cycle
+        // ONLY reset pipeline when user joins a DIFFERENT voice channel
+        // (avoid disrupting users already in a call on startup/reload)
+        let lastResetChannel: string | null = null;
         const handler = (event: any) => {
-            if (event?.type === "VOICE_CHANNEL_SELECT" && event.channelId) {
-                // Small delay to let Discord connect the audio engine first
+            if (event?.type === "VOICE_CHANNEL_SELECT" && event.channelId && event.channelId !== lastResetChannel) {
+                lastResetChannel = event.channelId;
                 setTimeout(() => resetKrispPipeline(), 1200);
             }
         };
@@ -114,9 +114,6 @@ export default definePlugin({
             FD?.subscribe?.("VOICE_CHANNEL_SELECT", handler);
             this._callCleanup = () => FD?.unsubscribe?.("VOICE_CHANNEL_SELECT", handler);
         } catch { }
-
-        // Also run once on startup for users already in a call (e.g. after a reload)
-        setTimeout(() => resetKrispPipeline(), 2000);
 
         // Ensure UI displays it
         const style = document.createElement("style");

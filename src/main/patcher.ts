@@ -258,27 +258,33 @@ if (!IS_VANILLA) {
     // If we wait for app.whenReady(), Discord's handler is already registered
     // and ipcMain.handle() throws "Attempted to register a second handler" → crash.
     //
-    // Strategy: patch ipcMain.handle itself to intercept Discord's registration
-    // and replace it with our own guarded version immediately.
+    // Strategy: patch ipcMain.handle itself to catch ALL duplicate registrations
+    // (not just fullscreen). If a second handler is registered for the same channel,
+    // we silently ignore it instead of crashing.
     {
         const _originalHandle = electron.ipcMain.handle.bind(electron.ipcMain);
         const FULLSCREEN_CHANNEL = "DISCORD_WINDOW_TOGGLE_FULLSCREEN";
         let _fullscreenPatched = false;
 
-        // Override ipcMain.handle so when Discord calls .handle(FULLSCREEN, ...)
-        // we silently drop it and register our own handler instead.
         (electron.ipcMain as any).handle = function(channel: string, listener: any) {
             if (channel === FULLSCREEN_CHANNEL) {
-                if (_fullscreenPatched) return; // already registered ours — ignore Discord's
+                if (_fullscreenPatched) return;
                 _fullscreenPatched = true;
-                // Register our handler instead of Discord's
                 _originalHandle(FULLSCREEN_CHANNEL, (event: electron.IpcMainInvokeEvent) => {
                     const win = electron.BrowserWindow.fromWebContents(event.sender);
                     if (win) win.setFullScreen(!win.isFullScreen());
                 });
                 return;
             }
-            return _originalHandle(channel, listener);
+            try {
+                return _originalHandle(channel, listener);
+            } catch (e: any) {
+                if (e?.message?.includes?.("Attempted to register a second handler")) {
+                    console.warn(`[Nightcord] Ignored duplicate IPC handler for '${channel}'`);
+                    return;
+                }
+                throw e;
+            }
         };
     }
 
