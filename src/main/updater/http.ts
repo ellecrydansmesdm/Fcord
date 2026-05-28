@@ -14,7 +14,7 @@ import { join } from "path";
 
 import { serializeErrors } from "./common";
 
-const RELEASES_REPO = "nightcordoff/nightcord";
+const RELEASES_REPO = "nightcordfr/nightcord";
 const API_BASE = `https://api.github.com/repos/${RELEASES_REPO}`;
 const REPO_URL = `https://github.com/${RELEASES_REPO}`;
 declare const VERSION: string;

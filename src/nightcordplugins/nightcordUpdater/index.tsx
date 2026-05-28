@@ -10,7 +10,7 @@ import { React, useEffect,useState } from "@webpack/common";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const REMOTE_VERSION_URL =
-    "https://api.github.com/repos/nightcordoff/nightcord/releases/latest";
+    "https://api.github.com/repos/nightcordfr/nightcord/releases/latest";
 
 // ── Version locale (injectée au build via define) ─────────────────────────────
 declare const VERSION: string;

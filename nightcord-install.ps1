@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 $ProgressPreference    = "SilentlyContinue"
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-$NightcordRepo   = "nightcordoff/nightcord"
+$NightcordRepo   = "nightcordfr/nightcord"
 $EquilotlUrl     = "https://github.com/Equicord/Equilotl/releases/latest/download/EquilotlCli.exe"
 $InstallDir      = Join-Path $env:LOCALAPPDATA "Nightcord"
 $DistDir         = Join-Path $InstallDir "dist"

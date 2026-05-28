@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "hasPatches":  true,
         "hasCommands":  false,
@@ -7955,26 +7955,6 @@
         "tags":  [
 
                  ],
-        "name":  "DoubleCall",
-        "description":  "Join two voice channels simultaneously with your own account.",
-        "authors":  [
-                        {
-                            "name":  "Nightcord",
-                            "id":  "0"
-                        }
-                    ],
-        "filePath":  "src/nightcordplugins/doubleCall",
-        "dirName":  "doubleCall"
-    },
-    {
-        "hasPatches":  false,
-        "hasCommands":  false,
-        "enabledByDefault":  true,
-        "required":  false,
-        "isModified":  false,
-        "tags":  [
-
-                 ],
         "name":  "EncryptedMessage",
         "description":  "Encrypts your messages with 400 unique techniques (0â€“399). Only those who know the key can decrypt.",
         "authors":  [
@@ -8374,26 +8354,6 @@
                          ],
         "filePath":  "src/nightcordplugins/hideAttachments",
         "dirName":  "hideAttachments"
-    },
-    {
-        "hasPatches":  false,
-        "hasCommands":  false,
-        "enabledByDefault":  true,
-        "required":  false,
-        "isModified":  false,
-        "tags":  [
-
-                 ],
-        "name":  "GhostClient",
-        "description":  "Discord ghost accounts â€” left-click to enable/disable, right-click to configure.",
-        "authors":  [
-                        {
-                            "name":  "Nightcord",
-                            "id":  "0"
-                        }
-                    ],
-        "filePath":  "src/nightcordplugins/ghostClient",
-        "dirName":  "ghostClient"
     },
     {
         "hasPatches":  true,

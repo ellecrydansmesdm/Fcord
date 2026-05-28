@@ -148,9 +148,9 @@ for /f "usebackq" %%d in (`powershell -NoProfile -Command "Get-Date -Format 'yyy
     echo {
     echo   "version": "%VERSION%",
     echo   "releaseDate": "%ISO_DATE%",
-    echo   "installerUrl": "https://github.com/nightcordoff/nightcord/releases/latest/download/Nightcord-Installer.exe",
-    echo   "distUrl": "https://github.com/nightcordoff/nightcord/releases/latest/download/nightcord-dist.zip",
-    echo   "downloadUrl": "https://github.com/nightcordoff/nightcord/releases/latest/download/desktop.asar",
+    echo   "installerUrl": "https://github.com/nightcordfr/nightcord/releases/latest/download/Nightcord-Installer.exe",
+    echo   "distUrl": "https://github.com/nightcordfr/nightcord/releases/latest/download/nightcord-dist.zip",
+    echo   "downloadUrl": "https://github.com/nightcordfr/nightcord/releases/latest/download/desktop.asar",
     echo   "changelog": "!NOTES!"
     echo }
 ) > "%VERSION_JSON%"
@@ -173,7 +173,7 @@ gh release create "v%VERSION%" ^
     "%DIST_ZIP%#nightcord-dist.zip" ^
     "%DESKTOP_ASAR%#desktop.asar" ^
     "%VERSION_JSON%#version.json" ^
-    --repo nightcordoff/nightcord ^
+    --repo nightcordfr/nightcord ^
     --title "Nightcord v%VERSION%" ^
     --notes "!NOTES!" ^
     --latest

@@ -68,7 +68,7 @@ async function ensureBinary() {
 
     const res = await fetch(BASE_URL + filename, {
         headers: {
-            "User-Agent": "Nightcord (https://github.com/nightcordoff/nightcord)"
+            "User-Agent": "Nightcord (https://github.com/nightcordfr/nightcord)"
         }
     });
 

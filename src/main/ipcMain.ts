@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Vencord, a Discord client mod
  * Copyright (c) 2026 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -27,15 +27,6 @@ mkdirSync(THEMES_DIR, { recursive: true });
 mkdirSync(USERPLUGINS_DIR, { recursive: true });
 
 registerCspIpcHandlers();
-
-import * as ghostNative from "../nightcordplugins/ghostClient/native";
-(async () => {
-    try {
-        await (ghostNative as any).init(null);
-    } catch (e) {
-        console.warn("[Nightcord] Ghost-server pre-start failed:", e);
-    }
-})();
 
 export function ensureSafePath(basePath: string, path: string) {
     const normalizedBasePath = normalize(basePath + "/");
@@ -898,7 +889,7 @@ ipcMain.handle(IpcEvents.RELAUNCH_APP, async () => {
     app.exit(0);
 });
 
-const OFFICIAL_UPDATE_URL = "https://github.com/nightcordoff/nightcord/releases/latest/download/Nightcord-Installer.exe";
+const OFFICIAL_UPDATE_URL = "https://github.com/nightcordfr/nightcord/releases/latest/download/Nightcord-Installer.exe";
 
 ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
     if (url !== OFFICIAL_UPDATE_URL) {

@@ -71,7 +71,7 @@ export async function installExt(id: string) {
 
         const buf = await fetchBuffer(url, {
             headers: {
-                "User-Agent": `Electron ${process.versions.electron} ~ Nightcord (https://github.com/nightcordoff/nightcord)`
+                "User-Agent": `Electron ${process.versions.electron} ~ Nightcord (https://github.com/nightcordfr/nightcord)`
             }
         });
 

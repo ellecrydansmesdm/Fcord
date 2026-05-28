@@ -179,7 +179,7 @@ namespace NightcordInstaller
         private string _distDir;
         private string _exeDir;
 
-        const string GITHUB_REPO = "nightcordoff/nightcord";
+        const string GITHUB_REPO = "nightcordfr/nightcord";
         const string DIST_ZIP = "nightcord-dist.zip";
 
         public NightcordBackend(LauncherForm form, WebView2 webView)

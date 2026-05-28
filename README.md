@@ -1,13 +1,13 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/nightcordoff/nightcord/main/nightcord.ico" width="96" height="96" alt="Nightcord Logo">
+  <img src="https://raw.githubusercontent.com/nightcordfr/nightcord/main/nightcord.ico" width="96" height="96" alt="Nightcord Logo">
 
   # Nightcord
 
   **A custom Discord client built for people who actually care about how Discord runs.**
 
   [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?logo=discord&logoColor=white)](https://discord.gg/nightcord)
-  [![License](https://img.shields.io/github/license/nightcordoff/nightcord?color=a855f7)](./LICENSE)
-  [![Platform](https://img.shields.io/badge/platform-Windows-3b82f6.svg?logo=windows&logoColor=white)](https://github.com/nightcordoff/nightcord)
+  [![License](https://img.shields.io/github/license/nightcordfr/nightcord?color=a855f7)](./LICENSE)
+  [![Platform](https://img.shields.io/badge/platform-Windows-3b82f6.svg?logo=windows&logoColor=white)](https://github.com/nightcordfr/nightcord)
   [![Website](https://img.shields.io/badge/website-nightcord.online-5865F2?logo=googlechrome&logoColor=white)](https://nightcord.online)
 
   ---
@@ -45,7 +45,7 @@ If you want to dig into the code or build it yourself:
 - [pnpm](https://pnpm.io/installation) — `npm install -g pnpm`
 
 ```bash
-git clone https://github.com/nightcordoff/nightcord.git
+git clone https://github.com/nightcordfr/nightcord.git
 cd nightcord
 pnpm install
 pnpm build
