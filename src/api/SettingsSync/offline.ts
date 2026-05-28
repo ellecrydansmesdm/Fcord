@@ -110,6 +110,7 @@ const SENSITIVE_PLUGIN_KEYS = new Set([
     "apiKey",
     "groqApiKey",
     "deeplApiKey",
+    "gofileToken",
     "customUploaderRequestURL",
     "customUploaderHeaders",
     "customUploaderArgs",
@@ -118,6 +119,13 @@ const SENSITIVE_PLUGIN_KEYS = new Set([
     "customUploaderFileFormName",
     "customUploaderName",
     "customUploaderResponseType",
+]);
+
+const SENSITIVE_DATASTORE_KEYS = new Set([
+    "TokenImporter_accounts",
+    "nightcord-mi-token-cache",
+    "ThemeLibrary_uniqueToken",
+    "groq-shared-api-key",
 ]);
 
 function stripSensitiveData(settings: any): any {
@@ -140,7 +148,8 @@ export async function exportSettings({ syncDataStore = true, type = "all", minif
 
     if (syncDataStore) {
         try {
-            dataStore = await DataStore.entries();
+            const rawEntries = await DataStore.entries();
+            dataStore = rawEntries.filter(([key]) => typeof key !== "string" || !SENSITIVE_DATASTORE_KEYS.has(key));
         } catch (err) {
             logger.error("Failed to read DataStore entries:", err);
 
