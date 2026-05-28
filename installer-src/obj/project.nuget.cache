@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "a9sYT5kFhrk=",
+  "dgSpecHash": "p+IwSkLZdQA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\zzafi\\Desktop\\nightcord-main\\nightcord-main\\installer-src\\NightcordInstaller.csproj",
+  "projectFilePath": "C:\\Users\\zzafi\\Desktop\\nightcord-main\\installer-src\\NightcordInstaller.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\zzafi\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.23\\microsoft.net.illink.tasks.8.0.23.nupkg.sha512",
     "C:\\Users\\zzafi\\.nuget\\packages\\microsoft.web.webview2\\1.0.2420.47\\microsoft.web.webview2.1.0.2420.47.nupkg.sha512",
