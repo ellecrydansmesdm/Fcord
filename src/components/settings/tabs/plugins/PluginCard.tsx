@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -43,7 +43,7 @@ function useTutorialExists(pluginName: string) {
 
         let cancelled = false;
         fetch(
-            `https://raw.githubusercontent.com/nightcordoff/nightcord-tutorials/main/videos/${pluginName}.mp4`,
+            `https://git.nightcord.su/nightcord/nightcord-tutorials/src/branch/main/videos/${pluginName}.mp4`,
             { method: "HEAD" }
         )
             .then(res => {
@@ -51,7 +51,7 @@ function useTutorialExists(pluginName: string) {
                     const found = res.ok;
                     TUTORIAL_CACHE.set(pluginName, found);
                     setExists(found);
-                    // Force le rafraîchissement global pour le filtre
+                    // Force le rafraÃ®chissement global pour le filtre
                     window.dispatchEvent(new CustomEvent("nightcord-tutorial-detected", { detail: { pluginName, found } }));
                 }
             })
@@ -121,12 +121,12 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
 
     const openTutorialVideo = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const videoUrl = `https://raw.githubusercontent.com/nightcordoff/nightcord-tutorials/main/videos/${plugin.name}.mp4`;
+        const videoUrl = `https://git.nightcord.su/nightcord/nightcord-tutorials/src/branch/main/videos/${plugin.name}.mp4`;
         openModal(props => (
             <ModalRoot {...props} size={ModalSize.DYNAMIC} className="nc-tutorial-modal">
                 <ModalHeader separator={false}>
                     <Text variant="heading-xl/bold" style={{ flex: 1, color: "#fff" }}>
-                        {plugin.name} — Tutorial
+                        {plugin.name} â€” Tutorial
                     </Text>
                     <ModalCloseButton onClick={props.onClose} />
                 </ModalHeader>
@@ -223,3 +223,5 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
             } />
     );
 }
+
+

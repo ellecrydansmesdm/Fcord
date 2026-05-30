@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "hasPatches":  true,
         "hasCommands":  false,
@@ -1242,95 +1242,95 @@
                          },
                          {
                              "name":  "dissatisfaction",
-                             "description":  " ï¼žï¹ï¼œ"
+                             "description":  " Ã¯Â¼Å¾Ã¯Â¹ÂÃ¯Â¼Å“"
                          },
                          {
                              "name":  "smug",
-                             "description":  "à² _à² "
+                             "description":  "Ã Â²Â _Ã Â²Â "
                          },
                          {
                              "name":  "happy",
-                             "description":  "ãƒ½(Â´â–½`)/"
+                             "description":  "Ã£Æ’Â½(Ã‚Â´Ã¢â€“Â½`)/"
                          },
                          {
                              "name":  "crying",
-                             "description":  "à²¥_à²¥"
+                             "description":  "Ã Â²Â¥_Ã Â²Â¥"
                          },
                          {
                              "name":  "angry",
-                             "description":  "ãƒ½(ï½€Ð”Â´)ï¾‰"
+                             "description":  "Ã£Æ’Â½(Ã¯Â½â‚¬Ãâ€Ã‚Â´)Ã¯Â¾â€°"
                          },
                          {
                              "name":  "anger",
-                             "description":  "ãƒ½(ï½`çš¿â€²ï½)ï¾‰"
+                             "description":  "Ã£Æ’Â½(Ã¯Â½Â`Ã§Å¡Â¿Ã¢â‚¬Â²Ã¯Â½Â)Ã¯Â¾â€°"
                          },
                          {
                              "name":  "joy",
-                             "description":  "\u003c(ï¿£ï¸¶ï¿£)\u003e"
+                             "description":  "\u003c(Ã¯Â¿Â£Ã¯Â¸Â¶Ã¯Â¿Â£)\u003e"
                          },
                          {
                              "name":  "blush",
-                             "description":  "à«® Ë¶áµ” áµ• áµ”Ë¶ áƒ"
+                             "description":  "Ã Â«Â® Ã‹Â¶Ã¡Âµâ€ Ã¡Âµâ€¢ Ã¡Âµâ€Ã‹Â¶ Ã¡Æ’Â"
                          },
                          {
                              "name":  "confused",
-                             "description":  "(â€¢à¸´_â€¢à¸´)?"
+                             "description":  "(Ã¢â‚¬Â¢Ã Â¸Â´_Ã¢â‚¬Â¢Ã Â¸Â´)?"
                          },
                          {
                              "name":  "sleeping",
-                             "description":  "(á´—_á´—)"
+                             "description":  "(Ã¡Â´â€”_Ã¡Â´â€”)"
                          },
                          {
                              "name":  "laughing",
-                             "description":  "o(â‰§â–½â‰¦)o"
+                             "description":  "o(Ã¢â€°Â§Ã¢â€“Â½Ã¢â€°Â¦)o"
                          },
                          {
                              "name":  "giving",
-                             "description":  "(ï¾‰â—•ãƒ®â—•)ï¾‰*:ï½¥ï¾Ÿâœ§"
+                             "description":  "(Ã¯Â¾â€°Ã¢â€”â€¢Ã£Æ’Â®Ã¢â€”â€¢)Ã¯Â¾â€°*:Ã¯Â½Â¥Ã¯Â¾Å¸Ã¢Å“Â§"
                          },
                          {
                              "name":  "peace",
-                             "description":  "âœŒ(â—•â€¿-)âœŒ"
+                             "description":  "Ã¢Å“Å’(Ã¢â€”â€¢Ã¢â‚¬Â¿-)Ã¢Å“Å’"
                          },
                          {
                              "name":  "ending1",
-                             "description":  "áª à£ªÖ¸ Û° Í™âŠ¹"
+                             "description":  "Ã¡ÂÂª Ã Â£ÂªÃ–Â¸ Ã›Â° Ãâ„¢Ã¢Å Â¹"
                          },
                          {
                              "name":  "uwu",
-                             "description":  "(\u003eâ©Š\u003c)"
+                             "description":  "(\u003eÃ¢Â©Å \u003c)"
                          },
                          {
                              "name":  "comfy",
-                             "description":  "(â”€â€¿â€¿â”€)â™¡"
+                             "description":  "(Ã¢â€â‚¬Ã¢â‚¬Â¿Ã¢â‚¬Â¿Ã¢â€â‚¬)Ã¢â„¢Â¡"
                          },
                          {
                              "name":  "lovehappy",
-                             "description":  "(*â‰§Ï‰â‰¦*)"
+                             "description":  "(*Ã¢â€°Â§Ãâ€°Ã¢â€°Â¦*)"
                          },
                          {
                              "name":  "loveee",
-                             "description":  "(â„ â„\u003eâ„ â–½ â„\u003câ„ â„)"
+                             "description":  "(Ã¢Ââ€ž Ã¢Ââ€ž\u003eÃ¢Ââ€ž Ã¢â€“Â½ Ã¢Ââ€ž\u003cÃ¢Ââ€ž Ã¢Ââ€ž)"
                          },
                          {
                              "name":  "give",
-                             "description":  "(ãƒŽ= â©Š = )ãƒŽ"
+                             "description":  "(Ã£Æ’Å½= Ã¢Â©Å  = )Ã£Æ’Å½"
                          },
                          {
                              "name":  "lovegive",
-                             "description":  "áƒ¦ã‚â—¡â•¹)ãƒŽâ™¡"
+                             "description":  "Ã¡Æ’Â¦Ã£â€šÂÃ¢â€”Â¡Ã¢â€¢Â¹)Ã£Æ’Å½Ã¢â„¢Â¡"
                          },
                          {
                              "name":  "music",
-                             "description":  "(ï¿£â–½ï¿£)/â™«â€¢Â¨â€¢.Â¸Â¸â™ª"
+                             "description":  "(Ã¯Â¿Â£Ã¢â€“Â½Ã¯Â¿Â£)/Ã¢â„¢Â«Ã¢â‚¬Â¢Ã‚Â¨Ã¢â‚¬Â¢.Ã‚Â¸Ã‚Â¸Ã¢â„¢Âª"
                          },
                          {
                              "name":  "stars",
-                             "description":  ".ð–¥” Ý Ë–à¹‹ à£­ â­‘"
+                             "description":  ".Ã°â€“Â¥â€ ÃÂ Ã‹â€“Ã Â¹â€¹ Ã Â£Â­ Ã¢Â­â€˜"
                          },
                          {
                              "name":  "lovegiving",
-                             "description":  "â¸œ(ï½¡Ëƒ áµ• Ë‚ )â¸â™¡"
+                             "description":  "Ã¢Â¸Å“(Ã¯Â½Â¡Ã‹Æ’ Ã¡Âµâ€¢ Ã‹â€š )Ã¢Â¸ÂÃ¢â„¢Â¡"
                          }
                      ],
         "filePath":  "src/plugins/moreCommands",
@@ -1387,7 +1387,7 @@
                             "id":  "235834946571337729"
                         }
                     ],
-        "description":  "Plays a ðŸ—¿ sound effect whenever a moyai emoji is sent, reacted, or used as a voice effect in your current channel.",
+        "description":  "Plays a Ã°Å¸â€”Â¿ sound effect whenever a moyai emoji is sent, reacted, or used as a voice effect in your current channel.",
         "filePath":  "src/plugins/moyai",
         "dirName":  "moyai"
     },
@@ -1802,7 +1802,7 @@
                      "Fun"
                  ],
         "name":  "PartyMode",
-        "description":  "Allows you to use party mode cause the party never ends âœ¨",
+        "description":  "Allows you to use party mode cause the party never ends Ã¢Å“Â¨",
         "authors":  [
                         {
                             "name":  "UwU",
@@ -2602,7 +2602,7 @@
 
                  ],
         "name":  "AudioLimiter",
-        "description":  "Automatically caps the volume of other users â€” no more screaming or loud noises that pierce your ears.",
+        "description":  "Automatically caps the volume of other users Ã¢â‚¬â€ no more screaming or loud noises that pierce your ears.",
         "authors":  [
                         {
                             "name":  "mushzi",
@@ -2726,33 +2726,6 @@
                      ],
         "filePath":  "src/nightcordplugins/impersonate",
         "dirName":  "impersonate"
-    },
-    {
-        "hasPatches":  false,
-        "hasCommands":  false,
-        "enabledByDefault":  false,
-        "required":  false,
-        "isModified":  false,
-        "tags":  [
-                     "Fun"
-                 ],
-        "name":  "KeyboardSounds",
-        "description":  "Adds OperaGX, osu! or Mechvibes sound effects when typing on your keyboard.",
-        "authors":  [
-                        {
-                            "name":  "HypedDomi",
-                            "id":  "354191516979429376"
-                        },
-                        {
-                            "name":  "Etorix",
-                            "id":  "94597845868355584"
-                        }
-                    ],
-        "dependencies":  [
-                             "AudioPlayerAPI"
-                         ],
-        "filePath":  "src/nightcordplugins/KeyboardSounds",
-        "dirName":  "KeyboardSounds"
     },
     {
         "hasPatches":  false,
@@ -5031,7 +5004,7 @@
                      "Utility"
                  ],
         "name":  "MessageLatency",
-        "description":  "Displays an indicator for messages that took â‰¥n seconds to send",
+        "description":  "Displays an indicator for messages that took Ã¢â€°Â¥n seconds to send",
         "authors":  [
                         {
                             "name":  "arHSM",
@@ -5832,7 +5805,7 @@
                          ],
         "authors":  [
                         {
-                            "name":  "âœ¨Tolgchuâœ¨",
+                            "name":  "Ã¢Å“Â¨TolgchuÃ¢Å“Â¨",
                             "id":  "329671025312923648"
                         },
                         {
@@ -6835,7 +6808,7 @@
         "name":  "TalkInReverse",
         "authors":  [
                         {
-                            "name":  "âœ¨Tolgchuâœ¨",
+                            "name":  "Ã¢Å“Â¨TolgchuÃ¢Å“Â¨",
                             "id":  "329671025312923648"
                         }
                     ],
@@ -7851,7 +7824,7 @@
 
                  ],
         "name":  "CreateTheme",
-        "description":  "Create Theme UI â€” registered via settings.tsx",
+        "description":  "Create Theme UI Ã¢â‚¬â€ registered via settings.tsx",
         "authors":  [
                         {
                             "name":  "V",
@@ -7956,7 +7929,7 @@
 
                  ],
         "name":  "EncryptedMessage",
-        "description":  "Encrypts your messages with 400 unique techniques (0â€“399). Only those who know the key can decrypt.",
+        "description":  "Encrypts your messages with 400 unique techniques (0Ã¢â‚¬â€œ399). Only those who know the key can decrypt.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -8089,7 +8062,7 @@
 
                  ],
         "name":  "FakeSwitcher",
-        "description":  "Right-click â†’ add a user to the switcher. Click in the switcher â†’ your profile takes their appearance locally.",
+        "description":  "Right-click Ã¢â€ â€™ add a user to the switcher. Click in the switcher Ã¢â€ â€™ your profile takes their appearance locally.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -8158,7 +8131,7 @@
 
                  ],
         "name":  "Fake Voice Option",
-        "description":  "Apparaissez mute ou sourd tout en Ã©coutant. Par mushzi.",
+        "description":  "Apparaissez mute ou sourd tout en ÃƒÂ©coutant. Par mushzi.",
         "authors":  [
                         {
                             "name":  "mushzi",
@@ -8180,7 +8153,7 @@
                          },
                          {
                              "name":  "fakedeafen_mute",
-                             "description":  "Toggle Fake Deafen \u0026 Mute simultanÃ©ment"
+                             "description":  "Toggle Fake Deafen \u0026 Mute simultanÃƒÂ©ment"
                          }
                      ],
         "filePath":  "src/nightcordplugins/FakeVoice",
@@ -8322,7 +8295,7 @@
 
                  ],
         "name":  "FollowUser",
-        "description":  "Suit un user en vocal. Clic droit â†’ Follow User. Coeur blanc = suivi actif (clic gauche = rejoindre, clic droit = unfollow). Auto-unfollow apres 30min d\u0027inactivite.",
+        "description":  "Suit un user en vocal. Clic droit Ã¢â€ â€™ Follow User. Coeur blanc = suivi actif (clic gauche = rejoindre, clic droit = unfollow). Auto-unfollow apres 30min d\u0027inactivite.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -8568,7 +8541,7 @@
                      "Utility"
                  ],
         "name":  "MemberCount",
-        "description":  "Shows the number of online members, total members, and users in voice channels on the server â€” in the member list and tooltip.",
+        "description":  "Shows the number of online members, total members, and users in voice channels on the server Ã¢â‚¬â€ in the member list and tooltip.",
         "authors":  [
                         {
                             "name":  "V",
@@ -8715,7 +8688,7 @@
 
                  ],
         "name":  "MuteAllServers",
-        "description":  "Right-click a server â†’ mute all servers and mark all as read in one click.",
+        "description":  "Right-click a server Ã¢â€ â€™ mute all servers and mark all as read in one click.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -8775,7 +8748,7 @@
 
                  ],
         "name":  "OverlayFix",
-        "description":  "Tente de rÃ©parer l\u0027overlay en trompant Discord sur le nom du processus (se fait passer pour discord.exe).",
+        "description":  "Tente de rÃƒÂ©parer l\u0027overlay en trompant Discord sur le nom du processus (se fait passer pour discord.exe).",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -8844,7 +8817,7 @@
 
                  ],
         "name":  "PrevNames",
-        "description":  "Shows the username history of a user. Right-click -> PrevNames.",
+        "description":  "Shows the username history of a user. Right-click -\u003e PrevNames.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -8867,7 +8840,7 @@
 
                  ],
         "name":  "PrevNames",
-        "description":  "Shows the username history of a user. Right-click -> PrevNames.",
+        "description":  "Shows the username history of a user. Right-click -\u003e PrevNames.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -9175,7 +9148,7 @@
 
                  ],
         "name":  "SoundCordPlayer",
-        "description":  "Integrated SoundCord player. Client ID is automatically fetched via native Electron process â€” no account required.",
+        "description":  "Integrated SoundCord player. Client ID is automatically fetched via native Electron process Ã¢â‚¬â€ no account required.",
         "authors":  [
                         {
                             "name":  "nobody",
@@ -9567,7 +9540,7 @@
 
                  ],
         "name":  "WordBomb",
-        "description":  "Assistant BombParty/WordBomb avec overlay persistant, IA intÃ©grÃ©e et alphabet track.",
+        "description":  "Assistant BombParty/WordBomb avec overlay persistant, IA intÃƒÂ©grÃƒÂ©e et alphabet track.",
         "authors":  [
                         {
                             "name":  "Nightcord",
@@ -9587,7 +9560,7 @@
 
                  ],
         "name":  "CustomProfile",
-        "description":  "Visually customize your Discord profile (username, PFP, banner, badges, bio...) — persistent, only visible to you.",
+        "description":  "Visually customize your Discord profile (username, PFP, banner, badges, bio...) â€” persistent, only visible to you.",
         "authors":  [
                         {
                             "name":  "Nightcord",

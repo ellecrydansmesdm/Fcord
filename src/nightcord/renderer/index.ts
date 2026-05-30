@@ -50,9 +50,15 @@ customSections.push(() => ({
 VesktopNative.voice.onToggleSelfMute(() => VoiceActions.toggleSelfMute());
 VesktopNative.voice.onToggleSelfDeaf(() => VoiceActions.toggleSelfDeaf());
 
-// Show security reminder popup on every launch
+// Afficher le SecurityModal uniquement au premier lancement
+const SECURITY_MODAL_KEY = "nightcord_security_modal_seen";
 onceReady.then(() => {
-    setTimeout(() => openModal(props => React.createElement(SecurityModal, props)), 1500);
+    if (!localStorage.getItem(SECURITY_MODAL_KEY)) {
+        setTimeout(() => {
+            openModal(props => React.createElement(SecurityModal, props));
+            localStorage.setItem(SECURITY_MODAL_KEY, "1");
+        }, 1500);
+    }
 });
 
 // TODO: remove this legacy workaround once some time has passed

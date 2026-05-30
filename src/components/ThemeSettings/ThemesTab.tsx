@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a modification for Discord's desktop app
  * Copyright (c) 2022 Vendicated and contributors
  *
@@ -201,7 +201,7 @@ function UserCSSThemeCard({ theme, enabled, onChange, onDelete, onSettingsReset 
                 <Flex flexDirection="row" gap="0.4em" style={{ alignItems: "center" }}>
                     {!!theme.homepageURL && <Link href={theme.homepageURL}>Homepage</Link>}
                     {!!(theme.homepageURL && theme.supportURL) && (
-                        <span style={{ color: "var(--text-muted)" }}>•</span>
+                        <span style={{ color: "var(--text-muted)" }}>â€¢</span>
                     )}
                     {!!theme.supportURL && <Link href={theme.supportURL}>Support</Link>}
                 </Flex>
@@ -337,7 +337,7 @@ function OtherThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton, 
                     )}
                     {!!theme.website && <Link href={theme.website}>Website</Link>}
                     {!!(theme.website && theme.invite) && (
-                        <span style={{ color: "var(--text-muted)" }}>•</span>
+                        <span style={{ color: "var(--text-muted)" }}>â€¢</span>
                     )}
                     {!!theme.invite && (
                         <Link
@@ -728,7 +728,7 @@ function ThemesTab() {
             />
 
             <Notice.Info className={Margins.bottom16} style={{ width: "100%" }}>
-                Looking for themes? Check out <Link href="https://nightcord.online/themes">NightCord Themes</Link> or search on <Link href="https://github.com/search?q=discord+theme">GitHub</Link>. When downloading from BetterDiscord, click "Download" and place the .theme.css file into your themes folder.
+                Looking for themes? Check out <Link href="https://nightcord.su/themes">NightCord Themes</Link> or search on <Link href="https://github.com/search?q=discord+theme">GitHub</Link>. When downloading from BetterDiscord, click "Download" and place the .theme.css file into your themes folder.
             </Notice.Info>
 
             <div className={cl("link-row")}>
@@ -755,7 +755,7 @@ function ThemesTab() {
                 Manage your themes here. Local themes load from your themes folder, online themes from URLs. Themes with a cog wheel icon have customizable settings.
             </Paragraph>
             <Paragraph color="text-subtle" className={Margins.bottom16}>
-                {allThemes.length} theme{allThemes.length !== 1 ? "s" : ""} installed ({localCount} local, {onlineCount} online) · {enabledCount} enabled
+                {allThemes.length} theme{allThemes.length !== 1 ? "s" : ""} installed ({localCount} local, {onlineCount} online) Â· {enabledCount} enabled
             </Paragraph>
 
             <div className={cl("filter-row")}>
@@ -942,3 +942,4 @@ function UserscriptThemesTab() {
 export default IS_USERSCRIPT
     ? wrapTab(UserscriptThemesTab, "Themes")
     : wrapTab(ThemesTab, "Themes");
+

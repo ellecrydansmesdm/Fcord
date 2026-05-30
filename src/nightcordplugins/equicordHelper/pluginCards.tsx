@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -141,7 +141,7 @@ export const PluginCards = ErrorBoundary.wrap(function PluginCards({ message }: 
         );
     });
 
-    // Process components — Equibot (equicord.org / vencord.dev)
+    // Process components â€” Equibot (equicord.org / vencord.dev)
     const components = (message.components?.[0] as any)?.components;
     if (message.author.id === EQUIBOT_USER_ID && components?.length >= 4) {
         const description = components[1]?.content;
@@ -166,14 +166,14 @@ export const PluginCards = ErrorBoundary.wrap(function PluginCards({ message }: 
         }
     }
 
-    // Process components — NightCord Bot (nightcord.online, Component v2 Container format)
+    // Process components â€” NightCord Bot (nightcord.su, Component v2 Container format)
     if (message.author.id === NIGHTCORD_BOT_USER_ID) {
         const containerComponents = (message.components?.[0] as any)?.components;
         if (containerComponents?.length >= 3) {
             // Find ActionRow by presence of nested components (same pattern as Equibot check above)
             const actionRow = containerComponents.find((c: any) => c?.components);
             const pluginUrl = actionRow?.components?.[0]?.url;
-            if (pluginUrl?.startsWith("https://nightcord.online/plugins/")) {
+            if (pluginUrl?.startsWith("https://nightcord.su/plugins/")) {
                 const pluginNameFromUrl = decodeURIComponent(new URL(pluginUrl).pathname.split("/")[2]);
                 const pluginNameNoSpaces = pluginNameFromUrl?.toLowerCase().replace(/\s+/g, "");
                 const actualPluginName =
@@ -206,3 +206,4 @@ export const PluginCards = ErrorBoundary.wrap(function PluginCards({ message }: 
         </div>
     );
 }, { noop: true });
+

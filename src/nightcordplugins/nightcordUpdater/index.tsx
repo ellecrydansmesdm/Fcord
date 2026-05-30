@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2026 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -6,11 +6,10 @@
 
 import definePlugin from "@utils/types";
 import { findByPropsLazy } from "@webpack";
-import { React, useEffect,useState } from "@webpack/common";
+import { React, useEffect, useState } from "@webpack/common";
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const REMOTE_VERSION_URL =
-    "https://api.github.com/repos/nightcordfr/nightcord/releases/latest";
+const REMOTE_VERSION_URL = "https://git.nightcord.su/api/v1/repos/nightcord/nightcord/releases/latest";
 
 // ── Version locale (injectée au build via define) ─────────────────────────────
 declare const VERSION: string;
@@ -37,13 +36,10 @@ function isStrictlyNewer(remote: string, local: string): boolean {
 interface UpdateInfo {
     remoteVersion: string;
     localVersion: string;
-    downloadUrl: string;
 }
 
 let pendingUpdate: UpdateInfo | null = null;
 let listeners: Array<() => void> = [];
-// Anti-loop: if the user already clicked "Update" in this session, hide the banner
-let updateAttempted = false;
 
 function notify() { listeners.forEach(f => f()); }
 
@@ -61,24 +57,19 @@ async function checkForUpdates() {
         console.log(`[NightcordUpdater] local=${localVersion} remote=${remoteVersion}`);
 
         if (isStrictlyNewer(remoteVersion, localVersion)) {
-            pendingUpdate = {
-                remoteVersion,
-                localVersion,
-                downloadUrl: "auto",
-            };
+            pendingUpdate = { remoteVersion, localVersion };
             notify();
         }
-        // Sinon : rien, pas de bannière
     } catch (e) {
-        console.error("[NightcordUpdater] Error vérification:", e);
+        console.error("[NightcordUpdater] Error:", e);
     }
 }
 
-// ── Banner React ────────────────────────────────────────────────────────────
+// ── Banner React ──────────────────────────────────────────────────────────────
 function UpdateBanner() {
-    const [info, setInfo] = useState<UpdateInfo | null>(pendingUpdate);
+    const [info, setInfo]       = useState<UpdateInfo | null>(pendingUpdate);
     const [dismissed, setDismissed] = useState(false);
-    const [status, setStatus] = useState<string | null>(null);
+    const [status, setStatus]   = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -87,12 +78,11 @@ function UpdateBanner() {
         return () => { listeners = listeners.filter(f => f !== fn); };
     }, []);
 
-    if (!info || dismissed || updateAttempted) return null;
+    if (!info || dismissed) return null;
 
     async function doUpdate() {
         if (loading || !info) return;
         setLoading(true);
-        updateAttempted = true; // Marquer immédiatement pour éviter les double-clics
         setStatus("Downloading...");
 
         try {
@@ -100,29 +90,26 @@ function UpdateBanner() {
             const ipc = VencordNative?.updater;
             if (!ipc) throw new Error("VencordNative.updater not available");
 
-            // Étape 1 : fetch GitHub metadata → stocke l'URL du zip dans le main process
+            // Étape 1 : fetch Gitea metadata → stocke l'URL du zip dans le main process
             const updateRes: { ok: boolean; value?: boolean; error?: any; } = await ipc.update();
             if (!updateRes?.ok) {
                 throw new Error(updateRes?.error?.message ?? "Update check failed");
             }
 
-            // Étape 2 : télécharge le zip + extrait dans dist/ (PowerShell)
+            // Étape 2 : télécharge le zip + extrait dans dist/
             setStatus("✓ Downloaded! Extracting...");
             const buildRes: { ok: boolean; value?: boolean; error?: any; } = await ipc.rebuild();
             if (!buildRes?.ok) {
-                // IpcRes ok=false → l'erreur est dans buildRes.error
                 const errMsg = buildRes?.error?.message ?? JSON.stringify(buildRes?.error) ?? "Installation failed";
                 throw new Error(errMsg);
             }
 
             setStatus("✓ Update applied — restarting in 2s...");
 
-            // Redémarrage propre via le handler RELAUNCH_APP du main process
             setTimeout(() => {
                 try {
                     VencordNative.nightcord?.relaunch?.();
                 } catch {
-                    // Fallback Discord Desktop
                     (window as any).DiscordNative?.app?.relaunch?.();
                     window.location.reload();
                 }
@@ -132,7 +119,6 @@ function UpdateBanner() {
             const msg = e?.message ? e.message.substring(0, 120) : "Unknown error";
             setStatus(`❌ ${msg}. Check your connection or restart manually.`);
             setLoading(false);
-            updateAttempted = false; // Permet un retry
         }
     }
 
@@ -153,7 +139,6 @@ function UpdateBanner() {
             gap: 12,
         }
     },
-        // Texte gauche
         React.createElement("div", {
             style: { display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }
         },
@@ -166,7 +151,6 @@ function UpdateBanner() {
                 status ?? `Current version: ${info.localVersion}`
             )
         ),
-        // Boutons droite
         React.createElement("div", { style: { display: "flex", gap: 8, flexShrink: 0 } },
             React.createElement("button", {
                 onClick: doUpdate,
@@ -220,7 +204,7 @@ function mountBanner() {
             ReactDOM.render(React.createElement(UpdateBanner), bannerContainer);
         }
     } catch (e) {
-        console.error("[NightcordUpdater] Error montage bannière:", e);
+        console.error("[NightcordUpdater] Error mounting banner:", e);
     }
 }
 
@@ -235,23 +219,20 @@ function unmountBanner() {
 export default definePlugin({
     name: "NightcordUpdater",
     enabledByDefault: true,
-    description: "Checks for updates on startup. Green banner only if a newer version exists on GitHub.",
+    description: "Shows a banner when a new Nightcord version is available. Click Update to install.",
     authors: [{ name: "Nightcord", id: 0n }],
 
     start() {
-        // Monte la bannière dès que le DOM est prêt
         const mountWhenReady = () => setTimeout(mountBanner, 1500);
         if (document.readyState === "complete") mountWhenReady();
         else window.addEventListener("load", mountWhenReady, { once: true });
 
-        // Vérifie les mises à jour 5s après le lancement
         setTimeout(() => checkForUpdates(), 5000);
     },
 
     stop() {
         unmountBanner();
         pendingUpdate = null;
-        updateAttempted = false;
         listeners = [];
     },
 });

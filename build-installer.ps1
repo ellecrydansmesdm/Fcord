@@ -1,104 +1,76 @@
-# build-installer.ps1 - Compile Nightcord-Installer.exe
+# build-installer.ps1 — Build Nightcord-Installer.exe (Electron + electron-builder)
 # Usage: .\build-installer.ps1
 
 $ErrorActionPreference = "Stop"
-$Root   = $PSScriptRoot
-$SrcDir = Join-Path $Root "installer-src"
-$OutDir = Join-Path $Root "release\installer"
-$OutExe = Join-Path $OutDir "Nightcord-Installer.exe"
+$Root      = $PSScriptRoot
+$SrcDir    = Join-Path $Root "installer-src"
+$OutDir    = Join-Path $Root "release\installer"
+$OutExe    = Join-Path $OutDir "Nightcord-Installer.exe"
 
 Write-Host ""
-Write-Host "  [Nightcord] Compiling installer..." -ForegroundColor Cyan
+Write-Host "  [Nightcord] Building Electron installer..." -ForegroundColor Cyan
 
+# ── Prerequis ───────────────────────────────────────────────────────────────
+$nodeOk = $null
+try { $nodeOk = & node --version 2>$null } catch {}
+if (-not $nodeOk) {
+    Write-Host "  [ERREUR] Node.js introuvable. Installez-le depuis https://nodejs.org" -ForegroundColor Red
+    exit 1
+}
+Write-Host "  Node.js : $nodeOk" -ForegroundColor DarkGray
+
+# ── Dossier de sortie ────────────────────────────────────────────────────────
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
-# Method 1: dotnet SDK
-$hasDotnet = $null
-try { $hasDotnet = & dotnet --version 2>$null } catch { }
-
-if ($hasDotnet) {
-    Write-Host "  [1/1] dotnet build (SDK $hasDotnet)..." -ForegroundColor DarkGray
-    & dotnet publish "$SrcDir\NightcordInstaller.csproj" `
-        -c Release `
-        -o $OutDir `
-        --nologo `
-        -v quiet `
-        -p:PublishSingleFile=true `
-        -p:SelfContained=false `
-        -r win-x64
+# ── Installer les dependances si besoin ──────────────────────────────────────
+$nodeModules = Join-Path $SrcDir "node_modules"
+if (-not (Test-Path $nodeModules)) {
+    Write-Host "  [1/3] npm install --legacy-peer-deps..." -ForegroundColor DarkGray
+    Push-Location $SrcDir
+    & npm install --legacy-peer-deps
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "  [ERROR] dotnet build failed." -ForegroundColor Red
+        Write-Host "  [ERREUR] npm install a echoue." -ForegroundColor Red
+        Pop-Location
         exit 1
     }
-    # dotnet may place the .exe in a subdirectory
-    $built = Get-ChildItem $OutDir -Recurse -Filter "Nightcord-Installer.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($built -and $built.FullName -ne $OutExe) {
-        Copy-Item $built.FullName $OutExe -Force
-    }
-}
-# Method 2: csc.exe (.NET Framework - always present on Windows)
-else {
-    Write-Host "  dotnet SDK not found - using csc.exe (.NET Framework)..." -ForegroundColor Yellow
-
-    $fxDir = "${env:SystemRoot}\Microsoft.NET\Framework64"
-    $csc = Get-ChildItem "$fxDir\v4*\csc.exe" -ErrorAction SilentlyContinue |
-           Sort-Object FullName -Descending |
-           Select-Object -First 1 -ExpandProperty FullName
-
-    if (-not $csc) {
-        $fxDir32 = "${env:SystemRoot}\Microsoft.NET\Framework"
-        $csc = Get-ChildItem "$fxDir32\v4*\csc.exe" -ErrorAction SilentlyContinue |
-               Sort-Object FullName -Descending |
-               Select-Object -First 1 -ExpandProperty FullName
-    }
-
-    if (-not $csc) {
-        Write-Host "  [ERROR] Neither dotnet SDK nor csc.exe found." -ForegroundColor Red
-        Write-Host "  -> Install .NET SDK: https://dotnet.microsoft.com/download" -ForegroundColor Yellow
-        exit 1
-    }
-
-    Write-Host "  [1/1] Compiling with $csc..." -ForegroundColor DarkGray
-
-    $ico    = Join-Path $Root "nightcord.ico"
-    $icoArg = if (Test-Path $ico) { "/win32icon:`"$ico`"" } else { "" }
-
-    $refs = @(
-        "System.Net.Http.dll",
-        "System.IO.Compression.dll",
-        "System.IO.Compression.FileSystem.dll",
-        "System.Windows.Forms.dll",
-        "System.Drawing.dll",
-        "System.dll"
-    ) | ForEach-Object { "/r:$_" }
-
-    $args = @(
-        "/target:winexe",
-        "/platform:anycpu",
-        "/optimize+",
-        "/nologo",
-        "/out:`"$OutExe`"",
-        "/utf8output"
-    ) + $refs
-
-    if ($icoArg) { $args += $icoArg }
-    $args += "`"$SrcDir\Program.cs`""
-
-    & $csc @args
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "  [ERROR] Compilation failed." -ForegroundColor Red
-        exit 1
-    }
+    Pop-Location
+    Write-Host "  [1/3] Dependances installees." -ForegroundColor Green
+} else {
+    Write-Host "  [1/3] node_modules present, installation ignoree." -ForegroundColor DarkGray
 }
 
-# Result
+# ── Compilation webpack ──────────────────────────────────────────────────────
+Write-Host "  [2/3] electron-webpack (compilation)..." -ForegroundColor DarkGray
+Push-Location $SrcDir
+& npm run compile
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  [ERREUR] Compilation webpack echouee." -ForegroundColor Red
+    Pop-Location
+    exit 1
+}
+Pop-Location
+Write-Host "  [2/3] Webpack OK." -ForegroundColor Green
+
+# ── Packaging electron-builder ───────────────────────────────────────────────
+Write-Host "  [3/3] electron-builder --win (packaging)..." -ForegroundColor DarkGray
+Push-Location $SrcDir
+& npx electron-builder --win -p never
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  [ERREUR] electron-builder a echoue." -ForegroundColor Red
+    Pop-Location
+    exit 1
+}
+Pop-Location
+Write-Host "  [3/3] Packaging OK." -ForegroundColor Green
+
+# ── Verification ─────────────────────────────────────────────────────────────
 if (Test-Path $OutExe) {
     $size = [math]::Round((Get-Item $OutExe).Length / 1KB, 0)
     Write-Host ""
-    Write-Host "  OK  Nightcord-Installer.exe compiled ($size KB)" -ForegroundColor Green
+    Write-Host "  OK  Nightcord-Installer.exe compile ($size KB)" -ForegroundColor Green
     Write-Host "    -> $OutExe" -ForegroundColor DarkGray
     Write-Host ""
 } else {
-    Write-Host "  [ERROR] Nightcord-Installer.exe not found after compilation." -ForegroundColor Red
+    Write-Host "  [ERREUR] Nightcord-Installer.exe introuvable apres compilation." -ForegroundColor Red
     exit 1
 }

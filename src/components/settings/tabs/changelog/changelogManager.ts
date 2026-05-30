@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -35,9 +35,9 @@ const LAST_SEEN_HASH_KEY = "EquicordChangelog_LastSeenHash";
 const KNOWN_PLUGINS_KEY = "EquicordChangelog_KnownPlugins";
 const KNOWN_SETTINGS_KEY = "EquicordChangelog_KnownSettings";
 const LAST_REPO_CHECK_KEY = "EquicordChangelog_LastRepoCheck";
-const GITHUB_COMPARE_ENDPOINT = "https://api.github.com/repos";
-const NIGHTCORD_RELEASES_REPO = "nightcordfr/nightcord";
-const NIGHTCORD_REPO_URL = `https://github.com/${NIGHTCORD_RELEASES_REPO}`;
+const GITEA_API_BASE = "https://git.nightcord.su/api/v1/repos";
+const NIGHTCORD_RELEASES_REPO = "nightcord/nightcord";
+const NIGHTCORD_REPO_URL = `https://git.nightcord.su/${NIGHTCORD_RELEASES_REPO}`;
 
 type KnownPluginSettingsMap = Map<string, Set<string>>;
 
@@ -63,10 +63,10 @@ async function fetchCommitsBetween(
     if (!repoSlug || typeof fetch !== "function") return [];
     try {
         const res = await fetch(
-            `${GITHUB_COMPARE_ENDPOINT}/${repoSlug}/compare/${fromHash}...${toHash}`,
+            `${GITEA_API_BASE}/${repoSlug}/compare/${fromHash}...${toHash}`,
             {
                 headers: {
-                    Accept: "application/vnd.github+json",
+                    Accept: "application/json",
                     "Cache-Control": "no-cache",
                 },
             },
@@ -486,3 +486,4 @@ export function formatTimestamp(timestamp: number): string {
         return date.toLocaleDateString();
     }
 }
+

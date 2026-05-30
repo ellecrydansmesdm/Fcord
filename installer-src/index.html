@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -348,7 +348,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
-      /* tabular-nums keeps digit widths stable — no layout shift */
+      /* tabular-nums keeps digit widths stable â€” no layout shift */
       font-variant-numeric: tabular-nums;
       font-family: var(--font-mono);
       font-size: 10px;
@@ -492,7 +492,7 @@
       background: rgba(192, 132, 252, 0.15);
       border-color: var(--accent2);
     }
-    .btn-github:hover {
+    .btn-gitea:hover {
       background: rgba(255, 255, 255, 0.05);
       border-color: #ffffff;
     }
@@ -565,7 +565,7 @@
     <div class="titlebar">
       <div class="titlebar-left">
         <img src="{{ICON_BASE64}}" class="logo-mark" />
-        <span class="titlebar-title" style="cursor: pointer;" onclick="window.nightcord.openUrl('https://nightcord.online/')">Nightcord Installer</span>
+        <span class="titlebar-title" style="cursor: pointer;" onclick="window.nightcord.openUrl('https://nightcord.su/')">Nightcord Installer</span>
         <span class="titlebar-version" id="titlebar-version">...</span>
       </div>
       <div class="titlebar-right">
@@ -585,7 +585,7 @@
     <div class="content">
       <div class="header">
         <h1>Nightcord</h1>
-        <p>// discord client mod — select your installation target</p>
+        <p>// discord client mod â€” select your installation target</p>
       </div>
 
       <div>
@@ -638,7 +638,7 @@
     <div class="settings-container" onclick="event.stopPropagation()">
       <div class="settings-header">
         <h2>Nightcord Links & Settings</h2>
-        <button class="settings-close-btn" onclick="toggleSettingsModal()">✕</button>
+        <button class="settings-close-btn" onclick="toggleSettingsModal()">âœ•</button>
       </div>
       <div class="settings-content">
         <p class="settings-desc">Access official Nightcord links and community resources.</p>
@@ -649,7 +649,7 @@
             </svg>
             <span>Join Discord Server</span>
           </button>
-          <button class="btn-setting-link btn-website" onclick="window.nightcord.openUrl('https://nightcord.online')">
+          <button class="btn-setting-link btn-website" onclick="window.nightcord.openUrl('https://nightcord.su')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-link-icon">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="2" y1="12" x2="22" y2="12"></line>
@@ -657,11 +657,11 @@
             </svg>
             <span>Official Website</span>
           </button>
-          <button class="btn-setting-link btn-github" onclick="window.nightcord.openUrl('https://github.com/nightcordfr/nightcord')">
+          <button class="btn-setting-link btn-github" onclick="window.nightcord.openUrl('https://git.nightcord.su/nightcord/nightcord')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="btn-link-icon">
               <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.11.82-.26.82-.577v-2.17c-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.73.083-.73 1.205.084 1.84 1.237 1.84 1.237 1.07 1.835 2.807 1.305 3.492.998.108-.775.42-1.305.763-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.467-2.38 1.235-3.22-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.98-.398 3-.403 1.02.005 2.043.137 3 .403 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.24 2.873.118 3.176.77.84 1.233 1.91 1.233 3.22 0 4.61-2.803 5.625-5.475 5.92.43.37.823 1.102.823 2.222v3.293c0 .32.218.694.825.577C20.565 21.797 24 17.298 24 12c0-6.63-5.37-12-12-12z"/>
             </svg>
-            <span>GitHub Repository</span>
+            <span>Gitea Repository</span>
           </button>
 
           <div class="update-result" id="update-result"></div>
@@ -748,18 +748,18 @@
       if (discords.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
-            ⚠️ No Discord installations found automatically.<br>
+            âš ï¸ No Discord installations found automatically.<br>
             <span style="font-size:11px;margin-top:6px;display:block;">
               Use the <strong style="color:var(--accent)">+ Manual Path</strong> button to enter the path manually.
             </span>
           </div>`;
-        setStatus('error', 'No installations auto-detected — use manual path.');
+        setStatus('error', 'No installations auto-detected â€” use manual path.');
         return;
       }
 
       for (let i = 0; i < discords.length; i++) {
         const d = discords[i];
-        const icon = ICONS[d.name] || { emoji: '⚪', cls: 'stable' };
+        const icon = ICONS[d.name] || { emoji: 'âšª', cls: 'stable' };
         let injected = false;
         let hasThirdParty = false;
         try { injected = await window.nightcord.isInjected(d.path); } catch {}
@@ -774,13 +774,13 @@
 
     function renderCard(d, i, injected, iconCls, hasThirdParty = false) {
       const list = document.getElementById('discord-list');
-      const icon = ICONS[d.name] || { emoji: '⚙️', cls: iconCls };
+      const icon = ICONS[d.name] || { emoji: 'âš™ï¸', cls: iconCls };
 
       let statusBadge;
       if (injected) {
-        statusBadge = `<span class="badge badge-injected">✓ injected</span>`;
+        statusBadge = `<span class="badge badge-injected">âœ“ injected</span>`;
       } else if (hasThirdParty) {
-        statusBadge = `<span class="badge" style="background:rgba(251,191,36,0.15);color:var(--warn)">⚠ mod detected</span>`;
+        statusBadge = `<span class="badge" style="background:rgba(251,191,36,0.15);color:var(--warn)">âš  mod detected</span>`;
       } else {
         statusBadge = `<span class="badge badge-clean">clean</span>`;
       }
@@ -792,7 +792,7 @@
       card.dataset.thirdParty = hasThirdParty ? '1' : '0';
       card.innerHTML = `
         <div class="card-left">
-          <div class="card-icon ${icon.cls || iconCls}">${icon.html || icon.emoji || '⚙️'}</div>
+          <div class="card-icon ${icon.cls || iconCls}">${icon.html || icon.emoji || 'âš™ï¸'}</div>
           <div class="card-info">
             <h3>${d.name}</h3>
             <div class="card-path">${d.path}</div>
@@ -819,10 +819,10 @@
       const card = document.querySelectorAll('.discord-card')[index];
       const isThirdParty = card && card.dataset.thirdParty === '1';
       if (isThirdParty) {
-        setStatus('loading', `⚠ ${selected.name}: Vencord/Equicord detected — clicking Inject will replace it with Nightcord.`);
+        setStatus('loading', `âš  ${selected.name}: Vencord/Equicord detected â€” clicking Inject will replace it with Nightcord.`);
         document.getElementById('btn-inject').textContent = 'Replace with Nightcord';
       } else {
-        setStatus('idle', `Selected: ${selected.name} — ${selected.path}`);
+        setStatus('idle', `Selected: ${selected.name} â€” ${selected.path}`);
         document.getElementById('btn-inject').textContent = 'Inject Nightcord';
       }
     }
@@ -863,14 +863,14 @@
             clearInterval(interval);
             resolve({ success: false, error: status.error });
           }
-          // 'running' → keep polling (progress bar updated by SetProgress from C#)
+          // 'running' â†’ keep polling (progress bar updated by SetProgress from C#)
         }, 500);
       }).then(result => {
         if (result.success) {
           setLoading(true, "Finalizing installation...", 100);
           setTimeout(async () => {
             setLoading(false);
-            setStatus('success', `✓ Nightcord injected into ${selected.name}! Restart Discord.`);
+            setStatus('success', `âœ“ Nightcord injected into ${selected.name}! Restart Discord.`);
             await loadDiscords();
             const idx = discords.findIndex(d => d.path === selected.path);
             if (idx !== -1) selectDiscord(idx);
@@ -895,7 +895,7 @@
         setLoading(true, "Completed", 100);
         setTimeout(async () => {
           setLoading(false);
-          setStatus('success', `✓ Nightcord uninjected from ${selected.name}.`);
+          setStatus('success', `âœ“ Nightcord uninjected from ${selected.name}.`);
           await loadDiscords();
         }, 600);
       } else {
@@ -904,11 +904,11 @@
       }
     }
 
-    // Fetch latest version from GitHub and show in titlebar badge
+    // Fetch latest version from Gitea and show in titlebar badge
     async function loadLatestVersion() {
       try {
-        const res = await fetch('https://api.github.com/repos/nightcordfr/nightcord/releases/latest', {
-          headers: { 'Accept': 'application/vnd.github.v3+json' }
+        const res = await fetch('https://git.nightcord.su/api/v1/repos/nightcord/nightcord/releases/latest', {
+          headers: { 'Accept': 'application/json' }
         });
         if (!res.ok) return;
         const data = await res.json();
@@ -919,7 +919,7 @@
           el.classList.add('loaded');
         }
       } catch (e) {
-        // silently fail — not critical
+        // silently fail â€” not critical
       }
     }
 
@@ -929,3 +929,4 @@
   </script>
 </body>
 </html>
+

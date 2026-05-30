@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a modification for Discord's desktop app
  * Copyright (c) 2023 Vendicated and contributors
  *
@@ -61,11 +61,11 @@ export const enum IpcEvents {
 
     SET_WINDOW_BACKGROUND_MATERIAL = "NightcordSetWindowBackgroundMaterial",
 
-    // SoundCord Player — thumbnail toolbar Windows
+    // SoundCord Player â€” thumbnail toolbar Windows
     SET_THUMBAR_BUTTONS = "SoundCordSetThumbarButtons",
     THUMBAR_BUTTON_CLICK = "SoundCordThumbarButtonClick",
 
-    // Nightcord Updater — télécharge un exe depuis une URL et le lance
+    // Nightcord Updater â€” tÃ©lÃ©charge un exe depuis une URL et le lance
     NIGHTCORD_DOWNLOAD_AND_RUN = "NightcordDownloadAndRun",
 
     // VB-Audio Virtual Cable (Windows only)
@@ -75,20 +75,17 @@ export const enum IpcEvents {
     // Relaunch de l'app Electron
     RELAUNCH_APP = "NightcordRelaunchApp",
 
-    // WorldBomb — Simulation Clavier/Souris Native
+    // WorldBomb â€” Simulation Clavier/Souris Native
     WORLD_BOMB_TYPE = "WorldBombType",
     WORLD_BOMB_PRESS_ENTER = "WorldBombPressEnter",
     WORLD_BOMB_PRESS_BACKSPACE = "WorldBombPressBackspace",
     WORLD_BOMB_CLICK = "WorldBombClick",
-    // Séquence complète en un seul appel système (clic + frappe + enter)
+    // SÃ©quence complÃ¨te en un seul appel systÃ¨me (clic + frappe + enter)
     WORLD_BOMB_SEQUENCE = "WorldBombSequence",
     // Position actuelle du curseur souris (pour calibration)
     WORLD_BOMB_GET_CURSOR_POS = "WorldBombGetCursorPos",
-    // Ouvre la fenêtre externe Stream Proof
-    WORLD_BOMB_OPEN_WINDOW = "WorldBombOpenWindow",
-
-    // Global Keyboard Hook for KeyboardSounds plugin
-    KEYBOARD_SOUNDS_START_GLOBAL = "KeyboardSoundsStartGlobal",
-    KEYBOARD_SOUNDS_STOP_GLOBAL = "KeyboardSoundsStopGlobal",
-    GLOBAL_KEY_DOWN = "GlobalKeyDown"
+    // Ouvre la fenÃªtre externe Stream Proof
+    WORLD_BOMB_OPEN_WINDOW = "WorldBombOpenWindow"
 }
+
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2026 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -19,10 +19,10 @@ import { changes, checkForUpdates, rebuild, update, UpdateLogger } from "@utils/
 import { React, useState } from "@webpack/common";
 import { Toasts } from "@webpack/common";
 
-// Version locale depuis package.json (injectée au build)
+// Version locale depuis package.json (injectÃ©e au build)
 declare const VERSION: string;
 
-const REPO_URL = "https://github.com/nightcordfr/nightcord";
+const REPO_URL = "https://git.nightcord.su/nightcord/nightcord";
 
 function UpdaterTab() {
     const [checking, setChecking] = useState(false);
@@ -44,7 +44,7 @@ function UpdaterTab() {
 
             if (!hasUpdate) {
                 Toasts.show({
-                    message: "Tu es déjà sur la dernière version !",
+                    message: "Tu es dÃ©jÃ  sur la derniÃ¨re version !",
                     id: Toasts.genId(),
                     type: Toasts.Type.SUCCESS,
                     options: { position: Toasts.Position.BOTTOM }
@@ -56,9 +56,9 @@ function UpdaterTab() {
             // Strip any residual HTML and truncate to keep the UI clean
             if (detail) {
                 detail = detail.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-                if (detail.length > 300) detail = detail.substring(0, 300) + "…";
+                if (detail.length > 300) detail = detail.substring(0, 300) + "â€¦";
             }
-            setError(`Impossible de vérifier les mises à jour.${detail ? ` (${detail})` : " Vérifie ta connexion."}`);
+            setError(`Impossible de vÃ©rifier les mises Ã  jour.${detail ? ` (${detail})` : " VÃ©rifie ta connexion."}`);
         } finally {
             setChecking(false);
         }
@@ -110,8 +110,8 @@ function UpdaterTab() {
                     <div>
                         <Span size="sm" color="text-subtle">Website</Span>
                         <div>
-                            <Link href="https://nightcord.online" style={{ fontSize: 13 }}>
-                                nightcord.online
+                            <Link href="https://nightcord.su" style={{ fontSize: 13 }}>
+                                nightcord.su
                             </Link>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ function UpdaterTab() {
                 </Card>
             )}
 
-            {/* Résultat vérification */}
+            {/* RÃ©sultat vÃ©rification */}
             {checked && !error && (
                 outdated ? (
                     <Card style={{ padding: "10px 16px", marginBottom: 12, borderLeft: "3px solid var(--status-warning)" }}>
@@ -135,7 +135,7 @@ function UpdaterTab() {
                     </Card>
                 ) : (
                     <Card style={{ padding: "10px 16px", marginBottom: 12, borderLeft: "3px solid var(--status-positive)" }}>
-                        <Span size="sm" style={{ color: "var(--text-positive)" }}>You are running the latest version ✓</Span>
+                        <Span size="sm" style={{ color: "var(--text-positive)" }}>You are running the latest version âœ“</Span>
                     </Card>
                 )
             )}
@@ -157,7 +157,7 @@ function UpdaterTab() {
                         onClick={handleUpdate}
                         disabled={downloading}
                     >
-                        {downloading ? "Installing..." : "🚀 Update Now (Automatic)"}
+                        {downloading ? "Installing..." : "ðŸš€ Update Now (Automatic)"}
                     </Button>
                 )}
             </Flex>
@@ -172,3 +172,6 @@ function UpdaterTab() {
 }
 
 export default wrapTab(UpdaterTab, "Updater");
+
+
+

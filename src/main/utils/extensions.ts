@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a modification for Discord's desktop app
  * Copyright (c) 2022 Vendicated and contributors
  *
@@ -71,7 +71,7 @@ export async function installExt(id: string) {
 
         const buf = await fetchBuffer(url, {
             headers: {
-                "User-Agent": `Electron ${process.versions.electron} ~ Nightcord (https://github.com/nightcordfr/nightcord)`
+                "User-Agent": `Electron ${process.versions.electron} ~ Nightcord (https://git.nightcord.su/nightcord/nightcord)`
             }
         });
 
@@ -82,3 +82,4 @@ export async function installExt(id: string) {
     // @ts-expect-error Electron 36 Deprecates session.defaultSession.loadExtension()
     session.defaultSession.extensions ? session.defaultSession.extensions.loadExtension(extDir) : session.defaultSession.loadExtension(extDir);
 }
+

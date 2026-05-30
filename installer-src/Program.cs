@@ -179,15 +179,16 @@ namespace NightcordInstaller
         private string _distDir;
         private string _exeDir;
 
-        const string GITHUB_REPO = "nightcordfr/nightcord";
-        const string DIST_ZIP = "nightcord-dist.zip";
+        const string GITEA_REPO = "nightcord/nightcord";
+        const string GITEA_URL  = "https://git.nightcord.su";
+        const string DIST_ZIP   = "nightcord-dist.zip";
 
         public NightcordBackend(LauncherForm form, WebView2 webView)
         {
             _form = form;
             _webView = webView;
             _http = new HttpClient();
-            _http.Timeout = TimeSpan.FromSeconds(30); // Prevent infinite hang on GitHub API
+            _http.Timeout = TimeSpan.FromSeconds(30);
             _exeDir = Path.GetDirectoryName(Application.ExecutablePath);
             _distDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nightcord", "dist");
         }
@@ -366,10 +367,10 @@ namespace NightcordInstaller
             SetProgress(2, "Fetching latest release information...");
             Directory.CreateDirectory(Path.GetDirectoryName(_distDir));
 
-            var apiUrl = $"https://api.github.com/repos/{GITHUB_REPO}/releases/latest";
+            var apiUrl = $"{GITEA_URL}/api/v1/repos/{GITEA_REPO}/releases/latest";
             _http.DefaultRequestHeaders.Clear();
             _http.DefaultRequestHeaders.Add("User-Agent", "Nightcord-Installer/2.0");
-            _http.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            _http.DefaultRequestHeaders.Add("Accept", "application/json");
 
             string json;
             try
@@ -378,26 +379,26 @@ namespace NightcordInstaller
             }
             catch (TaskCanceledException)
             {
-                throw new Exception("GitHub API timed out (30s). Check your internet connection and try again.");
+                throw new Exception("Gitea API timed out (30s). Check your internet connection and try again.");
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"Could not reach GitHub: {ex.Message}. Check your internet connection.");
+                throw new Exception($"Could not reach git.nightcord.su: {ex.Message}. Check your internet connection.");
             }
 
             var zipUrl = ExtractJsonValue(json, "browser_download_url", DIST_ZIP);
-            
+
             if (string.IsNullOrEmpty(zipUrl))
-                throw new Exception($"'{DIST_ZIP}' not found in the GitHub release. The release may not be published yet.");
+                throw new Exception($"'{DIST_ZIP}' not found in the Gitea release. The release may not be published yet.");
 
             SetProgress(5, "Starting download...");
             var tmpZip = Path.Combine(Path.GetTempPath(), "nightcord-dist.zip");
-            
+
             using (var response = await _http.GetAsync(zipUrl, HttpCompletionOption.ResponseHeadersRead))
             {
                 response.EnsureSuccessStatusCode();
-                var totalBytes = response.Content.Headers.ContentLength ?? (long)(348.0 * 1024 * 1024); // Fallback to 348MB if null
-                
+                var totalBytes = response.Content.Headers.ContentLength ?? (long)(348.0 * 1024 * 1024);
+
                 using (var contentStream = await response.Content.ReadAsStreamAsync())
                 using (var fs = new FileStream(tmpZip, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
                 {
@@ -410,12 +411,11 @@ namespace NightcordInstaller
                     {
                         await fs.WriteAsync(buffer, 0, read);
                         totalRead += read;
-                        
+
                         double percent = (double)totalRead / totalBytes * 100.0;
                         if (percent - lastReportedPercent >= 0.5 || percent >= 100.0)
                         {
                             lastReportedPercent = percent;
-                            // Map 0-100% of download to 5%-75% of overall progress
                             double overallPercent = 5.0 + (percent * 0.70);
                             double totalMB = (double)totalBytes / (1024.0 * 1024.0);
                             double readMB  = (double)totalRead  / (1024.0 * 1024.0);
@@ -426,12 +426,11 @@ namespace NightcordInstaller
             }
 
             SetProgress(75, "Preparing extraction...");
-            await Task.Run(() => 
+            await Task.Run(() =>
             {
                 if (Directory.Exists(_distDir)) Directory.Delete(_distDir, true);
                 Directory.CreateDirectory(_distDir);
 
-                // Normalize _distDir with a guaranteed trailing separator for safe StartsWith checks
                 var normalizedDistDir = _distDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                                                 + Path.DirectorySeparatorChar;
 
@@ -443,18 +442,15 @@ namespace NightcordInstaller
 
                     foreach (var entry in archive.Entries)
                     {
-                        // Normalize the zip entry path: replace forward slashes, strip leading slashes
                         var entryPath = entry.FullName
                             .Replace('/', Path.DirectorySeparatorChar)
                             .TrimStart(Path.DirectorySeparatorChar);
 
-                        // Reject any entry that tries to traverse upward (e.g. ../../evil)
                         if (entryPath.Contains(".."))
                             continue;
 
                         var fullPath = Path.GetFullPath(Path.Combine(_distDir, entryPath));
 
-                        // Security check: ensure resolved path stays inside _distDir
                         if (!fullPath.StartsWith(normalizedDistDir, StringComparison.OrdinalIgnoreCase))
                             continue;
 
@@ -473,13 +469,12 @@ namespace NightcordInstaller
                         if (percent - lastReportedPercent >= 1.0 || percent >= 100.0)
                         {
                             lastReportedPercent = percent;
-                            // Map 0-100% of extraction to 75%-90% of overall progress
                             double overallPercent = 75.0 + (percent * 0.15);
                             SetProgress(overallPercent, $"Extracting files ({extractedEntries}/{totalEntries})...");
                         }
                     }
                 }
-                
+
                 try { File.Delete(tmpZip); } catch { }
             });
         }
@@ -494,48 +489,35 @@ namespace NightcordInstaller
             KillDiscord(resPath);
 
             SetProgress(91, "Removing previous mod injection (Vencord / Equicord / OpenAsar)...");
-            // ── NETTOYAGE COMPLET DE TOUTE INJECTION PRÉCÉDENTE ──────────────────────
-            // 1. Supprimer le dossier app/ quel que soit le mod qui l'a créé
             if (Directory.Exists(appDir))
             {
-                // Déjà Nightcord → on réinjecte proprement sans bail-out partiel
                 try { Directory.Delete(appDir, true); } catch { }
             }
 
-            // 2. Supprimer tout app.asar faux (< 2 MB) créé par Vencord/OpenAsar/Equicord
-            //    Le vrai app.asar Discord fait entre 40 MB et 80 MB.
             if (File.Exists(appAsar) && new FileInfo(appAsar).Length < 2_000_000)
             {
                 File.Delete(appAsar);
             }
 
-            // 3. Chercher un backup fait par un mod tiers (Vencord utilise _app.asar,
-            //    Equicord aussi, OpenAsar utilise original_app.asar)
             string[] thirdPartyBackups = { "_app.asar", "original_app.asar", "app.asar.bak" };
             foreach (var bkName in thirdPartyBackups)
             {
                 var bkPath = Path.Combine(resPath, bkName);
-                // C'est un vrai backup si sa taille est > 2 MB
                 if (File.Exists(bkPath) && new FileInfo(bkPath).Length > 2_000_000)
                 {
-                    // Si app.asar est absent ou corrompu, restaurer ce backup en tant que app.asar
                     if (!File.Exists(appAsar) || new FileInfo(appAsar).Length < 2_000_000)
                     {
                         if (File.Exists(appAsar)) File.Delete(appAsar);
-                        // Copier (pas déplacer) pour ne pas perdre le backup si une erreur survient
                         File.Copy(bkPath, appAsar);
                     }
                     break;
                 }
             }
 
-            // 4. Nettoyer les patches dans discord_desktop_core que Vencord/Equicord injectent
-            //    dans splashScreen.js et app_bootstrap (cause les settings parasites)
             CleanModulePatches(resPath);
 
             SetProgress(92, "Configuring Nightcord loader...");
 
-            // Vérification finale : on doit avoir un vrai app.asar ou un backup avant de continuer
             if (!File.Exists(appAsar) && !File.Exists(backup))
             {
                 throw new Exception(
@@ -544,7 +526,6 @@ namespace NightcordInstaller
                 );
             }
 
-            // Créer le backup Nightcord si app.asar existe et qu'on n'a pas encore de backup
             if (File.Exists(appAsar))
             {
                 if (File.Exists(backup)) File.Delete(backup);
@@ -559,20 +540,12 @@ namespace NightcordInstaller
             StartDiscord(resPath);
         }
 
-        /// <summary>
-        /// Nettoie les patches laissés par Vencord/Equicord dans les modules natifs Discord.
-        /// Ces patches (dans discord_desktop_core, etc.) font que les settings Discord affichent
-        /// encore l'interface Vencord/Equicord même après suppression de leur dossier app/.
-        /// </summary>
         private void CleanModulePatches(string resPath)
         {
             try
             {
-                // Chemins où Vencord/Equicord injectent leurs hooks
-                var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var appBase = Path.GetDirectoryName(resPath);
 
-                // Chercher le dossier modules (dans app-X.X.XXXX/modules/)
                 string[] modulesSearchPaths = {
                     Path.Combine(appBase, "modules"),
                     Path.Combine(resPath, "modules")
@@ -582,13 +555,11 @@ namespace NightcordInstaller
                 {
                     if (!Directory.Exists(modulesDir)) continue;
 
-                    // Chercher discord_desktop_core-*/discord_desktop_core/
                     foreach (var coreParent in Directory.GetDirectories(modulesDir, "discord_desktop_core*"))
                     {
                         var corePath = Path.Combine(coreParent, "discord_desktop_core");
                         if (!Directory.Exists(corePath)) continue;
 
-                        // Fichiers patchés par Vencord/Equicord dans discord_desktop_core
                         string[] patchedFiles = {
                             Path.Combine(corePath, "index.js"),
                             Path.Combine(corePath, "app", "app_bootstrap", "splashScreen.js"),
@@ -600,7 +571,6 @@ namespace NightcordInstaller
                             if (!File.Exists(pf)) continue;
                             var content = File.ReadAllText(pf);
 
-                            // Détecter la présence d'une injection Vencord/Equicord dans ce fichier
                             bool isPatched = content.Contains("vencord", StringComparison.OrdinalIgnoreCase)
                                          || content.Contains("equicord", StringComparison.OrdinalIgnoreCase)
                                          || content.Contains("require(\"vencord")
@@ -610,7 +580,6 @@ namespace NightcordInstaller
 
                             if (!isPatched) continue;
 
-                            // Chercher un backup .orig ou .bak laissé par le mod
                             string[] backupExts = { ".orig", ".bak", ".vanilla" };
                             bool restored = false;
                             foreach (var ext in backupExts)
@@ -627,13 +596,10 @@ namespace NightcordInstaller
 
                             if (!restored)
                             {
-                                // Pas de backup → supprimer le fichier patché.
-                                // Discord le recrée au prochain démarrage depuis app.asar.
                                 try { File.Delete(pf); } catch { }
                             }
                         }
 
-                        // Supprimer le dossier app/ à l'intérieur de discord_desktop_core si injecté
                         var innerAppDir = Path.Combine(corePath, "app");
                         if (Directory.Exists(innerAppDir))
                         {
@@ -655,7 +621,6 @@ namespace NightcordInstaller
             }
             catch (Exception ex)
             {
-                // Non-fatal : on log et on continue
                 Console.WriteLine($"[Nightcord] CleanModulePatches warning: {ex.Message}");
             }
         }
@@ -670,7 +635,6 @@ namespace NightcordInstaller
             KillDiscord(resPath);
 
             SetProgress(30, "Removing injected folder...");
-            // 1. Remove the injected 'app' folder
             if (Directory.Exists(appDir))
             {
                 var pkg = Path.Combine(appDir, "package.json");
@@ -681,71 +645,52 @@ namespace NightcordInstaller
             }
 
             SetProgress(50, "Restoring original files...");
-            // Nettoyage des faux app.asar avant de restaurer
             if (File.Exists(appAsar) && new FileInfo(appAsar).Length < 1000000) {
                 File.Delete(appAsar);
             }
 
-            // 2. Restore app.asar backup
             if (File.Exists(backup))
             {
                 if (!File.Exists(appAsar)) {
                     File.Move(backup, appAsar);
                 } else {
-                    // S'il y a un vrai app.asar (taille > 1Mo), Discord s'est mis à jour, l'ancien backup est obsolète
-                    File.Delete(backup); 
+                    File.Delete(backup);
                 }
             }
 
             SetProgress(70, "Cleaning up assets...");
-            // 3. Clean up Nightcord-specific assets (folders we added)
-            // We DON'T delete ffmpeg.dll because it's a native Discord file!
             var appBase = Path.GetDirectoryName(resPath);
-            
-            // Revert build_info.json patch
+
             var buildInfoPath = Path.Combine(resPath, "build_info.json");
             if (File.Exists(buildInfoPath)) {
                 try {
                     var json = File.ReadAllText(buildInfoPath);
                     if (json.Contains("\"localModulesRoot\"")) {
-                        // Simple regex to remove the line
                         json = Regex.Replace(json, @",\s*""localModulesRoot""\s*:\s*""modules""\s*", "");
                         File.WriteAllText(buildInfoPath, json);
                     }
                 } catch { }
             }
 
-            string[] filesToClean = { "node.exe", "yt-dlp.exe", "ffmpeg.exe" }; // safe to delete as Discord doesn't have these
-            foreach (var f in filesToClean) { 
-                var p = Path.Combine(appBase, f); 
-                if (File.Exists(p)) try { File.Delete(p); } catch { } 
+            string[] filesToClean = { "node.exe", "yt-dlp.exe", "ffmpeg.exe" };
+            foreach (var f in filesToClean) {
+                var p = Path.Combine(appBase, f);
+                if (File.Exists(p)) try { File.Delete(p); } catch { }
             }
 
             string[] dirsToClean = { "mac", "multi-instance-icons", "ghost-server" };
-            foreach (var dir in dirsToClean) { 
-                var p = Path.Combine(appBase, dir); 
-                if (Directory.Exists(p)) try { Directory.Delete(p, true); } catch { } 
+            foreach (var dir in dirsToClean) {
+                var p = Path.Combine(appBase, dir);
+                if (Directory.Exists(p)) try { Directory.Delete(p, true); } catch { }
             }
 
             SetProgress(95, "Restarting Discord...");
-            // Relancer Discord proprement après la désinstallation
             StartDiscord(resPath);
             SetProgress(100, "Done!");
         }
 
         private void WriteLoader(string appDir)
         {
-            // CRITICAL: use a relative path from appDir to patcher.js
-            // An absolute path breaks when the user's appdata path differs (e.g. Canary after update)
-            // appDir = {resources}\app\
-            // _distDir = %LOCALAPPDATA%\Nightcord\dist\
-            // We must use the absolute path BUT with forward slashes and proper escaping for require()
-            // The path is correct at install time; it only breaks if the user moves AppData.
-            // Real fix: use path.join(__dirname, ...) relative navigation from patcher.js location.
-            //
-            // Strategy: write index.js so it resolves patcher.js relative to _distDir stored in a sibling file,
-            // OR simply use the absolute path correctly escaped. The Canary bug is NOT the path —
-            // it's that the dist folder may not exist yet when Canary loads. We add an existence check.
             var patcher = Path.Combine(_distDir, "patcher.js").Replace("\\", "/");
             File.WriteAllText(Path.Combine(appDir, "package.json"), "{\"name\":\"nightcord\",\"main\":\"index.js\"}");
             File.WriteAllText(Path.Combine(appDir, "index.js"),
@@ -753,9 +698,7 @@ namespace NightcordInstaller
                 $"\"use strict\";\n" +
                 $"const fs = require('fs');\n" +
                 $"const path = require('path');\n" +
-                $"// Primary: injected dist path\n" +
                 $"const primary = {JsonEscape(patcher)};\n" +
-                $"// Fallback: dist/ folder next to the exe (portable mode)\n" +
                 $"const exeDir = path.dirname(process.execPath);\n" +
                 $"const fallback = path.join(exeDir, 'resources', 'dist', 'patcher.js');\n" +
                 $"const fallback2 = path.join(exeDir, 'dist', 'patcher.js');\n" +
@@ -767,7 +710,6 @@ namespace NightcordInstaller
 
         private string JsonEscape(string s)
         {
-            // Produce a JSON string literal: "value" with proper escaping
             return System.Text.Json.JsonSerializer.Serialize(s);
         }
 
@@ -834,7 +776,7 @@ namespace NightcordInstaller
                 var procName = resPath.Contains("DiscordPTB") ? "DiscordPTB.exe" :
                                resPath.Contains("DiscordCanary") ? "DiscordCanary.exe" :
                                resPath.Contains("DiscordDevelopment") ? "DiscordDevelopment.exe" : "Discord.exe";
-                               
+
                 if (File.Exists(exe)) Process.Start(exe, $"--processStart {procName}");
             } catch { }
         }

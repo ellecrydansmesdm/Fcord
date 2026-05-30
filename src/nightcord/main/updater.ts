@@ -21,19 +21,17 @@ let updaterWindow: BrowserWindow | null = null;
 autoUpdater.on("update-available", update => {
     if (State.store.updater?.ignoredVersion === update.version) return;
     if ((State.store.updater?.snoozeUntil ?? 0) > Date.now()) return;
-    // Anti-boucle : si on vient de télécharger et installer cette version, ne pas ré-ouvrir
     if (update.version === app.getVersion()) return;
-    // Si la fenêtre updater est déjà ouverte pour cette version, ne pas en ouvrir une autre
     if (updaterWindow && !updaterWindow.isDestroyed()) return;
 
     openUpdater(update);
 });
 
-let updateDownloaded = false;
+// Pas d'auto-install : on attend que l'utilisateur clique sur "Installer" dans la fenêtre updater
 autoUpdater.on("update-downloaded", () => {
-    updateDownloaded = true;
-    setTimeout(() => autoUpdater.quitAndInstall(false, true), 100);
+    updaterWindow?.webContents.send(UpdaterIpcEvents.DOWNLOAD_PROGRESS, 100);
 });
+
 autoUpdater.on("download-progress", p =>
     updaterWindow?.webContents.send(UpdaterIpcEvents.DOWNLOAD_PROGRESS, p.percent)
 );
@@ -43,15 +41,9 @@ autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = false;
 autoUpdater.fullChangelog = true;
 
-// Anti-boucle : on vérifie si l'app vient juste de se mettre à jour
-// en comparant la version installée avec la dernière version vérifiée
-let lastCheckedVersion: string | null = null;
-
 const isOutdated = autoUpdater.checkForUpdates().then(res => {
     if (!res?.isUpdateAvailable) return false;
-    // Si l'update est déjà téléchargée (on vient de redémarrer après install), ignorer
     if (res.updateInfo?.version === app.getVersion()) return false;
-    lastCheckedVersion = res.updateInfo?.version ?? null;
     return true;
 });
 
@@ -81,6 +73,8 @@ function openUpdater(update: UpdateInfo) {
     handle(UpdaterIpcEvents.GET_DATA, () => ({ update, version: app.getVersion() }));
     handle(UpdaterIpcEvents.INSTALL, async () => {
         await autoUpdater.downloadUpdate();
+        // L'utilisateur a cliqué "Installer" — on installe et redémarre
+        autoUpdater.quitAndInstall(false, true);
     });
     handle(UpdaterIpcEvents.SNOOZE_UPDATE, () => {
         State.store.updater ??= {};

@@ -11,7 +11,7 @@ import { USER_AGENT } from "../constants";
 import { VENCORD_DIR } from "../vencordDir";
 import { downloadFile, fetchie } from "./http";
 
-const API_BASE = "https://api.github.com";
+const API_BASE = "https://git.nightcord.su/api/v1";
 
 export interface ReleaseData {
     name: string;
@@ -26,19 +26,17 @@ export interface ReleaseData {
 export async function githubGet(endpoint: string) {
     const opts: RequestInit = {
         headers: {
-            Accept: "application/vnd.github+json",
+            Accept: "application/json",
             "User-Agent": USER_AGENT
         }
     };
-
-    if (process.env.GITHUB_TOKEN) (opts.headers! as any).Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
 
     return fetchie(API_BASE + endpoint, opts, { retryOnNetworkError: true });
 }
 
 export async function downloadVencordAsar() {
     await downloadFile(
-        "https://github.com/Nightcord/Nightcord/releases/latest/download/Nightcord.asar",
+        "https://git.nightcord.su/nightcord/nightcord/releases/download/latest/Nightcord.asar",
         VENCORD_DIR,
         {},
         { retryOnNetworkError: true }

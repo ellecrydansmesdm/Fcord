@@ -241,114 +241,6 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_SEQUENCE, async (
         try { rmSync(tempDir, { recursive: true, force: true }); } catch {}
     }
 });
-
-let globalHookProcess: any = null;
-ipcMain.handle(IpcEvents.KEYBOARD_SOUNDS_START_GLOBAL, event => {
-    if (globalHookProcess) return;
-
-    const { spawn } = require("child_process");
-    const { writeFileSync, unlinkSync } = require("fs");
-    const { join } = require("path");
-    const { tmpdir } = require("os");
-
-    const code = `
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-
-public class KeyHook
-{
-    private const int WH_KEYBOARD_LL = 13;
-    private const int WM_KEYDOWN = 0x0100;
-    private const int WM_SYSKEYDOWN = 0x0104;
-    private static LowLevelKeyboardProc _proc = HookCallback;
-    private static IntPtr _hookID = IntPtr.Zero;
-
-    public static void Main()
-    {
-        _hookID = SetHook(_proc);
-        Application.Run();
-        UnhookWindowsHookEx(_hookID);
-    }
-
-    private static IntPtr SetHook(LowLevelKeyboardProc proc)
-    {
-        using (Process curProcess = Process.GetCurrentProcess())
-        using (ProcessModule curModule = curProcess.MainModule)
-        {
-            return SetWindowsHookEx(WH_KEYBOARD_LL, proc,
-                GetModuleHandle(curModule.ModuleName), 0);
-        }
-    }
-
-    private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-    private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
-    {
-        if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN))
-        {
-            int vkCode = Marshal.ReadInt32(lParam);
-            Console.WriteLine(vkCode);
-            Console.Out.Flush();
-        }
-        return CallNextHookEx(_hookID, nCode, wParam, lParam);
-    }
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool UnhookWindowsHookEx(IntPtr hhk);
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr GetModuleHandle(string lpModuleName);
-}
-`;
-
-    const psScript = `
-Add-Type -TypeDefinition @"
-${code}
-"@ -ReferencedAssemblies "System.Windows.Forms"
-[KeyHook]::Main()
-`;
-
-    const tempDir = mkdtempSync(join(tmpdir(), "nightcord-kb-"));
-    const tempFile = join(tempDir, "global_hook.ps1");
-    try {
-        writeFileSync(tempFile, "\uFEFF" + psScript, "utf8");
-        globalHookProcess = spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", tempFile]);
-
-        globalHookProcess.stdout.on("data", (data: Buffer) => {
-            const lines = data.toString().trim().split(/\r?\n/);
-            for (const line of lines) {
-                const vkCode = parseInt(line.trim(), 10);
-                if (!isNaN(vkCode)) {
-                    event.sender.send(IpcEvents.GLOBAL_KEY_DOWN, vkCode);
-                }
-            }
-        });
-
-        globalHookProcess.on("exit", () => {
-            try { unlinkSync(tempFile); } catch { }
-            globalHookProcess = null;
-        });
-    } catch (e) {
-        console.error("[KeyboardSounds] Failed to start global hook:", e);
-    }
-});
-
-ipcMain.handle(IpcEvents.KEYBOARD_SOUNDS_STOP_GLOBAL, () => {
-    if (globalHookProcess) {
-        try { globalHookProcess.kill(); } catch { }
-        globalHookProcess = null;
-    }
-});
-
 ipcMain.handle(IpcEvents.WORLD_BOMB_GET_CURSOR_POS, () => {
     return screen.getCursorScreenPoint();
 });
@@ -889,7 +781,7 @@ ipcMain.handle(IpcEvents.RELAUNCH_APP, async () => {
     app.exit(0);
 });
 
-const OFFICIAL_UPDATE_URL = "https://github.com/nightcordfr/nightcord/releases/latest/download/Nightcord-Installer.exe";
+const OFFICIAL_UPDATE_URL = "https://git.nightcord.su/nightcord/nightcord/releases/download/latest/Nightcord-Installer.exe";
 
 ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
     if (url !== OFFICIAL_UPDATE_URL) {
@@ -1018,3 +910,4 @@ ipcMain.handle(IpcEvents.INSTALL_VB_CABLE, async () => {
         try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
     }
 });
+
