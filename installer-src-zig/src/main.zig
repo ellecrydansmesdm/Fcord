@@ -558,7 +558,10 @@ fn readFileAbsoluteAlloc(allocator: std.mem.Allocator, path_value: []const u8, m
     const cwd = std.Io.Dir.cwd();
     var file = try cwd.openFile(getIo(), path_value, .{});
     defer file.close(getIo());
-    return try file.readToEndAlloc(allocator, max_bytes);
+
+    var buffer: [4096]u8 = undefined;
+    var reader = file.reader(getIo(), &buffer);
+    return try reader.interface.allocRemaining(allocator, .limited(max_bytes));
 }
 
 fn writeFileAbsolute(path_value: []const u8, content: []const u8) !void {
