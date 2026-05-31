@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Vencord, a Discord client mod
  * Copyright (c) 2026 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -92,7 +92,7 @@ async function applyUpdates(): Promise<boolean> {
         const tmpExtract = join(app.getPath("temp"), `nightcord-extract-${Date.now()}`);
 
         return await new Promise<boolean>((resolve, reject) => {
-            // Step 1 â€” extract zip to temp folder
+            // Step 1 — extract zip to temp folder
             const psExtract = `Expand-Archive -LiteralPath '${zipPath}' -DestinationPath '${tmpExtract}' -Force`;
             exec(`powershell -NoProfile -NonInteractive -Command "${psExtract}"`, err => {
                 if (err) {
@@ -100,7 +100,7 @@ async function applyUpdates(): Promise<boolean> {
                     return reject(new Error("ZIP extraction failed: " + err.message));
                 }
 
-                // Step 2 â€” copy extracted files into dist/desktop/ (= __dirname), overwriting existing ones
+                // Step 2 — copy extracted files into dist/desktop/ (= __dirname), overwriting existing ones
                 const psMove = `Copy-Item -Path '${tmpExtract}\\*' -Destination '${destPath}' -Recurse -Force`;
                 exec(`powershell -NoProfile -NonInteractive -Command "${psMove}"`, err2 => {
                     // Cleanup temp files regardless of outcome
@@ -126,4 +126,3 @@ ipcMain.handle(IpcEvents.GET_REPO, serializeErrors(() => REPO_URL));
 ipcMain.handle(IpcEvents.GET_UPDATES, serializeErrors(getUpdates));
 ipcMain.handle(IpcEvents.UPDATE, serializeErrors(fetchUpdates));
 ipcMain.handle(IpcEvents.BUILD, serializeErrors(applyUpdates));
-

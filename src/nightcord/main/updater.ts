@@ -41,10 +41,21 @@ autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = false;
 autoUpdater.fullChangelog = true;
 
-const isOutdated = autoUpdater.checkForUpdates().then(res => {
-    if (!res?.isUpdateAvailable) return false;
-    if (res.updateInfo?.version === app.getVersion()) return false;
-    return true;
+// On diffère le check de mise à jour APRÈS que app soit prête et la fenêtre principale chargée
+// pour éviter un freeze au démarrage quand Discord est lancé juste avant Nightcord.
+const isOutdated: Promise<boolean> = new Promise(resolve => {
+    app.whenReady().then(() => {
+        // Petit délai pour laisser la fenêtre principale s'initialiser complètement
+        setTimeout(() => {
+            autoUpdater.checkForUpdates()
+                .then(res => {
+                    if (!res?.isUpdateAvailable) return resolve(false);
+                    if (res.updateInfo?.version === app.getVersion()) return resolve(false);
+                    resolve(true);
+                })
+                .catch(() => resolve(false));
+        }, 5000);
+    });
 });
 
 handle(IpcEvents.UPDATER_IS_OUTDATED, () => isOutdated);
@@ -54,6 +65,19 @@ handle(IpcEvents.UPDATER_OPEN, async () => {
 });
 
 function openUpdater(update: UpdateInfo) {
+    // Éviter d'ouvrir plusieurs fenêtres updater en même temps
+    if (updaterWindow && !updaterWindow.isDestroyed()) {
+        updaterWindow.focus();
+        return;
+    }
+
+    // Nettoyer les anciens handlers avant d'en enregistrer de nouveaux
+    // pour éviter l'erreur "handler already registered" qui gèle le renderer
+    ipcMain.removeHandler(UpdaterIpcEvents.GET_DATA);
+    ipcMain.removeHandler(UpdaterIpcEvents.INSTALL);
+    ipcMain.removeHandler(UpdaterIpcEvents.SNOOZE_UPDATE);
+    ipcMain.removeHandler(UpdaterIpcEvents.IGNORE_UPDATE);
+
     updaterWindow = new BrowserWindow({
         title: "Nightcord Updater",
         autoHideMenuBar: true,
