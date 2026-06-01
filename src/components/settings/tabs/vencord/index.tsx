@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2024 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -165,7 +165,7 @@ function StealthModeSection() {
             <Heading className={Margins.top20}>Stealth Mode</Heading>
             <Paragraph className={Margins.bottom16}>
                 {enabled
-                    ? "Stealth mode is enabled — all Nightcord visual elements are hidden. Shortcut: Ctrl+Shift+H"
+                    ? "Stealth mode is enabled â€” all Nightcord visual elements are hidden. Shortcut: Ctrl+Shift+H"
                     : "Hides all Nightcord visual elements (icons, buttons, context menus) without disabling plugins. Shortcut: Ctrl+Shift+H"}
             </Paragraph>
             <Button
@@ -186,87 +186,133 @@ function StealthModeButton() {
             onClick={toggleStealthMode}
             variant={enabled ? "dangerPrimary" : "primary"}
         >
-            {enabled ? "✓ Stealth Mode Enabled — Click to disable" : "Enable Stealth Mode"}
+            {enabled ? "âœ“ Stealth Mode Enabled â€” Click to disable" : "Enable Stealth Mode"}
         </Button>
     );
 }
 
-function CustomProfileAuthSection() {
+function CustomProfileSyncToggle() {
+    const settings = useSettings();
     const [token, setToken] = React.useState<string | null>(null);
-    const [loading, setLoading] = React.useState(true);
-    const [authUrl, setAuthUrl] = React.useState<string | null>(null);
+    const [checking, setChecking] = React.useState(true);
+    const [busy, setBusy] = React.useState(false);
+    const [tokenInput, setTokenInput] = React.useState("");
+    const [waitingToken, setWaitingToken] = React.useState(false);
 
+    // Check stored token on mount
     React.useEffect(() => {
         getStoredToken().then(async t => {
             if (t) {
                 const check = await checkOAuthToken(t);
                 if (check?.valid) {
                     setToken(t);
+                    settings.syncOwnCustomProfile = true;
+                    settings.seeAllCustomProfile = true;
                 } else {
                     await clearToken();
+                    settings.syncOwnCustomProfile = false;
+                    settings.seeAllCustomProfile = false;
                 }
+            } else {
+                settings.syncOwnCustomProfile = false;
+                settings.seeAllCustomProfile = false;
             }
-            setLoading(false);
+            setChecking(false);
         });
     }, []);
 
-    const handleLogin = async () => {
-        setLoading(true);
-        try {
-            const data = await beginDiscordOAuth();
-            setAuthUrl(data.url);
-            // Use VencordNative in Electron (Discord desktop), fallback to window.open for web
+    const isEnabled = !!token;
+
+    async function handleToggle(on: boolean) {
+        if (busy) return;
+        if (on) {
+            // Activate: launch OAuth flow
+            setBusy(true);
             try {
-                await VencordNative.native.openExternal(data.url);
-            } catch {
-                window.open(data.url, "_blank");
+                const data = await beginDiscordOAuth();
+                try { await VencordNative.native.openExternal(data.url); } catch { window.open(data.url, "_blank"); }
+                setWaitingToken(true);
+            } catch (e) {
+                console.error("[CustomProfileSync] OAuth error:", e);
             }
-        } catch (e) {
-            console.error(e);
+            setBusy(false);
+        } else {
+            // Deactivate: clear everything
+            setBusy(true);
+            await clearToken();
+            setToken(null);
+            setWaitingToken(false);
+            setTokenInput("");
+            settings.syncOwnCustomProfile = false;
+            settings.seeAllCustomProfile = false;
+            setBusy(false);
         }
-        setLoading(false);
-    };
-
-    if (loading) return null;
-
-    if (token) {
-        return (
-            <Notice.Info className={Margins.bottom20} style={{ width: "100%" }}>
-                You are signed in to Nightcord Sync. Your custom profile is synchronized.
-            </Notice.Info>
-        );
     }
 
+    async function handleTokenSubmit() {
+        const t = tokenInput.trim();
+        if (!t) return;
+        setBusy(true);
+        const check = await checkOAuthToken(t);
+        if (check?.valid) {
+            await storeToken(t);
+            setToken(t);
+            setWaitingToken(false);
+            setTokenInput("");
+            settings.syncOwnCustomProfile = true;
+            settings.seeAllCustomProfile = true;
+        } else {
+            alert("Invalid token. Please try again.");
+        }
+        setBusy(false);
+    }
+
+    if (checking) return null;
+
     return (
-        <Notice.Warning className={Margins.bottom20} style={{ width: "100%", overflow: "hidden" }}>
-            You are not signed in. <a role="button" onClick={handleLogin} style={{ cursor: "pointer", color: "var(--text-link)" }}>Sign in with Discord</a> to use Custom Profile Sync.
-            {authUrl && (
-                <div style={{ marginTop: "8px" }}>
-                    After signing in, paste your session token below:
-                    <input 
-                        type="password" 
-                        placeholder="Paste session token here and press Enter..." 
-                        style={{ width: "100%", marginTop: "4px", padding: "8px", borderRadius: "4px", background: "var(--background-secondary)", color: "var(--text-normal)", border: "none" }}
-                        onKeyDown={async e => {
-                            if (e.key === "Enter") {
-                                const t = e.currentTarget.value.trim();
-                                if (t) {
-                                    setLoading(true);
-                                    const check = await checkOAuthToken(t);
-                                    if (check?.valid) {
-                                        await storeToken(t);
-                                        setToken(t);
-                                    } else {
-                                        alert("Invalid token");
-                                    }
-                                    setLoading(false);
-                                }
-                            }
-                        }}
-                    />
+        <div style={{ marginBottom: 16 }}>
+            <FormSwitch
+                value={isEnabled}
+                onChange={handleToggle}
+                title="Custom Profile Sync"
+                description={isEnabled
+                    ? "Your custom profile is synced. Other Nightcord users can see your profile, and you can see theirs."
+                    : "Enable to share your custom profile with other Nightcord users and see their profiles."}
+                disabled={busy}
+            />
+            {waitingToken && (
+                <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--background-secondary)", borderRadius: 8 }}>
+                    <div style={{ marginBottom: 8, color: "var(--text-normal)", fontSize: 14 }}>
+                        ✅ Browser opened — sign in with Discord, then paste the token you received below:
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                        <input
+                            type="password"
+                            placeholder="Paste your session token here..."
+                            value={tokenInput}
+                            onChange={e => setTokenInput(e.currentTarget.value)}
+                            onKeyDown={e => { if (e.key === "Enter") handleTokenSubmit(); }}
+                            style={{ flex: 1, padding: "8px 12px", borderRadius: 6, background: "var(--background-tertiary)", color: "var(--text-normal)", border: "1px solid var(--background-modifier-accent)", outline: "none" }}
+                        />
+                        <Button onClick={handleTokenSubmit} disabled={busy || !tokenInput.trim()}>
+                            Confirm
+                        </Button>
+                    </div>
                 </div>
             )}
-        </Notice.Warning>
+            {isEnabled && (
+                <div style={{ marginTop: 4 }}>
+                    <a role="button" onClick={async () => {
+                        await clearToken();
+                        setToken(null);
+                        settings.syncOwnCustomProfile = false;
+                        settings.seeAllCustomProfile = false;
+                    }} style={{ fontSize: 12, color: "var(--text-muted)", cursor: "pointer" }}>
+                        Disconnect account
+                    </a>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -286,13 +332,7 @@ function EquicordSettings() {
         warning: { enabled: boolean; message?: string; };
     }>
         = [
-            {
-                key: "seeAllCustomProfile",
-                title: "See All Customprofile",
-                description: "Share your custom profile (except username) with others and see their custom profiles.",
-                restartRequired: false,
-                warning: { enabled: false },
-            },
+
             {
                 key: "useQuickCss",
                 title: "Enable Custom CSS",
@@ -392,7 +432,7 @@ function EquicordSettings() {
                     </a>.
                 </Notice.Info>
 
-                <CustomProfileAuthSection />
+                <CustomProfileSyncToggle />
 
                 {Switches.filter((s): s is Exclude<typeof s, false> => !!s).map(
                     s => (
@@ -522,3 +562,6 @@ function EquicordSettings() {
 }
 
 export default wrapTab(EquicordSettings, "Nightcord Settings");
+
+
+

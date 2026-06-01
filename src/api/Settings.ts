@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a modification for Discord's desktop app
  * Copyright (c) 2022 Vendicated and contributors
  *
@@ -81,6 +81,7 @@ export interface Settings {
     disableMinSize: boolean;
     winNativeTitleBar: boolean;
     seeAllCustomProfile: boolean;
+    syncOwnCustomProfile: boolean;
     plugins: {
         [plugin: string]: {
             enabled: boolean;
@@ -138,6 +139,7 @@ const DefaultSettings: Settings = {
     disableMinSize: false,
     winNativeTitleBar: false,
     seeAllCustomProfile: true,
+    syncOwnCustomProfile: false,
     plugins: {},
 
     uiElements: {
@@ -213,11 +215,11 @@ export const SettingsStore = new SettingsStoreClass(settings, {
                 return target[key] = { enabled: shouldBeEnabled };
             }
 
-            // Si le plugin doit être actif par défaut et qu'il est désactivé, on le force à actif
+            // Si le plugin doit Ãªtre actif par dÃ©faut et qu'il est dÃ©sactivÃ©, on le force Ã  actif
             if (shouldBeEnabled && target[key].enabled === false) {
                 target[key].enabled = true;
             }
-            // Si le plugin doit être désactivé de force, on le force à inactif
+            // Si le plugin doit Ãªtre dÃ©sactivÃ© de force, on le force Ã  inactif
             if (forceOff) {
                 target[key].enabled = false;
             }
@@ -428,3 +430,4 @@ type ResolveUseSettings<T extends object> = {
     : Key
     : never;
 };
+
