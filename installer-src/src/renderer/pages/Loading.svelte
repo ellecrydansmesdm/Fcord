@@ -1,9 +1,9 @@
-<script>
-    import Spinner from "../common/Spinner.svelte";
-</script>
-
 <div class="loader">
-    <Spinner/>
+    <img
+        class="loading-gif"
+        src="https://cdn.nightcord.ru/badge/c8695534-1f89-4379-a04c-ff28bb4366ed.gif"
+        alt="Loading..."
+    />
 </div>
 
 <style>
@@ -14,5 +14,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        background: #000;
+    }
+
+    .loading-gif {
+        width: 240px;
+        height: 240px;
+        object-fit: contain;
     }
 </style>

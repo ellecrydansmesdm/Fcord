@@ -34,50 +34,56 @@ import { openNotificationSettingsModal } from "./NotificationSettings";
 
 const cl = classNameFactory("vc-vencord-tab-");
 
-const DEV_TEAM = [
-    {
-        id: "ahki",
-        name: "ahki__",
-        role: "Owner",
-        pfp: "https://i.imgur.com/gHucHbN.jpeg",
-        description: "Founder and owner of Nightcord."
-    },
-    {
-        id: "kza",
-        name: "Kza",
-        role: "Co-Owner",
-        pfp: "https://i.imgur.com/wqKfGyK.jpeg",
-        description: "Co-owner of Nightcord."
-    },
-    {
-        id: "attachante",
-        name: "attachante",
-        role: "Developer",
-        pfp: "https://i.imgur.com/R8s7Jz9.png",
-        description: "Developer within the Nightcord team."
-    },
-    {
-        id: "Fancy",
-        name: "Fancy",
-        role: "Developer",
-        pfp: "https://i.imgur.com/RVJ2bUG.png",
-        description: "Developer within the Nightcord team."
-    },
-    {
-        id: "Xeen",
-        name: "Xeen",
-        role: "BOT Developer",
-        pfp: "https://i.imgur.com/mXKUR8I.png",
-        description: "Bot developer for Nightcord."
-    },
-    {
-        id: "biemal",
-        name: "Biemal",
-        role: "WebApp Developer",
-        pfp: "https://i.imgur.com/8PISMQu.png",
-        description: "WebApp developer within the Nightcord team."
-    }
+const DEV_TEAM_IDS = [
+    { id: "1086802921984893038", role: "Owner" },
+    { id: "171356978310938624", role: "Co-Owner" }
 ];
+
+function useDiscordUser(userId: string) {
+    const [user, setUser] = React.useState<{ name: string; pfp: string; } | null>(null);
+    React.useEffect(() => {
+        const cached = UserStore?.getUser(userId);
+        if (cached) {
+            setUser({
+                name: cached.globalName ?? cached.username,
+                pfp: cached.avatar
+                    ? `https://cdn.discordapp.com/avatars/${userId}/${cached.avatar}.webp?size=128`
+                    : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(userId) >> 22n) % 6}.png`
+            });
+            return;
+        }
+        fetch(`https://discord.com/api/v9/users/${userId}`, {
+            headers: { Authorization: (window as any).token ?? "" }
+        })
+            .then(r => r.json())
+            .then(u => setUser({
+                name: u.global_name ?? u.username ?? userId,
+                pfp: u.avatar
+                    ? `https://cdn.discordapp.com/avatars/${userId}/${u.avatar}.webp?size=128`
+                    : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(userId) >> 22n) % 6}.png`
+            }))
+            .catch(() => setUser({ name: userId, pfp: `https://cdn.discordapp.com/embed/avatars/0.png` }));
+    }, [userId]);
+    return user;
+}
+
+function DevCard({ id, role }: { id: string; role: string; }) {
+    const user = useDiscordUser(id);
+    return (
+        <Card variant="primary" outline style={{ padding: "10px" }}>
+            <Flex align={Flex.Align.CENTER} gap="10px">
+                <Avatar
+                    src={user?.pfp ?? `https://cdn.discordapp.com/embed/avatars/0.png`}
+                    size="SIZE_48"
+                />
+                <Flex direction={Flex.Direction.VERTICAL} style={{ flex: 1, gap: "0px" }}>
+                    <Heading tag="h3" style={{ marginBottom: "-2px" }}>{user?.name ?? "..."}</Heading>
+                    <Heading tag="h4" style={{ opacity: 0.6 }}>{role}</Heading>
+                </Flex>
+            </Flex>
+        </Card>
+    );
+}
 
 function DevTeamSection() {
     const [showDevs, setShowDevs] = React.useState(false);
@@ -127,23 +133,9 @@ function DevTeamSection() {
                             to { opacity: 1; transform: translateY(0); }
                         }
                     `}</style>
-                    {DEV_TEAM.map(dev => {
-                        return (
-                            <Card key={dev.id} variant="primary" outline style={{ padding: "10px" }}>
-                                <Flex align={Flex.Align.CENTER} gap="10px">
-                                    <Avatar
-                                        src={dev.pfp}
-                                        size="SIZE_48"
-                                    />
-                                    <Flex direction={Flex.Direction.VERTICAL} style={{ flex: 1, gap: "0px" }}>
-                                        <Heading tag="h3" style={{ marginBottom: "-2px" }}>{dev.name}</Heading>
-                                        <Heading tag="h4" style={{ opacity: 0.6, marginBottom: "2px" }}>{dev.role}</Heading>
-                                        <Paragraph size="xs" style={{ lineHeight: "1.2" }}>{dev.description}</Paragraph>
-                                    </Flex>
-                                </Flex>
-                            </Card>
-                        );
-                    })}
+                    {DEV_TEAM_IDS.map(dev => (
+                        <DevCard key={dev.id} id={dev.id} role={dev.role} />
+                    ))}
                 </div>
             )}
         </>
