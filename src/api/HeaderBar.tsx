@@ -8,7 +8,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { Logger } from "@utils/Logger";
 import { classes } from "@utils/misc";
 import { findComponentByCodeLazy, findCssClassesLazy } from "@webpack";
-import { Clickable,Tooltip, useEffect, useState } from "@webpack/common";
+import { Clickable, Tooltip, useEffect, useState, Popout, useRef } from "@webpack/common";
 import type { ComponentType, JSX, MouseEventHandler, ReactNode } from "react";
 
 const logger = new Logger("HeaderBarAPI");
@@ -309,6 +309,116 @@ export function _notifyStealthChange() {
 export function addStealthListener(fn: () => void) { stealthListeners.add(fn); }
 export function removeStealthListener(fn: () => void) { stealthListeners.delete(fn); }
 
+
+// ------------------------------------------------------------------------------
+// COMPACT MODE � variable m�moire comme source de v�rit�
+// ------------------------------------------------------------------------------
+
+let _compactActive = false;
+try { _compactActive = localStorage.getItem("Nightcord_compactMode") === "1"; } catch { }
+
+export function isCompactModeEnabled(): boolean {
+    return _compactActive;
+}
+
+function persistCompact(v: boolean) {
+    try { v ? localStorage.setItem("Nightcord_compactMode", "1") : localStorage.removeItem("Nightcord_compactMode"); } catch { }
+}
+
+export function syncCompactBodyClass() {
+    try { if (_compactActive) document.body?.classList.add("nightcord-compact"); else document.body?.classList.remove("nightcord-compact"); } catch { }
+}
+
+export function toggleCompactMode() {
+    _compactActive = !_compactActive;
+    persistCompact(_compactActive);
+    _notifyCompactChange();
+    try { if (_compactActive) document.body?.classList.add("nightcord-compact"); else document.body?.classList.remove("nightcord-compact"); } catch { }
+    console.log("[CompactMode] toggled ?", _compactActive);
+    return _compactActive;
+}
+
+// Auto-init at module load
+if (_compactActive) {
+    try { document.body?.classList.add("nightcord-compact"); } catch { }
+}
+
+// Listeners for React re-render
+export const compactListeners = new Set<() => void>();
+export function _notifyCompactChange() {
+    compactListeners.forEach(fn => fn());
+    window.dispatchEvent(new Event("nightcord-compact-change"));
+}
+export function addCompactListener(fn: () => void) { compactListeners.add(fn); }
+export function removeCompactListener(fn: () => void) { compactListeners.delete(fn); }
+const GridVerticalIcon = (props: any) => (
+    <svg width={props.width || 24} height={props.height || 24} viewBox="0 0 24 24" fill={props.color || "currentColor"} {...props}>
+        <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z" />
+    </svg>
+);
+
+function CompactHeaderPopout({ type, closePopout }: { type: "header" | "channel", closePopout: () => void }) {
+    const map = type === "header" ? headerBarButtons : channelToolbarButtons;
+    return (
+        <div className="compact-popout-container">
+            <div className="compact-popout-grid">
+                {Array.from(map)
+                    .sort(([, a], [, b]) => a.priority - b.priority)
+                    .map(([id, { render: Button }]) => (
+                        <div key={id} style={{ display: "contents" }} onClick={closePopout}>
+                            <ErrorBoundary noop>
+                                <Button />
+                            </ErrorBoundary>
+                        </div>
+                    ))}
+            </div>
+            <div className="compact-popout-divider" />
+            <div className="compact-popout-disable" onClick={() => { toggleCompactMode(); closePopout(); }}>
+                Disable Compact Mode
+            </div>
+        </div>
+    );
+}
+
+function CompactHeaderBarToggle() {
+    const [, forceUpdate] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const popoutRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const listener = () => forceUpdate(n => n + 1);
+        compactListeners.add(listener);
+        window.addEventListener("nightcord-compact-change", listener);
+        return () => {
+            compactListeners.delete(listener);
+            window.removeEventListener("nightcord-compact-change", listener);
+        };
+    }, []);
+
+    return (
+        <Popout
+            targetElementRef={popoutRef}
+            renderPopout={() => <CompactHeaderPopout type="header" closePopout={() => setIsOpen(false)} />}
+            shouldShow={isOpen}
+            onRequestClose={() => setIsOpen(false)}
+            position="bottom"
+            align="right"
+            spacing={8}
+        >
+            {() => (
+                <div ref={popoutRef as any} style={{ display: "flex" }}>
+                    <HeaderBarButton
+                        icon={GridVerticalIcon}
+                        tooltip="Compact Mode"
+                        onClick={() => setIsOpen(v => !v)}
+                        selected={isOpen}
+                    />
+                </div>
+            )}
+        </Popout>
+    );
+}
+
 function HeaderBarButtons() {
     const [, forceUpdate] = useState(0);
 
@@ -316,15 +426,27 @@ function HeaderBarButtons() {
         const listener = () => forceUpdate(n => n + 1);
         headerBarListeners.add(listener);
         stealthListeners.add(listener);
+        compactListeners.add(listener);
         window.addEventListener("nightcord-stealth-change", listener);
+        window.addEventListener("nightcord-compact-change", listener);
         return () => {
             headerBarListeners.delete(listener);
             stealthListeners.delete(listener);
+            compactListeners.delete(listener);
             window.removeEventListener("nightcord-stealth-change", listener);
+            window.removeEventListener("nightcord-compact-change", listener);
         };
     }, []);
 
     if (isStealthModeEnabled()) return null;
+
+    if (isCompactModeEnabled()) {
+        return (
+            <div className="vc-header-bar-btns" style={{ display: "contents" }}>
+                <CompactHeaderBarToggle />
+            </div>
+        );
+    }
 
     return (
         <div className="vc-header-bar-btns" style={{ display: "contents" }}>
@@ -339,6 +461,45 @@ function HeaderBarButtons() {
     );
 }
 
+function CompactChannelToolbarToggle() {
+    const [, forceUpdate] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const popoutRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const listener = () => forceUpdate(n => n + 1);
+        compactListeners.add(listener);
+        window.addEventListener("nightcord-compact-change", listener);
+        return () => {
+            compactListeners.delete(listener);
+            window.removeEventListener("nightcord-compact-change", listener);
+        };
+    }, []);
+
+    return (
+        <Popout
+            targetElementRef={popoutRef}
+            renderPopout={() => <CompactHeaderPopout type="channel" closePopout={() => setIsOpen(false)} />}
+            shouldShow={isOpen}
+            onRequestClose={() => setIsOpen(false)}
+            position="bottom"
+            align="right"
+            spacing={8}
+        >
+            {() => (
+                <div ref={popoutRef as any} style={{ display: "flex" }}>
+                    <ChannelToolbarButton
+                        icon={GridVerticalIcon}
+                        tooltip="Compact Mode"
+                        onClick={() => setIsOpen(v => !v)}
+                        selected={isOpen}
+                    />
+                </div>
+            )}
+        </Popout>
+    );
+}
+
 function ChannelToolbarButtons() {
     const [, forceUpdate] = useState(0);
 
@@ -346,15 +507,27 @@ function ChannelToolbarButtons() {
         const listener = () => forceUpdate(n => n + 1);
         channelToolbarListeners.add(listener);
         stealthListeners.add(listener);
+        compactListeners.add(listener);
         window.addEventListener("nightcord-stealth-change", listener);
+        window.addEventListener("nightcord-compact-change", listener);
         return () => {
             channelToolbarListeners.delete(listener);
             stealthListeners.delete(listener);
+            compactListeners.delete(listener);
             window.removeEventListener("nightcord-stealth-change", listener);
+            window.removeEventListener("nightcord-compact-change", listener);
         };
     }, []);
 
     if (isStealthModeEnabled()) return null;
+
+    if (isCompactModeEnabled()) {
+        return (
+            <div className="vc-channel-toolbar-btns" style={{ display: "contents" }}>
+                <CompactChannelToolbarToggle />
+            </div>
+        );
+    }
 
     return (
         <div className="vc-channel-toolbar-btns" style={{ display: "contents" }}>

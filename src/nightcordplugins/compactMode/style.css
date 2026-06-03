@@ -1,0 +1,61 @@
+/* Compact Mode - replace all Nightcord plugin UI with a single compact toggle icon */
+
+/* When compact mode is active, hide user area buttons */
+body.nightcord-compact .vc-user-area-btns {
+    display: none !important;
+}
+
+/* Compact Popout Menu Styles */
+.compact-popout-container {
+    background-color: var(--background-floating, #111214);
+    border-radius: 12px;
+    padding: 16px 16px 12px 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 250px;
+    backdrop-filter: blur(16px);
+}
+
+.compact-popout-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px 12px;
+    justify-items: center;
+    align-items: center;
+}
+
+/* Since the wrapper is display: contents, the direct grid children are the buttons themselves */
+.compact-popout-grid > * {
+    margin: 0 !important;
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+.compact-popout-grid > *:hover {
+    transform: scale(1.15) !important;
+}
+
+.compact-popout-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.08);
+    margin: 4px 8px;
+    border-radius: 1px;
+}
+
+.compact-popout-disable {
+    text-align: center;
+    color: var(--text-danger, #ed4245);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin: 0 4px;
+}
+
+.compact-popout-disable:hover {
+    background-color: var(--button-danger-background-hover, #da373c);
+    color: var(--white-500, #ffffff);
+}

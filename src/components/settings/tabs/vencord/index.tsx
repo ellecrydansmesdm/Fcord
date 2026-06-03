@@ -6,7 +6,7 @@
 
 import "./VencordTab.css";
 
-import { isStealthModeEnabled, toggleStealthMode } from "@api/HeaderBar";
+import { isCompactModeEnabled, isStealthModeEnabled, toggleCompactMode, toggleStealthMode } from "@api/HeaderBar";
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { plugins } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
@@ -146,6 +146,16 @@ function DevTeamSection() {
 type KeysOfType<Object, Type> = {
     [K in keyof Object]: Object[K] extends Type ? K : never;
 }[keyof Object];
+
+function useCompactActive() {
+    const [active, setActive] = React.useState(isCompactModeEnabled);
+    React.useEffect(() => {
+        const handler = () => setActive(isCompactModeEnabled());
+        window.addEventListener("nightcord-compact-change", handler);
+        return () => window.removeEventListener("nightcord-compact-change", handler);
+    }, []);
+    return active;
+}
 
 function useStealthActive() {
     const [active, setActive] = React.useState(isStealthModeEnabled);
@@ -313,6 +323,7 @@ function CustomProfileSyncToggle() {
 function EquicordSettings() {
     const settings = useSettings();
     const stealthActive = useStealthActive();
+    const compactActive = useCompactActive();
 
     const needsVibrancySettings = IS_DISCORD_DESKTOP && IS_MAC;
 
@@ -542,6 +553,19 @@ function EquicordSettings() {
                 </Flex>
 
             </>)}
+
+            <Divider className={Margins.top20} />
+
+            <Heading className={Margins.top20}>Compact Mode</Heading>
+            <Paragraph className={Margins.bottom16}>
+                Replaces all Nightcord buttons with a single compact toggle icon. Click the icon in the header bar, channel toolbar, or chat bar to restore all buttons.
+            </Paragraph>
+            <Button
+                onClick={toggleCompactMode}
+                variant={compactActive ? "dangerPrimary" : "primary"}
+            >
+                {compactActive ? "✓ Compact Mode Enabled — Click to disable" : "Enable Compact Mode"}
+            </Button>
 
             <Divider className={Margins.top20} />
 

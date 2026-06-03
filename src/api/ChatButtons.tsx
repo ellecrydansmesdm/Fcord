@@ -12,10 +12,10 @@ import { classes } from "@utils/misc";
 import { IconComponent } from "@utils/types";
 import { Channel } from "@vencord/discord-types";
 import { findCssClassesLazy } from "@webpack";
-import { Clickable, Tooltip, useEffect,useState } from "@webpack/common";
+import { Clickable, Tooltip, useEffect, useState, Popout, useRef } from "@webpack/common";
 import { HTMLProps, JSX, MouseEventHandler, ReactNode } from "react";
 
-import { addStealthListener, isStealthModeEnabled, removeStealthListener } from "./HeaderBar";
+import { addCompactListener, addStealthListener, isCompactModeEnabled, isStealthModeEnabled, removeCompactListener, removeStealthListener, toggleCompactMode } from "./HeaderBar";
 import { useSettings } from "./Settings";
 
 const ButtonWrapperClasses = findCssClassesLazy("button", "buttonWrapper", "notificationDot");
@@ -110,16 +110,28 @@ function VencordChatBarButtons(props: ChatBarProps) {
     useEffect(() => {
         const listener = () => forceUpdate(n => n + 1);
         addStealthListener(listener);
+        addCompactListener(listener);
         window.addEventListener("nightcord-stealth-change", listener);
+        window.addEventListener("nightcord-compact-change", listener);
         backpackListeners.add(listener);
         return () => {
             removeStealthListener(listener);
+            removeCompactListener(listener);
             window.removeEventListener("nightcord-stealth-change", listener);
+            window.removeEventListener("nightcord-compact-change", listener);
             backpackListeners.delete(listener);
         };
     }, []);
 
     if (isStealthModeEnabled()) return null;
+
+    if (isCompactModeEnabled()) {
+        return (
+            <div className="vc-chat-bar-btns" style={{ display: "contents" }}>
+                <CompactChatBarToggle chatBarProps={props} />
+            </div>
+        );
+    }
 
     const { analyticsName } = props.type;
     return (
@@ -184,3 +196,73 @@ export const ChatBarButton = ErrorBoundary.wrap((props: ChatBarButtonProps) => {
 }, { noop: true });
 
 /* Vencord Buttons context menu removed — managed by Backpack plugin */
+
+function CompactChatPopout({ chatBarProps, closePopout }: any) {
+    const { chatBarButtons } = useSettings(["uiElements.chatBarButtons.*"]).uiElements;
+    const { analyticsName } = chatBarProps.type;
+    return (
+        <div className="compact-popout-container">
+            <div className="compact-popout-grid">
+                {Array.from(ChatBarButtonMap)
+                    .filter(([key]) => key !== "Backpack" && chatBarButtons[key]?.enabled !== false && !BackpackedButtons.has(key))
+                    .sort(([a], [b]) => (a === "Backpack" ? -1 : b === "Backpack" ? 1 : 0))
+                    .map(([key, { render: Button }]) => (
+                        <div key={key} style={{ display: "contents" }} onClick={closePopout}>
+                            <ErrorBoundary noop>
+                                <Button {...chatBarProps} isMainChat={analyticsName === "normal"} isAnyChat={["normal", "sidebar"].includes(analyticsName)} />
+                            </ErrorBoundary>
+                        </div>
+                    ))}
+            </div>
+            <div className="compact-popout-divider" />
+            <div className="compact-popout-disable" onClick={() => { toggleCompactMode(); closePopout(); }}>
+                Disable Compact Mode
+            </div>
+        </div>
+    );
+}
+
+function CompactChatBarToggle({ chatBarProps }: any) {
+    const [, forceUpdate] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const popoutRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const listener = () => forceUpdate(n => n + 1);
+        addCompactListener(listener);
+        window.addEventListener("nightcord-compact-change", listener);
+        return () => {
+            removeCompactListener(listener);
+            window.removeEventListener("nightcord-compact-change", listener);
+        };
+    }, []);
+
+    const GridIcon = () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z" />
+        </svg>
+    );
+
+    return (
+        <Popout
+            targetElementRef={popoutRef}
+            renderPopout={() => <CompactChatPopout chatBarProps={chatBarProps} closePopout={() => setIsOpen(false)} />}
+            shouldShow={isOpen}
+            onRequestClose={() => setIsOpen(false)}
+            position="top"
+            align="right"
+            spacing={8}
+        >
+            {() => (
+                <div ref={popoutRef as any} style={{ display: "flex", alignItems: "center" }}>
+                    <ChatBarButton
+                        tooltip="Compact Mode"
+                        onClick={() => setIsOpen(v => !v)}
+                    >
+                        <GridIcon />
+                    </ChatBarButton>
+                </div>
+            )}
+        </Popout>
+    );
+}
