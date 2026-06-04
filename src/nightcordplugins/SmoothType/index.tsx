@@ -148,6 +148,7 @@ function applyCaretPosition() {
 let observer: MutationObserver | null = null;
 
 function startObserver() {
+    if (observer || document.visibilityState === "hidden") return;
     observer = new MutationObserver(() => applyCaretPosition());
     observer.observe(document.body, { childList: true, subtree: true });
 }
@@ -157,12 +158,35 @@ function stopObserver() {
     observer = null;
 }
 
+function handleVisibilityChange() {
+    if (document.visibilityState === "hidden") {
+        stopObserver();
+    } else if (document.activeElement?.closest("[data-slate-editor]")) {
+        startObserver();
+    }
+}
+
 const handlers = {
     sel:   () => applyCaretPosition(),
-    focus: () => applyCaretPosition(),
-    blur:  () => { getCaret().style.display = "none"; },
+    focus: () => {
+        applyCaretPosition();
+        if (document.activeElement?.closest("[data-slate-editor]")) {
+            startObserver();
+        }
+    },
+    blur:  () => {
+        getCaret().style.display = "none";
+        stopObserver();
+    },
     key:   () => applyCaretPosition(),
-    click: () => applyCaretPosition(),
+    click: () => {
+        applyCaretPosition();
+        if (document.activeElement?.closest("[data-slate-editor]")) {
+            startObserver();
+        } else {
+            stopObserver();
+        }
+    },
 };
 
 function startListeners() {
@@ -203,11 +227,15 @@ export default definePlugin({
     start() {
         applyCSS();
         getCaret();
-        startObserver();
+        if (document.activeElement?.closest("[data-slate-editor]")) {
+            startObserver();
+        }
         startListeners();
+        document.addEventListener("visibilitychange", handleVisibilityChange);
     },
 
     stop() {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
         stopObserver();
         stopListeners();
         removeCSS();

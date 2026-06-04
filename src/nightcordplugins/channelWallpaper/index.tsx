@@ -24,6 +24,7 @@ const settings = definePluginSettings({
         default: "{}",
         hidden: true,
         restartNeeded: false,
+        onChange() { _invalidateWpCache(); }
     },
     opacity: {
         type: OptionType.SLIDER,
@@ -32,6 +33,7 @@ const settings = definePluginSettings({
         default: 0.3,
         stickToMarkers: false,
         restartNeeded: false,
+        onChange(v: number) { _cachedOpacity = v; }
     },
     blur: {
         type: OptionType.SLIDER,
@@ -40,6 +42,7 @@ const settings = definePluginSettings({
         default: 0,
         stickToMarkers: false,
         restartNeeded: false,
+        onChange(v: number) { _cachedBlur = v; }
     },
     defaultWallpaper: {
         type: OptionType.STRING,
@@ -67,15 +70,25 @@ const settings = definePluginSettings({
     },
 });
 
-// ── Wallpaper storage helpers ──────────────────────────────────────────────────
+let _cachedOpacity = 0.3;
+let _cachedBlur = 0;
+const cacheWpSettings = () => {
+    _cachedOpacity = settings.store.opacity ?? 0.3;
+    _cachedBlur = settings.store.blur ?? 0;
+};
+
+let _wpCache: Record<string, string> | null = null;
+let _wpRaw = "";
 
 function getWallpapers(): Record<string, string> {
-    try {
-        return JSON.parse(settings.store.wallpapers || "{}");
-    } catch {
-        return {};
-    }
+    const raw = settings.store.wallpapers || "{}";
+    if (raw === _wpRaw && _wpCache !== null) return _wpCache;
+    try { _wpCache = JSON.parse(raw); } catch { _wpCache = {}; }
+    _wpRaw = raw;
+    return _wpCache!;
 }
+
+function _invalidateWpCache() { _wpCache = null; _wpRaw = ""; }
 
 function saveWallpaper(channelId: string, url: string, skipSync = false) {
     const wp = getWallpapers();
@@ -85,6 +98,7 @@ function saveWallpaper(channelId: string, url: string, skipSync = false) {
         delete wp[channelId];
     }
     settings.store.wallpapers = JSON.stringify(wp);
+    _invalidateWpCache();
     applyWallpaper(channelId);
 
     // Peer-to-peer sync
@@ -116,6 +130,7 @@ function saveLocalWallpaperOnly(channelId: string, url: string) {
     if (url) wp[channelId] = url;
     else delete wp[channelId];
     settings.store.wallpapers = JSON.stringify(wp);
+    _invalidateWpCache();
     if (SelectedChannelStore.getChannelId() === channelId) {
         applyWallpaper(channelId);
     }
@@ -181,6 +196,30 @@ function removeWallpaperElements() {
     document.getElementById(CONTAINER_ID)?.remove();
 }
 
+let activeVideo: HTMLVideoElement | null = null;
+
+function pauseVideo() {
+    if (activeVideo && !activeVideo.paused) {
+        activeVideo.pause();
+    }
+}
+
+function playVideo() {
+    if (activeVideo && activeVideo.paused && !document.hidden && document.hasFocus()) {
+        activeVideo.play().catch(() => {});
+    }
+}
+
+function handleVisChange() {
+    if (document.hidden) pauseVideo();
+    else playVideo();
+}
+
+function handleFocusChange() {
+    if (document.hasFocus()) playVideo();
+    else pauseVideo();
+}
+
 function applyWallpaper(channelId?: string) {
     removeWallpaperElements();
 
@@ -190,14 +229,13 @@ function applyWallpaper(channelId?: string) {
     const url = getWallpaper(cid);
     if (!url) return;
 
-    const opacity = settings.store.opacity ?? 0.3;
-    const blur = settings.store.blur ?? 0;
+    const opacity = _cachedOpacity;
+    const blur = _cachedBlur;
     const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(url) || url.startsWith("data:video/");
 
     if (!document.getElementById(STYLE_ID)) {
         const style = document.createElement("style");
         style.id = STYLE_ID;
-        // Couvrir les anciens ET nouveaux noms de classes Discord (changement fréquent)
         style.textContent = `
 /* Zone messages : rendre le fond transparent pour laisser le wallpaper apparaître */
 [class*="messagesWrapper"],
@@ -243,8 +281,10 @@ function applyWallpaper(channelId?: string) {
         video.loop = true;
         video.muted = true;
         video.playsInline = true;
+        activeVideo = video;
         container.appendChild(video);
     } else {
+        activeVideo = null;
         const img = document.createElement("img");
         img.src = url;
         img.alt = "";
@@ -253,7 +293,6 @@ function applyWallpaper(channelId?: string) {
     }
 
     const tryInject = () => {
-        // Chercher avec les anciens ET nouveaux noms de classes Discord
         const target =
             document.querySelector('[class*="messagesWrapper"]') ||
             document.querySelector('[class*="chat-messages"]') ||
@@ -261,7 +300,6 @@ function applyWallpaper(channelId?: string) {
             document.querySelector('[class*="content_"][class*="chat"]');
 
         if (target && target instanceof HTMLElement) {
-            // S'assurer que l'élément est dans la zone principale (pas dans une popup)
             if (!target.closest('[class*="popout"]') && !target.closest('[class*="modal"]')) {
                 if (!target.querySelector(`#${CONTAINER_ID}`)) {
                     (target as HTMLElement).style.position = "relative";
@@ -274,10 +312,13 @@ function applyWallpaper(channelId?: string) {
     };
 
     if (!tryInject()) {
+        let _injTick = 0;
         const observer = new MutationObserver((_, obs) => {
+            if (++_injTick % 3 !== 0) return;
             if (tryInject()) obs.disconnect();
         });
-        observer.observe(document.body, { childList: true, subtree: true });
+        const root = document.querySelector('[class*="chat"]') || document.body;
+        observer.observe(root, { childList: true, subtree: true });
         setTimeout(() => observer.disconnect(), 3000);
     }
 }
@@ -479,15 +520,23 @@ export default definePlugin({
     },
 
     start() {
+        cacheWpSettings();
         if (settings.store.vpsUrl) initVPSSync();
         const cid = SelectedChannelStore.getChannelId();
         if (cid) {
             setTimeout(() => applyWallpaper(cid), 500);
         }
+        document.addEventListener("visibilitychange", handleVisChange);
+        window.addEventListener("focus", handleFocusChange);
+        window.addEventListener("blur", handleFocusChange);
     },
 
     stop() {
         removeWallpaperElements();
         vpsSocket?.close();
+        document.removeEventListener("visibilitychange", handleVisChange);
+        window.removeEventListener("focus", handleFocusChange);
+        window.removeEventListener("blur", handleFocusChange);
+        activeVideo = null;
     }
 });

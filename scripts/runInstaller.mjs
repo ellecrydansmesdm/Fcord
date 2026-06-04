@@ -97,7 +97,7 @@ function checkBuild() {
 }
 
 // ── Nettoyage des injections précédentes ─────────────────────────────────────
-function cleanOldNightcord() {
+function cleanOldNightcord(isUninstall) {
     console.log("[Nightcord] Cleaning previous installations...");
     const platform = process.platform;
     const candidates = [];
@@ -158,7 +158,7 @@ function cleanOldNightcord() {
                 }
             }
 
-            if (existsSync(backupPath)) {
+            if (!isUninstall && existsSync(backupPath)) {
                 if (existsSync(appAsarPath)) {
                     rmSync(appAsarPath, { recursive: true, force: true });
                 }
@@ -223,20 +223,30 @@ function launchInjectedDiscord() {
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
-cleanOldNightcord();
-
 const argStart = process.argv.indexOf("--");
-const args = argStart === -1 ? [] : process.argv.slice(argStart + 1);
+const args = argStart === -1 ? process.argv.slice(2) : process.argv.slice(argStart + 1);
 
 const isUninstall = args.includes("--uninstall");
+cleanOldNightcord(isUninstall);
 if (!isUninstall) checkBuild();
 
 const installerBin = await ensureBinary();
 
 console.log("[Nightcord] Injecting...");
 
+const mappedArgs = args.map(a => {
+    if (a === "--install") return "-install";
+    if (a === "--uninstall") return "-uninstall";
+    if (a === "--repair") return "-repair";
+    return a;
+});
+
+if (!mappedArgs.includes("-branch") && !mappedArgs.includes("--branch")) {
+    mappedArgs.push("-branch", "stable");
+}
+
 try {
-    execFileSync(installerBin, args, {
+    execFileSync(installerBin, mappedArgs, {
         stdio: "inherit",
         env: {
             ...process.env,

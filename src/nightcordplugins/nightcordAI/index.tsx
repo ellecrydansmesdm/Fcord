@@ -13,7 +13,7 @@ import { showApiKeyWarning } from "@utils/apiKeyWarning";
 import { ModalCloseButton,ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByPropsLazy } from "@webpack";
-import { ChannelStore, FluxDispatcher, Menu,React, RelationshipStore, RestAPI, useEffect, useRef, UserStore, useState } from "@webpack/common";
+import { ChannelStore, FluxDispatcher, IconUtils, Menu,React, RelationshipStore, RestAPI, useEffect, useRef, UserStore, useState } from "@webpack/common";
 
 import { getGroqKey, groqChat,setGroqKey } from "./groqManager";
 
@@ -610,9 +610,7 @@ Rules:
                                         {msg.role === "user"
                                             ? (() => {
                                                 const u = UserStore.getCurrentUser();
-                                                const url = u?.avatar
-                                                    ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.webp?size=32`
-                                                    : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u?.id ?? "0") >> 22n) % 6n}.png`;
+                                                const url = u ? (u.avatar ? IconUtils.getUserAvatarURL(u, false, 32) : IconUtils.getDefaultAvatarURL(u.id)) : "";
                                                 return <img src={url} width="32" height="32" style={{ borderRadius: "50%", objectFit: "cover", width: "32px", height: "32px" }} />;
                                             })()
                                             : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path fill="currentColor" d="M7.89 13.46a1 1 0 0 1-1.78-.9L7 13l-.9-.45.01-.01.01-.02a2.24 2.24 0 0 1 .14-.23c.1-.14.23-.31.4-.5.37-.36.98-.79 1.84-.79.86 0 1.47.43 1.83.8a3.28 3.28 0 0 1 .55.72v.02h.01v.01L10 13l.9-.45a1 1 0 0 1-1.79.9 1.28 1.28 0 0 0-.19-.25c-.14-.13-.28-.2-.42-.2-.14 0-.28.07-.42.2a1.28 1.28 0 0 0-.19.25ZM13.55 13.9a1 1 0 0 0 1.34-.44c0-.02.02-.04.04-.06.03-.05.08-.13.15-.2.14-.13.28-.2.42-.2.14 0 .28.07.42.2a1.28 1.28 0 0 1 .19.25 1 1 0 0 0 1.78-.9L17 13l.9-.45-.01-.01-.01-.02a2.1 2.1 0 0 0-.14-.23 3.28 3.28 0 0 0-.4-.5c-.37-.36-.98-.79-1.84-.79-.86 0-1.47.43-1.83.8a3.28 3.28 0 0 0-.55.72v.02h-.01v.01L14 13l-.9-.45a1 1 0 0 0 .45 1.34Z" /><path fill="currentColor" fillRule="evenodd" d="M12 21c5.52 0 10-1.86 10-6 0-5.59-2.8-10.07-4.26-11.67a1 1 0 1 0-1.48 1.34 14.8 14.8 0 0 1 2.35 3.86A10.23 10.23 0 0 0 12 6C9.47 6 7.15 7.02 5.4 8.53a14.8 14.8 0 0 1 2.34-3.86 1 1 0 1 0-1.48-1.34A18.65 18.65 0 0 0 2 15c0 4.14 4.48 6 10 6Zm0-12c3.87 0 7 2 7 4.2S15.87 17 12 17s-7-1.6-7-3.8C5 11 8.13 9 12 9Z" clipRule="evenodd" /></svg>
@@ -872,14 +870,41 @@ export default definePlugin({
 
         let debounceTimer: any = null;
         this._observer = new MutationObserver(() => {
+            if (document.visibilityState === "hidden") return;
+            const existing = document.getElementById("nai-nav-injected");
+            if (existing) {
+                const navItem = findShopNavItem();
+                if (navItem && existing.nextSibling === navItem && navItem.style.display === "none") {
+                    return;
+                }
+            }
             if (debounceTimer) clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => inject(), 80);
         });
-        this._observer.observe(document.body, { childList: true, subtree: true });
+        if (document.visibilityState !== "hidden") {
+            this._observer.observe(document.body, { childList: true, subtree: true });
+        }
         inject();
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "hidden") {
+                this._observer?.disconnect();
+            } else {
+                if (this._observer) {
+                    this._observer.observe(document.body, { childList: true, subtree: true });
+                    inject();
+                }
+            }
+        };
+        (this as any)._handleVisibilityChange = handleVisibilityChange;
+        document.addEventListener("visibilitychange", handleVisibilityChange);
     },
 
     stop() {
+        if ((this as any)._handleVisibilityChange) {
+            document.removeEventListener("visibilitychange", (this as any)._handleVisibilityChange);
+            (this as any)._handleVisibilityChange = null;
+        }
         this._observer?.disconnect();
         this._observer = null;
         try { this._reactRoot?.unmount(); } catch (_) { }

@@ -75,6 +75,17 @@ export async function encryptToken(_: any, token: string): Promise<string | null
     }
 }
 
+export async function decryptTokenNative(_: any, encryptedBase64: string): Promise<string | null> {
+    try {
+        if (!safeStorage.isEncryptionAvailable()) return null;
+        if (!encryptedBase64.startsWith("dQw4w9WgXcQ:")) return null;
+        const raw = Buffer.from(encryptedBase64.split("dQw4w9WgXcQ:")[1], "base64");
+        return safeStorage.decryptString(raw);
+    } catch {
+        return null;
+    }
+}
+
 function decryptDPAPI(encryptedKeyBase64: string): Buffer {
     const buf = Buffer.from(encryptedKeyBase64, "base64").slice(5);
     const hexStr = buf.toString("hex");

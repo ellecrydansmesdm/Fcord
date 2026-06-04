@@ -175,7 +175,7 @@ export default definePlugin({
                 document.body.appendChild(controls);
             }
         });
-        (this as any)._obs.observe(document.body, { childList: true, subtree: true });
+        (this as any)._obs.observe(document.body, { childList: true, subtree: false });
     },
 
     stop() {

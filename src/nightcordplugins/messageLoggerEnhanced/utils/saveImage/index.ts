@@ -100,12 +100,43 @@ export async function deleteMessageImages(message: LoggedMessage | LoggedMessage
     }
 }
 
-export const getAttachmentBlobUrl = memoize(async (attachment: LoggedAttachment) => {
+const blobCache = new Map<string, string>();
+const maxBlobCacheSize = 100;
+
+export async function getAttachmentBlobUrl(attachment: LoggedAttachment): Promise<string | null> {
+    const key = attachment.id;
+    if (blobCache.has(key)) {
+        return blobCache.get(key)!;
+    }
+
     const imageData = await getImage(attachment.id, attachment.fileExtension);
     if (!imageData) return null;
 
     const blob = new Blob([imageData]);
     const resUrl = URL.createObjectURL(blob);
 
+    if (blobCache.size >= maxBlobCacheSize) {
+        const firstKey = blobCache.keys().next().value;
+        if (firstKey !== undefined) {
+            const oldUrl = blobCache.get(firstKey);
+            if (oldUrl) {
+                try {
+                    URL.revokeObjectURL(oldUrl);
+                } catch {}
+            }
+            blobCache.delete(firstKey);
+        }
+    }
+
+    blobCache.set(key, resUrl);
     return resUrl;
-});
+}
+
+getAttachmentBlobUrl.clear = () => {
+    for (const url of blobCache.values()) {
+        try {
+            URL.revokeObjectURL(url);
+        } catch {}
+    }
+    blobCache.clear();
+};

@@ -38,6 +38,50 @@ export function ensureSafePath(basePath: string, path: string) {
     return target.startsWith(base) ? normalizedPath : null;
 }
 
+export function validateSender(event: any): boolean {
+    if (!event || !event.sender) return false;
+    const frame = event.senderFrame;
+    if (!frame) return false;
+    const url = frame.url;
+    if (!url) return false;
+
+    if (url.startsWith("file://")) {
+        const normalizedPath = normalize(url.replace("file://", ""));
+        const appPath = normalize(app.getAppPath());
+        return normalizedPath.startsWith(appPath);
+    }
+
+    if (url.startsWith("data:")) return false;
+
+    try {
+        const parsed = new URL(url);
+        if (parsed.protocol === "https:") {
+            const host = parsed.hostname.toLowerCase();
+            return host === "discord.com" || host.endsWith(".discord.com") || host === "discordapp.com" || host.endsWith(".discordapp.com");
+        }
+    } catch {}
+    return false;
+}
+
+function verifySignature(filePath: string): Promise<boolean> {
+    if (process.platform !== "win32") return Promise.resolve(true);
+    const { execFile } = require("child_process");
+    return new Promise<boolean>((resolve) => {
+        execFile("powershell.exe", [
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-Command",
+            `(Get-AuthenticodeSignature -FilePath '${filePath.replace(/'/g, "''")}').Status`
+        ], (error: any, stdout: string) => {
+            if (error) {
+                resolve(false);
+                return;
+            }
+            resolve(stdout.trim() === "Valid");
+        });
+    });
+}
+
 function readCss() {
     return readFile(QUICK_CSS_PATH, "utf-8").catch(() => "");
 }
@@ -59,6 +103,8 @@ function getThemeData(fileName: string) {
 }
 
 ipcMain.handle(IpcEvents.WORLD_BOMB_TYPE, async (event, text: string, delay: number = 50) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    if (process.platform !== "win32") return;
     const { spawn } = require("child_process");
     const { writeFileSync, unlinkSync, mkdtempSync, rmSync } = require("fs");
     const { join } = require("path");
@@ -101,6 +147,7 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_TYPE, async (event, text: string, delay: num
 });
 
 function runPowershellScript(psScript: string): Promise<void> {
+    if (process.platform !== "win32") return Promise.resolve();
     const { spawn } = require("child_process");
     const { writeFileSync, unlinkSync, mkdtempSync, rmSync } = require("fs");
     const { join } = require("path");
@@ -129,7 +176,8 @@ try { rmSync(tempDir, { recursive: true, force: true }); } catch {}
     });
 }
 
-ipcMain.handle(IpcEvents.WORLD_BOMB_PRESS_ENTER, () => {
+ipcMain.handle(IpcEvents.WORLD_BOMB_PRESS_ENTER, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     return runPowershellScript(`
         $sig = '[DllImport("user32.dll")] public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);'
         Add-Type -MemberDefinition $sig -Name WinAPI -Namespace NC -ErrorAction SilentlyContinue
@@ -139,11 +187,13 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_PRESS_ENTER, () => {
     `);
 });
 
-ipcMain.handle(IpcEvents.WORLD_BOMB_PRESS_BACKSPACE, () => {
+ipcMain.handle(IpcEvents.WORLD_BOMB_PRESS_BACKSPACE, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     return runPowershellScript("Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('{BACKSPACE}')");
 });
 
 ipcMain.handle(IpcEvents.WORLD_BOMB_CLICK, (event, x: number, y: number) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     const safeX = Math.max(0, Math.min(99999, Math.round(x)));
     const safeY = Math.max(0, Math.min(99999, Math.round(y)));
     return runPowershellScript(`
@@ -163,6 +213,8 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_SEQUENCE, async (
     targetX: number = -1,
     targetY: number = -1
 ) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    if (process.platform !== "win32") return;
     const { spawn } = require("child_process");
     const { writeFileSync, unlinkSync, mkdtempSync, rmSync } = require("fs");
     const { join } = require("path");
@@ -242,12 +294,14 @@ ipcMain.handle(IpcEvents.WORLD_BOMB_SEQUENCE, async (
         try { rmSync(tempDir, { recursive: true, force: true }); } catch {}
     }
 });
-ipcMain.handle(IpcEvents.WORLD_BOMB_GET_CURSOR_POS, () => {
+ipcMain.handle(IpcEvents.WORLD_BOMB_GET_CURSOR_POS, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     return screen.getCursorScreenPoint();
 });
 
 let streamProofWindow: BrowserWindow | null = null;
 ipcMain.handle(IpcEvents.WORLD_BOMB_OPEN_WINDOW, (event, lps: number = 50, humanChance: number = 10, safeMode: boolean = false, theme: string = "", playMode: string = "Normal", noSpace: boolean = false, groqKey: string = "") => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     if (streamProofWindow) {
         streamProofWindow.focus();
         return;
@@ -538,9 +592,13 @@ body { margin: 0; padding: 16px; background: transparent; overflow: hidden; font
         streamProofWindow = null;
     });
 });
-ipcMain.handle(IpcEvents.OPEN_QUICKCSS, () => shell.openPath(QUICK_CSS_PATH));
+ipcMain.handle(IpcEvents.OPEN_QUICKCSS, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return shell.openPath(QUICK_CSS_PATH);
+});
 
-ipcMain.handle(IpcEvents.OPEN_EXTERNAL, (_, url) => {
+ipcMain.handle(IpcEvents.OPEN_EXTERNAL, (event, url) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     try {
         var { protocol } = new URL(url);
     } catch {
@@ -552,20 +610,35 @@ ipcMain.handle(IpcEvents.OPEN_EXTERNAL, (_, url) => {
     shell.openExternal(url);
 });
 
-ipcMain.handle(IpcEvents.GET_QUICK_CSS, () => readCss());
-ipcMain.handle(IpcEvents.SET_QUICK_CSS, (_, css) =>
-    writeFileSync(QUICK_CSS_PATH, css)
-);
+ipcMain.handle(IpcEvents.GET_QUICK_CSS, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return readCss();
+});
+ipcMain.handle(IpcEvents.SET_QUICK_CSS, (event, css) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return writeFileSync(QUICK_CSS_PATH, css);
+});
 
-ipcMain.handle(IpcEvents.GET_THEMES_DIR, () => THEMES_DIR);
-ipcMain.handle(IpcEvents.GET_THEMES_LIST, () => listThemes());
-ipcMain.handle(IpcEvents.GET_THEME_DATA, (_, fileName) => getThemeData(fileName));
-ipcMain.handle(IpcEvents.DELETE_THEME, (_, fileName) => {
+ipcMain.handle(IpcEvents.GET_THEMES_DIR, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return THEMES_DIR;
+});
+ipcMain.handle(IpcEvents.GET_THEMES_LIST, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return listThemes();
+});
+ipcMain.handle(IpcEvents.GET_THEME_DATA, (event, fileName) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return getThemeData(fileName);
+});
+ipcMain.handle(IpcEvents.DELETE_THEME, (event, fileName) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     const safePath = ensureSafePath(THEMES_DIR, fileName);
     if (!safePath) return Promise.reject(`Unsafe path ${fileName}`);
     return unlink(safePath);
 });
-ipcMain.handle(IpcEvents.GET_THEME_SYSTEM_VALUES, () => {
+ipcMain.handle(IpcEvents.GET_THEME_SYSTEM_VALUES, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     let accentColor = systemPreferences.getAccentColor?.() ?? "";
 
     if (accentColor.length && accentColor[0] !== "#") {
@@ -577,10 +650,18 @@ ipcMain.handle(IpcEvents.GET_THEME_SYSTEM_VALUES, () => {
     };
 });
 
-ipcMain.handle(IpcEvents.OPEN_THEMES_FOLDER, () => shell.openPath(THEMES_DIR));
-ipcMain.handle(IpcEvents.OPEN_SETTINGS_FOLDER, () => shell.openPath(SETTINGS_DIR));
+ipcMain.handle(IpcEvents.OPEN_THEMES_FOLDER, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return shell.openPath(THEMES_DIR);
+});
+ipcMain.handle(IpcEvents.OPEN_SETTINGS_FOLDER, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return shell.openPath(SETTINGS_DIR);
+});
 
-ipcMain.handle(IpcEvents.INIT_FILE_WATCHERS, ({ sender }) => {
+ipcMain.handle(IpcEvents.INIT_FILE_WATCHERS, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    const { sender } = event;
     let quickCssWatcher: FSWatcher | undefined;
     let rendererCssWatcher: FSWatcher | undefined;
 
@@ -612,7 +693,8 @@ ipcMain.on(IpcEvents.GET_MONACO_THEME, e => {
     e.returnValue = nativeTheme.shouldUseDarkColors ? "vs-dark" : "vs-light";
 });
 
-ipcMain.handle(IpcEvents.GET_DESKTOP_SOURCES, async () => {
+ipcMain.handle(IpcEvents.GET_DESKTOP_SOURCES, async (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     try {
         const sources = await desktopCapturer.getSources({
             types: ["screen"],
@@ -626,7 +708,8 @@ ipcMain.handle(IpcEvents.GET_DESKTOP_SOURCES, async () => {
 
 let monacoWin: BrowserWindow | null = null;
 
-ipcMain.handle(IpcEvents.OPEN_MONACO_EDITOR, async () => {
+ipcMain.handle(IpcEvents.OPEN_MONACO_EDITOR, async (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     if (monacoWin && !monacoWin.isDestroyed()) {
         monacoWin.show();
         monacoWin.focus();
@@ -651,7 +734,7 @@ ipcMain.handle(IpcEvents.OPEN_MONACO_EDITOR, async () => {
         callback({
             responseHeaders: {
                 ...details.responseHeaders,
-                "Content-Security-Policy": ["default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"]
+                "Content-Security-Policy": ["default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval';"]
             }
         });
     });
@@ -678,9 +761,13 @@ app.on("before-quit", async event => {
     }
 });
 
-ipcMain.handle(IpcEvents.GET_RENDERER_CSS, () => readFile(RENDERER_CSS_PATH, "utf-8"));
+ipcMain.handle(IpcEvents.GET_RENDERER_CSS, (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
+    return readFile(RENDERER_CSS_PATH, "utf-8");
+});
 
 ipcMain.handle(IpcEvents.SET_WINDOW_BACKGROUND_MATERIAL, (event, material: "none" | "acrylic" | "mica" | "tabbed") => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     const win = BrowserWindow.fromWebContents(event.sender);
     if (!win) return;
     try {
@@ -706,7 +793,7 @@ ipcMain.handle(IpcEvents.SET_WINDOW_BACKGROUND_MATERIAL, (event, material: "none
                 win.setBackgroundMaterial(material);
             } else if (canSetVibrancy) {
 
-                win.setVibrancy(material === "acrylic" ? "acrylic" : "under-window");
+                win.setVibrancy((material === "acrylic" ? "acrylic" : "under-window") as any);
             }
         }
     } catch (e) {
@@ -722,6 +809,7 @@ const THUMBAR_ICONS = {
 };
 
 ipcMain.handle(IpcEvents.SET_THUMBAR_BUTTONS, (event, state: "playing" | "paused" | "stopped") => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     const win = BrowserWindow.fromWebContents(event.sender);
     if (!win || process.platform !== "win32") return;
 
@@ -767,7 +855,8 @@ if (IS_DISCORD_DESKTOP) {
     });
 }
 
-ipcMain.handle(IpcEvents.RELAUNCH_APP, async () => {
+ipcMain.handle(IpcEvents.RELAUNCH_APP, async (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
 
     if (process.platform === "win32") {
         const { spawn } = await import("node:child_process");
@@ -784,7 +873,8 @@ ipcMain.handle(IpcEvents.RELAUNCH_APP, async () => {
 
 const OFFICIAL_UPDATE_URL = `https://git.${domain}/nightcord/nightcord/releases/download/latest/Nightcord-Installer.exe`;
 
-ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
+ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (event, url: string) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     if (url !== OFFICIAL_UPDATE_URL) {
         throw new Error("Unauthorized update URL");
     }
@@ -815,6 +905,12 @@ ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
         });
     });
 
+    const isSigned = await verifySignature(tmpPath);
+    if (!isSigned) {
+        try { fs.unlinkSync(tmpPath); } catch {}
+        throw new Error("Signature validation failed for the downloaded update file.");
+    }
+
     const { response } = await dialog.showMessageBox({
         type: "info",
         buttons: ["Install update", "Cancel"],
@@ -835,7 +931,8 @@ ipcMain.handle(IpcEvents.NIGHTCORD_DOWNLOAD_AND_RUN, async (_, url: string) => {
     return true;
 });
 
-ipcMain.handle(IpcEvents.CHECK_VB_CABLE, async () => {
+ipcMain.handle(IpcEvents.CHECK_VB_CABLE, async (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     if (process.platform !== "win32") return { installed: false };
     const { existsSync } = require("fs");
 
@@ -844,7 +941,8 @@ ipcMain.handle(IpcEvents.CHECK_VB_CABLE, async () => {
     return { installed: existsSync(p1) || existsSync(p2) };
 });
 
-ipcMain.handle(IpcEvents.INSTALL_VB_CABLE, async () => {
+ipcMain.handle(IpcEvents.INSTALL_VB_CABLE, async (event) => {
+    if (!validateSender(event)) throw new Error("Unauthorized IPC invocation");
     if (process.platform !== "win32") return { success: false, error: "Windows only" };
 
     const { spawn } = require("child_process");
@@ -877,6 +975,11 @@ ipcMain.handle(IpcEvents.INSTALL_VB_CABLE, async () => {
         const installerPath = path.join(tmpDir, "VBCABLE_Setup_x64.exe");
         if (!fs.existsSync(installerPath)) {
             return { success: false, error: "Installer not found after extraction" };
+        }
+
+        const isSigned = await verifySignature(installerPath);
+        if (!isSigned) {
+            return { success: false, error: "Signature validation failed for the VB-Cable installer." };
         }
 
         const { response } = await dialog.showMessageBox({

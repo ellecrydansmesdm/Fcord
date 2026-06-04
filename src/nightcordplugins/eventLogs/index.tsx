@@ -9,18 +9,10 @@ import "./styles.css";
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { ModalCloseButton,ModalContent, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { findByPropsLazy, findStoreLazy } from "@webpack";
-import { ContextMenuApi, Forms, Menu, Select,showToast, Toasts } from "@webpack/common";
-import { React, useCallback,useEffect, useMemo, useState } from "@webpack/common";
+import { findByPropsLazy } from "@webpack";
+import { ChannelStore, ContextMenuApi, FluxDispatcher, Forms, GuildStore, IconUtils, Menu, MessageStore, React, Select, SelectedChannelStore, showToast, Toasts, useCallback, useEffect, useMemo, UserStore, useState } from "@webpack/common";
 
 import { t, useTranslation } from "../autoTranslateNightcord";
-
-const Dispatcher = findByPropsLazy("dispatch", "subscribe", "unsubscribe");
-const UserStore = findStoreLazy("UserStore");
-const ChannelStore = findStoreLazy("ChannelStore");
-const GuildStore = findStoreLazy("GuildStore");
-const MessageStore = findStoreLazy("MessageStore");
-const SelectedChannelStore = findStoreLazy("SelectedChannelStore");
 
 // Stratégie de navigation alternative via Dispatcher
 const navigateTo = (path: string) => {
@@ -30,7 +22,7 @@ const navigateTo = (path: string) => {
         if (Router?.push) return Router.push(path);
 
         // Dernier recours via le dispatcher
-        Dispatcher.dispatch({
+        FluxDispatcher.dispatch({
             type: "NAVIGATE_TO",
             path: path
         });
@@ -173,15 +165,21 @@ const msgCache = new Map<string, { content: string; authorId: string; authorName
 // Flag pour bloquer les purges du cache pendant le scroll (LOAD_MESSAGES_SUCCESS actif)
 let isLoadingMessages = false;
 
+function pruneMsgCache() {
+    if (msgCache.size < MSG_CACHE_MAX) return;
+    for (let i = 0; i < MSG_CACHE_PURGE; i++) {
+        const firstKey = msgCache.keys().next().value;
+        if (firstKey !== undefined) msgCache.delete(firstKey);
+        else break;
+    }
+}
+
 function cacheMsg(msg: any) {
     if (!msg?.id) return;
     // FIX: Ne pas purger le cache pendant un chargement de messages (scroll DM)
     // La purge en plein milieu d'un LOAD_MESSAGES_SUCCESS forçait un recalcul des
     // globalPaths Node qui entrait en conflit avec la virtualisation Discord.
-    if (msgCache.size >= MSG_CACHE_MAX && !isLoadingMessages) {
-        const keys = Array.from(msgCache.keys());
-        for (let i = 0; i < MSG_CACHE_PURGE; i++) msgCache.delete(keys[i]);
-    }
+    if (!isLoadingMessages) pruneMsgCache();
     const a = authorFrom(msg);
     msgCache.set(msg.id, { content: msg.content ?? "", authorId: a.authorId ?? "", authorName: a.authorName, authorAvatar: a.authorAvatar });
 }
@@ -214,8 +212,7 @@ const FRIENDS_SET = new Set(["friend_add", "friend_remove", "friend_request", "f
 const GUILD_SET = new Set(["guild_member_add", "guild_member_remove", "guild_ban", "guild_timeout", "guild_kick", "user_disconnect"]);
 
 const avatarUrl = (userId: string, av?: string | null) =>
-    av ? `https://cdn.discordapp.com/avatars/${userId}/${av}.webp?size=32`
-        : `https://cdn.discordapp.com/embed/avatars/${Math.abs(parseInt(userId.slice(-4), 16)) % 5}.png`;
+    av ? IconUtils.getUserAvatarURL({ id: userId, avatar: av } as any, false, 32) : IconUtils.getDefaultAvatarURL(userId);
 
 function renderContent(text: string) {
     if (!text) return text;
@@ -621,8 +618,8 @@ const prevVS = new Map<string, any>();
 
 function subscribeToEvents() {
     const sub = (ev: string, fn: (d: any) => void) => {
-        Dispatcher.subscribe(ev, fn);
-        unsubs.push(() => Dispatcher.unsubscribe(ev, fn));
+        FluxDispatcher.subscribe(ev, fn);
+        unsubs.push(() => FluxDispatcher.unsubscribe(ev, fn));
     };
 
     sub("MESSAGE_CREATE", d => {
@@ -661,19 +658,13 @@ function subscribeToEvents() {
                 isLoadingMessages = true;
                 try { for (const m of msgs) cacheMsg(m); } finally { isLoadingMessages = false; }
                 // Purge différée si le cache dépasse la limite
-                if (msgCache.size >= MSG_CACHE_MAX) {
-                    const keys = Array.from(msgCache.keys());
-                    for (let i = 0; i < MSG_CACHE_PURGE; i++) msgCache.delete(keys[i]);
-                }
+                pruneMsgCache();
             }, { timeout: 3000 });
         } else {
             setTimeout(() => {
                 isLoadingMessages = true;
                 try { for (const m of msgs) cacheMsg(m); } finally { isLoadingMessages = false; }
-                if (msgCache.size >= MSG_CACHE_MAX) {
-                    const keys = Array.from(msgCache.keys());
-                    for (let i = 0; i < MSG_CACHE_PURGE; i++) msgCache.delete(keys[i]);
-                }
+                pruneMsgCache();
             }, 100);
         }
     });
@@ -743,7 +734,8 @@ function subscribeToEvents() {
                 if (!s.mute && p.mute) pushLog({ type: "voice_mute_mod", content: t("Unmuted by staff"), ...b });
                 if (s.selfStream !== p.selfStream) pushLog({ type: "voice_stream", content: s.selfStream ? t("Stream started") : t("Stream stopped"), ...b });
             }
-            prevVS.set(userId, s);
+            if (!channelId) prevVS.delete(userId);
+            else prevVS.set(userId, s);
         }
     });
     const relUser = (data: any) => {

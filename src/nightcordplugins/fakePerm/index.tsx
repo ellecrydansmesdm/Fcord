@@ -7,23 +7,9 @@
 import { addContextMenuPatch, NavContextMenuPatchCallback, removeContextMenuPatch } from "@api/ContextMenu";
 import { ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
-import { findByProps } from "@webpack";
-import { Button, GuildChannelStore, GuildMemberStore, GuildRoleStore, GuildStore, Menu, React, Select, TextArea } from "@webpack/common";
+import { Button, GuildChannelStore, GuildMemberStore, GuildRoleStore, GuildStore, Menu, React, Select, TextArea, SelectedGuildStore, UserStore, FluxDispatcher, VoiceStateStore, showToast } from "@webpack/common";
 
-// ─── Global State ──────────────────────────────────────────────────────────────
-// isEnabled is the SINGLE source of truth — read from DataStore at start()
-// Context menu patches are always registered, they check isEnabled at runtime
 let isEnabled = false;
-
-const DS_KEY = "FakePerm.options.enabled"; // Standard Equicord key for plugin options
-
-// injectHideStyle / removeHideStyle removed — caused display bugs
-// by hiding Discord elements via too broad CSS selectors (roles, permissions, copy-user-id)
-// which made some rooms invisible. Complete removal.
-function injectHideStyle() { /* intentionally removed */ }
-function removeHideStyle() { /* intentionally removed */ }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function fpHide(el: HTMLElement) {
     el.style.display = "none";
@@ -43,32 +29,22 @@ const badgeListeners = new Set<() => void>();
 function notifyBadgeChange() { badgeVersion++; badgeListeners.forEach(fn => fn()); }
 
 function getCurrentGuildId(): string | null {
-    try { return (findByProps("getGuildId", "getLastSelectedGuildId") as any)?.getGuildId?.() ?? null; } catch { return null; }
+    try { return SelectedGuildStore?.getGuildId() ?? null; } catch { return null; }
 }
 
 function notifyMemberListChange() {
-    // Absolute guard: never call if FakePerm is disabled
     if (!isEnabled) return;
     try {
-        // Critical guard: never dispatch GUILD_MEMBER_LIST_UPDATE with empty or null guildId.
-        // An empty guildId ("") sent to Discord corrupts the internal state of GuildChannelStore
-        // and causes all rooms to disappear on servers with permissions.
         const guildId = getCurrentGuildId();
         if (!guildId) return;
 
-        // Additional verification: we only dispatch if the user is in
-        // a voice channel of the current server. Outside voice, this dispatch is useless
-        // and can corrupt the channel permissions state (invisible channels).
-        const FluxDispatcher = findByProps("dispatch", "subscribe") as any;
-        const voiceStates = findByProps("getVoiceStatesForChannel", "getVoiceStateForUser") as any;
-        const myId = (() => { try { return (findByProps("getCurrentUser") as any)?.getCurrentUser?.()?.id ?? null; } catch { return null; } })();
-        if (myId) {
-            const myVS = voiceStates?.getVoiceStateForUser?.(myId);
-            // Only dispatch if we are in voice in this server
+        const myId = UserStore?.getCurrentUser()?.id;
+        if (myId && VoiceStateStore) {
+            const myVS = VoiceStateStore.getVoiceStateForUser(myId);
             if (!myVS || myVS.guildId !== guildId) return;
         }
 
-        FluxDispatcher?.dispatch?.({ type: "GUILD_MEMBER_LIST_UPDATE", ops: [], id: "everyone", guildId });
+        FluxDispatcher?.dispatch({ type: "GUILD_MEMBER_LIST_UPDATE", ops: [], id: "everyone", guildId });
     } catch { }
 }
 
@@ -113,17 +89,22 @@ function getGuild(guildId: string | null) {
 
 function getMember(guildId: string | null, userId: string) {
     if (!guildId) return null;
-    try { return (findByProps("getMember", "getMembers") as any)?.getMember?.(guildId, userId) ?? null; } catch { return null; }
+    try { return GuildMemberStore?.getMember(guildId, userId) ?? null; } catch { return null; }
 }
 
 function isUserInVoice(userId: string, guildId: string | null): boolean {
     if (!guildId) return false;
-    try { const vs = (findByProps("getVoiceStateForUser") as any)?.getVoiceStateForUser?.(userId); return !!(vs && vs.guildId === guildId && vs.channelId); } catch { return false; }
+    try {
+        const vs = VoiceStateStore?.getVoiceStateForUser(userId);
+        return !!(vs && vs.guildId === guildId && vs.channelId);
+    } catch {
+        return false;
+    }
 }
 
 function getVoiceChannelId(userId: string, guildId: string | null): string | null {
     if (!guildId) return null;
-    try { return (findByProps("getVoiceStateForUser") as any)?.getVoiceStateForUser?.(userId)?.channelId ?? null; } catch { return null; }
+    try { return VoiceStateStore?.getVoiceStateForUser(userId)?.channelId ?? null; } catch { return null; }
 }
 
 function getGuildRoles(guildId: string | null): Array<{ id: string; name: string; color: number; }> {
@@ -145,7 +126,7 @@ function getMemberRoleIds(guildId: string | null, userId: string): string[] {
 }
 
 function toast(msg: string) {
-    try { const T = findByProps("show", "pop") as any; T?.show?.({ message: msg, type: 1, id: T.genId?.() ?? String(Date.now()) }); } catch { }
+    try { showToast(msg); } catch { }
 }
 
 function findVoiceUserElement(userId: string): HTMLElement | null {
@@ -401,7 +382,6 @@ function findGroupWithItem(children: any[], itemIds: string[]): number {
 const messageContextPatch: NavContextMenuPatchCallback = (children, { message }: any) => {
     if (!children || !Array.isArray(children) || !isEnabled || !message?.id) return;
     try {
-        // Only show in guilds (servers), not in DMs
         const guildId = getCurrentGuildId();
         if (!guildId) return;
         const hasDelete = children.some((g: any) => {
@@ -425,7 +405,6 @@ const userContextPatch: NavContextMenuPatchCallback = (children, { user }: any) 
         const guildId = getCurrentGuildId();
         if (!guildId) return;
 
-        // Hide native Roles and Permissions viewer when FakePerm is enabled
         const HIDDEN_IDS = new Set(["roles", "perm-viewer-permissions"]);
         for (let i = 0; i < children.length; i++) {
             const group = children[i];
@@ -629,19 +608,17 @@ export default definePlugin({
         addContextMenuPatch("user-context", userContextPatch);
         addContextMenuPatch("message", messageContextPatch);
 
-        // Style scrollbar submenu
         const style = document.createElement("style");
         style.id = "fakeperm-roles-style";
         style.textContent = "[class*='submenu']::-webkit-scrollbar{display:none!important}[class*='submenu']{scrollbar-width:none!important} .fp-footer-fix { display: flex; gap: 8px; padding: 16px; }";
         document.head.appendChild(style);
 
-        // MutationObserver for DOM overrides
         let _domTimer: ReturnType<typeof setTimeout> | null = null;
         this._domObserver = new MutationObserver(() => {
             if (!isEnabled) return;
             if (fakeNicks.size === 0 && disconnectedUsers.size === 0 && kickedUsers.size === 0) return;
             if (_domTimer) return;
-            _domTimer = setTimeout(() => { _domTimer = null; if (isEnabled) this.applyDomOverrides(); }, 150);
+            _domTimer = setTimeout(() => { _domTimer = null; if (isEnabled) this.applyDomOverrides(); }, 250);
         });
         this._domObserver.observe(document.body, { childList: true, subtree: true });
     },
@@ -649,7 +626,6 @@ export default definePlugin({
     stop() {
         this._domObserver?.disconnect();
         this._domObserver = null;
-        removeHideStyle();
         removeContextMenuPatch("user-context", userContextPatch);
         removeContextMenuPatch("message", messageContextPatch);
         isEnabled = false;

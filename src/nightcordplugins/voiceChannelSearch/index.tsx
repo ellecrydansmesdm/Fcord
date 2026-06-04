@@ -9,17 +9,11 @@ import "./styles.css";
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { ModalCloseButton,ModalContent, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { findByPropsLazy, findStoreLazy } from "@webpack";
-import { Forms, UserStore } from "@webpack/common";
-import { React, useEffect,useRef, useState } from "@webpack/common";
+import { findByPropsLazy } from "@webpack";
+import { ChannelStore, Forms, GuildChannelStore, GuildStore, IconUtils, PermissionStore, React, UserStore, useEffect, useRef, VoiceStateStore, useState } from "@webpack/common";
 
 import { t } from "../autoTranslateNightcord";
 
-const GuildStore = findStoreLazy("GuildStore");
-const GuildChannelStore = findStoreLazy("GuildChannelStore");
-const VoiceStateStore = findStoreLazy("VoiceStateStore");
-const ChannelStore = findStoreLazy("ChannelStore");
-const PermissionStore = findStoreLazy("PermissionStore");
 const ChannelActions = findByPropsLazy("selectVoiceChannel", "selectChannel");
 
 interface VoiceChannel {
@@ -66,7 +60,7 @@ async function scan(): Promise<VoiceChannel[]> {
                     if (!guild) continue;
                     const gName: string = guild.name ?? "";
                     const gIcon: string | null = guild.icon
-                        ? `https://cdn.discordapp.com/icons/${guildId}/${guild.icon}.webp?size=32`
+                        ? IconUtils.getGuildIconURL({ id: guildId, icon: guild.icon, size: 32 })
                         : null;
 
                     // Utilise getChannels() qui retourne TOUS les canaux du serveur

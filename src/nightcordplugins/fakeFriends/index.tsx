@@ -123,6 +123,7 @@ function unpatchAcceptFriend() {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function makeUserPayload(user: any) {
+    const bot = isBot(user);
     return {
         id: user.id,
         username: user.username,
@@ -131,7 +132,7 @@ function makeUserPayload(user: any) {
         discriminator: user.discriminator ?? "0",
         public_flags: user.publicFlags ?? 0,
         flags: user.flags ?? 0,
-        bot: false,
+        bot,
     };
 }
 

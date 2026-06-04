@@ -26,6 +26,16 @@ function cancelRequest(userId: string) {
     }
 }
 
+function hasOutgoingRequests(): boolean {
+    try {
+        const rels = (RelationshipStore as any).getRelationships?.() ?? {};
+        for (const type of Object.values(rels)) {
+            if (type === OUTGOING_REQUEST) return true;
+        }
+    } catch {}
+    return false;
+}
+
 function getUserIdFromOutgoingRelationships(): string | null {
     try {
         const rels = (RelationshipStore as any).getRelationships?.() ?? {};
@@ -53,7 +63,7 @@ function patchBtn(btn: HTMLElement, userId: string) {
 }
 
 function scan(root: Document | Element = document) {
-    // ── Cas 1 : popup profil ─────────────────────────────────────────────────
+    if (!hasOutgoingRequests()) return;
     // aria-label="Outgoing Friend Request" — invariant quelle que soit la langue UI
     root.querySelectorAll<HTMLElement>('button[aria-label="Outgoing Friend Request"]').forEach(btn => {
         // Trouver le userId via le container du profil
@@ -102,6 +112,15 @@ function scan(root: Document | Element = document) {
     });
 }
 
+function handleVisibilityChange() {
+    if (document.visibilityState === "hidden") {
+        observer?.disconnect();
+    } else if (observer) {
+        observer.observe(document.body, { childList: true, subtree: true });
+        scan(document);
+    }
+}
+
 export default definePlugin({
     name: "CancelFriendRequest",
     enabledByDefault: true,
@@ -110,23 +129,26 @@ export default definePlugin({
 
     start() {
         observer = new MutationObserver(mutations => {
+            if (document.visibilityState === "hidden") return;
             for (const m of mutations) {
                 for (const node of m.addedNodes) {
                     if (node instanceof HTMLElement) scan(node);
                 }
             }
         });
-        observer.observe(document.body, { childList: true, subtree: true });
+        if (document.visibilityState !== "hidden") {
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
         scan(document);
-        console.log("[CancelFriendRequest] Démarré ✓");
+        document.addEventListener("visibilitychange", handleVisibilityChange);
     },
 
     stop() {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
         observer?.disconnect();
         observer = null;
         document.querySelectorAll<HTMLElement>("[data-cfp]").forEach(el => {
             delete el.dataset.cfp;
         });
-        console.log("[CancelFriendRequest] Arrêté.");
     },
 });
