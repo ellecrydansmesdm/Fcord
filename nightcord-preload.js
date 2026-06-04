@@ -1,5 +1,6 @@
 // Nightcord preload — globalPaths fix + Equicord avec contextBridge
 "use strict";
+
 (function () {
     const Module = require("module");
     const path = require("path");
@@ -8,8 +9,11 @@
     const appData = process.env.APPDATA || path.join(process.env.USERPROFILE || "", "AppData", "Roaming");
     const moduleDataPath = path.join(appData, "discord", "module_data");
 
+    const _seenPaths = new Set(Module.globalPaths);
     function addGlobalPath(p) {
-        if (!Module.globalPaths.includes(p)) Module.globalPaths.push(p);
+        if (_seenPaths.has(p)) return;
+        _seenPaths.add(p);
+        Module.globalPaths.push(p);
     }
     addGlobalPath(moduleDataPath);
     try {
@@ -25,11 +29,18 @@
         }
     } catch (e) { }
 
+    const _gpArr = Module.globalPaths.slice();
+    const _gpSet = new Set(_gpArr);
     const _orig = Module._resolveLookupPaths;
     Module._resolveLookupPaths = function (request, parent) {
-        const len = parent?.paths?.length;
-        if (len != null && len !== 0) parent.paths = parent.paths.concat(Module.globalPaths);
-        else if (parent) parent.paths = [...Module.globalPaths];
+        if (parent) {
+            if (!parent.paths || parent.paths.length === 0) {
+                parent.paths = _gpArr.slice();
+            } else {
+                const ex = new Set(parent.paths);
+                for (const p of _gpSet) { if (!ex.has(p)) parent.paths.push(p); }
+            }
+        }
         return _orig.call(this, request, parent);
     };
 })();
@@ -124,7 +135,16 @@ if (location.protocol !== "data:") {
     // Injection du renderer.js via webFrame.executeJavaScript
     // Identique à l'original Equicord — c'est la méthode qui fonctionne
     try {
-        const rendererJs = T("VencordPreloadGetRendererJs");
+        let rendererJs;
+        try {
+            const rendererPath = path.join(__dirname, "renderer.js");
+            if (fs.existsSync(rendererPath)) {
+                rendererJs = fs.readFileSync(rendererPath, "utf-8");
+            }
+        } catch (_) {}
+        if (!rendererJs) {
+            rendererJs = T("VencordPreloadGetRendererJs");
+        }
         if (rendererJs) {
             webFrame.executeJavaScript(rendererJs).catch(e => {
                 console.error("[Nightcord] renderer inject failed:", e?.message);

@@ -19,7 +19,7 @@ export default definePlugin({
     name: "WordBomb",
     description: "Assistant BombParty/WordBomb avec overlay persistant, IA intégrée et alphabet track.",
     authors: [{ name: "Nightcord", id: 0n }],
-    enabledByDefault: true,
+    enabledByDefault: false,
     dependencies: ["HeaderBarAPI"],
 
     start() {

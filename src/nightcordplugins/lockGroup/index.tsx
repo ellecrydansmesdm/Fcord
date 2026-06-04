@@ -189,7 +189,7 @@ let originalPutMethod: any = null;
 
 export default definePlugin({
     name: "LockGroup",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Lock/unlock groups via the context menu (prevents adding members)",
     authors: [{ name: "Bash", id: 1327483363518582784n }],
     dependencies: ["ContextMenuAPI"],

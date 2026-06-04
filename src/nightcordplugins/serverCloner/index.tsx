@@ -12,7 +12,7 @@ import { FormSwitch } from "@components/FormSwitch";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
 import { findStoreLazy } from "@webpack";
-import { Button, GuildStore, Menu,React, RestAPI, Select, Toasts, useMemo, useRef, UserStore, useState } from "@webpack/common";
+import { Button, GuildStore, Menu, React, RestAPI, Select, Toasts, useMemo, useRef, UserStore, useState, IconUtils } from "@webpack/common";
 import { Forms } from "@webpack/common";
 const F = Forms as any;
 
@@ -68,7 +68,6 @@ interface CloneOptions {
 
 interface LogEntry { text: string; type: "ok" | "err" | "warn" | "info"; }
 
-// ── Persistent state (survives component unmount/remount) ────────────────
 let _running = false;
 let _cancelled = false;
 let _progress = 0;
@@ -93,8 +92,6 @@ function cancelClone() {
     _cancelled = true;
 }
 
-// ── Clone Engine ─────────────────────────────────────────────────────────
-
 async function cloneServer(
     sourceId: string,
     targetId: string,
@@ -103,6 +100,7 @@ async function cloneServer(
     setProgress: (p: number) => void,
 ) {
     _cancelled = false;
+    let sourceChannels: any[] = [];
     const token = getToken();
     if (!token) { log({ text: "Token not found!", type: "err" }); return; }
 
@@ -135,7 +133,6 @@ async function cloneServer(
 
     log({ text: `Cloning of "${sourceGuild.name}" → target server...`, type: "info" });
 
-    // ── Guild Settings ──────────────────────────────────────────────
     if (options.guildSettings && !isCancelled()) {
         try {
             log({ text: "Copying server settings...", type: "info" });
@@ -158,11 +155,11 @@ async function cloneServer(
         advance("Settings");
     }
 
-    // ── Icon ────────────────────────────────────────────────────────
     if (options.icon && sourceGuild.icon && !isCancelled()) {
         try {
             log({ text: "Copying server icon...", type: "info" });
-            const iconUrl = `https://cdn.discordapp.com/icons/${sourceId}/${sourceGuild.icon}.png?size=512`;
+            const iconUrl = IconUtils?.getGuildIconURL({ id: sourceId, icon: sourceGuild.icon, size: 512 }) ?? "";
+            if (!iconUrl) throw new Error("Could not construct icon URL");
             const resp = await fetch(iconUrl);
             const blob = await resp.blob();
             const base64 = await new Promise<string>(resolve => {
@@ -181,7 +178,6 @@ async function cloneServer(
         advance("Icon");
     }
 
-    // ── Roles ───────────────────────────────────────────────────────
     const roleMapping = new Map<string, string>();
     if (options.roles && !isCancelled()) {
         try {
@@ -189,7 +185,6 @@ async function cloneServer(
             const sourceRoles: any[] = await apiCall("get", `/guilds/${sourceId}/roles`);
             const targetRoles: any[] = await apiCall("get", `/guilds/${targetId}/roles`);
 
-            // Optional: Clear existing roles in target server
             if (options.clearRoles) {
                 log({ text: "Cleaning up existing roles in target server...", type: "warn" });
                 for (const role of targetRoles) {
@@ -251,12 +246,11 @@ async function cloneServer(
         advance("Roles");
     }
 
-    // ── Channels ────────────────────────────────────────────────────
     const channelMapping = new Map<string, string>();
     if (options.channels && !isCancelled()) {
         try {
             log({ text: "Copying channels...", type: "info" });
-            const sourceChannels: any[] = await apiCall("get", `/guilds/${sourceId}/channels`);
+            sourceChannels = await apiCall("get", `/guilds/${sourceId}/channels`);
             const categories = sourceChannels.filter(c => c.type === 4).sort((a, b) => a.position - b.position);
             const nonCategories = sourceChannels.filter(c => c.type !== 4).sort((a, b) => a.position - b.position);
 
@@ -314,7 +308,6 @@ async function cloneServer(
         advance("Channels");
     }
 
-    // ── Emojis ──────────────────────────────────────────────────────
     if (options.emojis && !isCancelled()) {
         try {
             log({ text: "Copying emojis...", type: "info" });
@@ -324,7 +317,8 @@ async function cloneServer(
                 if (_cancelled) break;
                 try {
                     const ext = emoji.animated ? "gif" : "png";
-                    const emojiUrl = `https://cdn.discordapp.com/emojis/${emoji.id}.${ext}?size=128`;
+                    const emojiUrl = IconUtils?.getEmojiURL({ id: emoji.id, animated: emoji.animated, size: 128 }) ?? "";
+                    if (!emojiUrl) throw new Error("Could not construct emoji URL");
                     const resp = await fetch(emojiUrl);
                     const blob = await resp.blob();
                     const base64 = await new Promise<string>(resolve => {
@@ -348,7 +342,6 @@ async function cloneServer(
         advance("Emojis");
     }
 
-    // ── Embeds ──────────────────────────────────────────────────────
     if (options.embeds && options.channels && !isCancelled()) {
         try {
             log({ text: "Copying bot embeds...", type: "info" });
@@ -372,7 +365,7 @@ async function cloneServer(
                     try {
                         webhook = await apiCall("post", `/channels/${targetChId}/webhooks`, {
                             name: "ServerCloner",
-                            enabledByDefault: true
+                            enabledByDefault: false
                         });
                     } catch (e: any) {
                         log({ text: `  Webhook creation error for channel ${targetChId}: ${e?.message || e}`, type: "err" });
@@ -408,7 +401,7 @@ async function cloneServer(
                                 embeds: cleanEmbeds,
                             };
                             if (msg.author.avatar) {
-                                webhookBody.avatar_url = `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.png`;
+                                webhookBody.avatar_url = IconUtils?.getUserAvatarURL({ id: msg.author.id, avatar: msg.author.avatar } as any) ?? "";
                             }
                             if (msg.content) webhookBody.content = msg.content;
 
@@ -464,8 +457,6 @@ function mapPermOverwrites(overwrites: any[], roleMapping: Map<string, string>):
             deny: String(ow.deny),
         }));
 }
-
-// ── Settings Component (inline, no modal) ───────────────────────────────
 
 function ServerClonerUI({ initialSourceId = "" }: { initialSourceId?: string }) {
     const [sourceId, setSourceId] = useState<string>(initialSourceId);
@@ -627,8 +618,6 @@ function ServerClonerUI({ initialSourceId = "" }: { initialSourceId?: string }) 
     );
 }
 
-// ── Modal & Context Menu ────────────────────────────────────────────────
-
 function ServerClonerModal({ rootProps, guildId }: { rootProps: any; guildId: string }) {
     return (
         <ModalRoot {...rootProps} size="large">
@@ -661,13 +650,11 @@ const patchGuildContext: NavContextMenuPatchCallback = (children, { guild }) => 
     }
 };
 
-// ── Plugin ───────────────────────────────────────────────────────────────
-
 const settings = definePluginSettings({
     cloner: {
         type: OptionType.COMPONENT,
         description: "",
-        component: ServerClonerUI,
+        component: ServerClonerUI as any,
     },
 });
 

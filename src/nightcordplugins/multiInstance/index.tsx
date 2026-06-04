@@ -11,7 +11,7 @@ import { DataStore } from "@api/index";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { PluginNative } from "@utils/types";
 import { findByProps } from "@webpack";
-import { Forms, React, ReactDOM, UserStore } from "@webpack/common";
+import { Forms, React, ReactDOM, UserStore, IconUtils, FluxDispatcher } from "@webpack/common";
 
 import { t } from "../autoTranslateNightcord";
 
@@ -74,16 +74,15 @@ function hookEncryptAndStoreTokens(): void {
 
 function hookFluxDispatcher(): (() => void) | null {
     try {
-        const Flux = findByProps("dispatch", "subscribe");
-        if (!Flux?.subscribe) return null;
+        if (!FluxDispatcher?.subscribe) return null;
         const handler = (event: any) => {
             if (event?.token && event?.userId) {
                 cacheToken(event.userId, event.token);
                 saveTokenCache();
             }
         };
-        Flux.subscribe("MULTI_ACCOUNT_VALIDATE_TOKEN_SUCCESS", handler);
-        return () => Flux.unsubscribe("MULTI_ACCOUNT_VALIDATE_TOKEN_SUCCESS", handler);
+        FluxDispatcher.subscribe("MULTI_ACCOUNT_VALIDATE_TOKEN_SUCCESS", handler);
+        return () => FluxDispatcher.unsubscribe("MULTI_ACCOUNT_VALIDATE_TOKEN_SUCCESS", handler);
     } catch { return null; }
 }
 
@@ -95,7 +94,6 @@ interface SavedAccount {
     id: string;
     token: string;
     username: string;
-    discriminator: string;
     avatar: string;
 }
 
@@ -104,16 +102,8 @@ interface AccountEntry extends SavedAccount {
     isNative: boolean;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-function getAvatarUrl(id: string, hash?: string | null, discriminator?: string): string {
-    if (hash) return `https://cdn.discordapp.com/avatars/${id}/${hash}.webp?size=64`;
-    const idx = discriminator && discriminator !== "0"
-        ? parseInt(discriminator) % 5
-        : Number(BigInt(id) >> 22n) % 6;
-    return `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
+function getAvatarUrl(id: string, hash?: string | null): string {
+    return hash ? IconUtils.getUserAvatarURL({ id, avatar: hash } as any, false, 64) : IconUtils.getDefaultAvatarURL(id);
 }
 
 function getNativeAccounts(): SavedAccount[] {
@@ -124,8 +114,7 @@ function getNativeAccounts(): SavedAccount[] {
             id: u.id,
             token: tokenCache[u.id] ?? "",
             username: u.globalName || u.username || `User_${u.id.slice(-4)}`,
-            discriminator: u.discriminator ?? "0",
-            avatar: getAvatarUrl(u.id, u.avatar, u.discriminator),
+            avatar: getAvatarUrl(u.id, u.avatar),
         }));
     } catch {
         return [];
@@ -156,9 +145,8 @@ function switchNativeAccount(userId: string) {
             return;
         }
         // Fallback : dispatch le flux event comme Discord le fait nativement
-        const Flux = findByProps("dispatch", "subscribe");
-        if (Flux?.dispatch) {
-            Flux.dispatch({ type: "MULTI_ACCOUNT_SWITCH_ATTEMPT", userId });
+        if (FluxDispatcher?.dispatch) {
+            FluxDispatcher.dispatch({ type: "MULTI_ACCOUNT_SWITCH_ATTEMPT", userId });
         }
     } catch {
         console.warn("[MultiInstance] switchNativeAccount failed for", userId);
@@ -380,7 +368,7 @@ function MultiInstanceModal({ rootProps }: { rootProps: any; }) {
                         <div className="mi-section-label">{t("ACTIVE ACCOUNT")}</div>
                         <div className="mi-account-row mi-account-row--current">
                             <AccountAvatar
-                                url={getAvatarUrl(currentUser.id, currentUser.avatar, currentUser.discriminator)}
+                                url={getAvatarUrl(currentUser.id, currentUser.avatar)}
                                 name={currentUser.username}
                             />
                             <div className="mi-account-info">
@@ -421,7 +409,7 @@ function MultiInstanceModal({ rootProps }: { rootProps: any; }) {
                                 <div className="mi-account-info">
                                     <span className="mi-account-name">{acc.username}</span>
                                     <span className="mi-account-tag">
-                                        {tagText}{acc.hasToken && acc.discriminator && acc.discriminator !== "0" ? ` · #${acc.discriminator}` : ""}
+                                        {tagText}
                                     </span>
                                 </div>
                                 {isOpen
@@ -555,7 +543,7 @@ function MultiInstanceButton() {
 
 export default definePlugin({
     name: "MultiInstance",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Opens a 2nd Discord (new window or split screen) with another account.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],

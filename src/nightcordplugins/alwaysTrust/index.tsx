@@ -59,7 +59,7 @@ const settings = definePluginSettings({
 
 export default definePlugin({
     name: "AlwaysTrust",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Removes 'untrusted domain' and 'suspicious download' popups. Also allows deleting a server without typing its name.",
     authors: [Devs.zt, Devs.Trwy],
     isModified: true,

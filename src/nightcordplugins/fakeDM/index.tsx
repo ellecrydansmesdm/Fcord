@@ -8,8 +8,7 @@ import "./styles.css";
 
 import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import definePlugin from "@utils/types";
-import { findStoreLazy } from "@webpack";
-import { FluxDispatcher, React, ReactDOM,SelectedChannelStore, UserStore } from "@webpack/common";
+import { ChannelStore, FluxDispatcher, IconUtils, React, ReactDOM,SelectedChannelStore, UserStore } from "@webpack/common";
 
 // ─── Unique IDs ─────────────────────────────────────────────────────────────
 let _idCounter = 0;
@@ -92,15 +91,10 @@ function clearFakes(channelId: string): number {
 // ─── Avatar URL ───────────────────────────────────────────────────────────────
 function avatarUrl(user: any): string {
     if (!user) return "";
-    if (user.avatar) return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp?size=32`;
-    const idx = user.discriminator && user.discriminator !== "0"
-        ? parseInt(user.discriminator) % 5
-        : Number(BigInt(user.id) >> 22n) % 6;
-    return `https://cdn.discordapp.com/embed/avatars/${idx}.png`;
+    return user.avatar ? IconUtils.getUserAvatarURL(user, false, 32) : IconUtils.getDefaultAvatarURL(user.id);
 }
 
 // ─── Channel helpers ─────────────────────────────────────────────────────────
-const ChannelStore = findStoreLazy("ChannelStore");
 
 /** Returns the current channel if it's a DM (type 1) or group DM (type 3), else null */
 function getCurrentDMChannel(): any | null {
@@ -588,7 +582,7 @@ const FakeDMButton: ChatBarButtonFactory = (props: any) => {
 // ─── Plugin ───────────────────────────────────────────────────────────────────
 export default definePlugin({
     name: "FakeDM",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Injects fake local messages into a DM or group DM. Button in the text bar. Persists across restarts.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["ChatInputButtonAPI"],

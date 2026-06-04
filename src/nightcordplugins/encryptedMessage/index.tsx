@@ -290,7 +290,7 @@ const messageContextPatch = (children: any, { message }: { message: any; }) => {
 
 export default definePlugin({
     name: "EncryptedMessage",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Encrypts your messages with 400 unique techniques (0–399). Only those who know the key can decrypt.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["ChatInputButtonAPI", "MessageEventsAPI", "MessageAccessoriesAPI"],

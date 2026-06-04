@@ -10,12 +10,11 @@ import { addContextMenuPatch, NavContextMenuPatchCallback, removeContextMenuPatc
 import { definePluginSettings } from "@api/Settings";
 import { ModalCloseButton, ModalContent, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
-import { findByProps, findByPropsLazy, findStoreLazy } from "@webpack";
-import { Forms, Menu, React, showToast, Toasts } from "@webpack/common";
+import { findByPropsLazy } from "@webpack";
+import { Forms, Menu, React, showToast, Toasts, GuildStore, UserStore, IconUtils } from "@webpack/common";
 
 const { useState, useEffect, useMemo } = React;
 
-const GuildStore = findStoreLazy("GuildStore");
 const GuildActions = findByPropsLazy("leaveGuild");
 
 interface GuildEntry {
@@ -33,7 +32,6 @@ const settings = definePluginSettings({
     }
 });
 
-/* ── Icônes ── */
 function SearchIcon() {
     return (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ opacity: 0.5, flexShrink: 0 }}>
@@ -42,7 +40,6 @@ function SearchIcon() {
     );
 }
 
-/* ── Modal ── */
 function LeaveAllServersModal({ rootProps }: { rootProps: any; }) {
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [search, setSearch] = useState("");
@@ -50,7 +47,7 @@ function LeaveAllServersModal({ rootProps }: { rootProps: any; }) {
     const [progress, setProgress] = useState("");
     const [currentIdx, setCurrentIdx] = useState(0);
 
-    const myId = useMemo(() => findByProps("getCurrentUser").getCurrentUser().id, []);
+    const myId = useMemo(() => UserStore?.getCurrentUser()?.id, []);
 
     const allGuilds = useMemo<GuildEntry[]>(() => {
         const raw = GuildStore?.getGuilds?.() ?? {};
@@ -112,7 +109,7 @@ function LeaveAllServersModal({ rootProps }: { rootProps: any; }) {
     };
 
     function getGuildIcon(g: GuildEntry) {
-        if (g.icon) return `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.webp?size=64`;
+        if (g.icon) return IconUtils?.getGuildIconURL({ id: g.id, icon: g.icon, size: 64 });
         return null;
     }
 
@@ -211,7 +208,6 @@ function LeaveAllServersModal({ rootProps }: { rootProps: any; }) {
     );
 }
 
-/* ── Context menu patch ── */
 const patchGuildContext: NavContextMenuPatchCallback = (children, { guild }) => {
     if (!children || !Array.isArray(children)) return;
     try {
@@ -234,7 +230,7 @@ const patchGuildContext: NavContextMenuPatchCallback = (children, { guild }) => 
 
 export default definePlugin({
     name: "LeaveAllServers",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Leaves all selected servers. Accessible via right-click on a server.",
     authors: [{ name: "Nightcord", id: 0n }],
     settings,

@@ -116,7 +116,7 @@ export function cleanupEmbed(embed) {
 export function cleanupUserObject(user: User) {
     /* backported from MLV2 rewrite */
     return {
-        discriminator: user.discriminator,
+        discriminator: user.discriminator ?? "0",
         username: user.username,
         avatar: user.avatar,
         id: user.id,

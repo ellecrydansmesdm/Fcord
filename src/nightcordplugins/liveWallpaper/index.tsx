@@ -154,8 +154,6 @@ const settings = definePluginSettings({
         type: OptionType.COMPONENT,
         component: SettingsComponent,
     },
-    // Remarque : Nous avons retiré wallpaperUrl d'ici.
-    // L'enregistrement est géré MANUELLEMENT via DataStore dans SettingsComponent.
     opacity: {
         type: OptionType.SLIDER,
         description: "Wallpaper opacity (0 = invisible, 0.5 = max)",
@@ -163,7 +161,7 @@ const settings = definePluginSettings({
         default: 0.15,
         stickToMarkers: false,
         restartNeeded: false,
-        onChange() { applyWallpaper(); },
+        onChange(v: number) { _lwOpacity = v; applyWallpaper(); },
     },
     blur: {
         type: OptionType.SLIDER,
@@ -172,7 +170,7 @@ const settings = definePluginSettings({
         default: 0,
         stickToMarkers: false,
         restartNeeded: false,
-        onChange() { applyWallpaper(); },
+        onChange(v: number) { _lwBlur = v; applyWallpaper(); },
     },
     brightness: {
         type: OptionType.SLIDER,
@@ -181,14 +179,14 @@ const settings = definePluginSettings({
         default: 1.0,
         stickToMarkers: false,
         restartNeeded: false,
-        onChange() { applyWallpaper(); },
+        onChange(v: number) { _lwBrightness = v; applyWallpaper(); },
     },
     muted: {
         type: OptionType.BOOLEAN,
         description: "Muted (no sound by default)",
         default: true,
         restartNeeded: false,
-        onChange() { applyWallpaper(); },
+        onChange(v: boolean) { _lwMuted = v; applyWallpaper(); },
     },
     volume: {
         type: OptionType.SLIDER,
@@ -197,9 +195,46 @@ const settings = definePluginSettings({
         default: 1.0,
         stickToMarkers: false,
         restartNeeded: false,
-        onChange() { applyWallpaper(); },
+        onChange(v: number) { _lwVolume = v; applyWallpaper(); },
     },
 });
+
+let _lwOpacity = 0.15;
+let _lwBlur = 0;
+let _lwBrightness = 1.0;
+let _lwMuted = true;
+let _lwVolume = 1.0;
+const cacheLwSettings = () => {
+    _lwOpacity = settings.store.opacity ?? 0.15;
+    _lwBlur = settings.store.blur ?? 0;
+    _lwBrightness = settings.store.brightness ?? 1.0;
+    _lwMuted = settings.store.muted ?? true;
+    _lwVolume = settings.store.volume ?? 1.0;
+};
+
+let activeVideo: HTMLVideoElement | null = null;
+
+function pauseVideo() {
+    if (activeVideo && !activeVideo.paused) {
+        activeVideo.pause();
+    }
+}
+
+function playVideo() {
+    if (activeVideo && activeVideo.paused && !document.hidden && document.hasFocus()) {
+        activeVideo.play().catch(() => {});
+    }
+}
+
+function handleVisChange() {
+    if (document.hidden) pauseVideo();
+    else playVideo();
+}
+
+function handleFocusChange() {
+    if (document.hasFocus()) playVideo();
+    else pauseVideo();
+}
 
 // ── Wallpaper injection ────────────────────────────────────────────────────────
 
@@ -214,11 +249,11 @@ async function applyWallpaper() {
     const url = await getWallpaperUrl();
     if (!url) return;
 
-    const opacity = settings.store.opacity ?? 0.15;
-    const blur = settings.store.blur ?? 0;
-    const brightness = settings.store.brightness ?? 1.0;
-    const muted = settings.store.muted ?? true;
-    const volume = settings.store.volume ?? 1.0;
+    const opacity = _lwOpacity;
+    const blur = _lwBlur;
+    const brightness = _lwBrightness;
+    const muted = _lwMuted;
+    const volume = _lwVolume;
     const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(url) || url.startsWith("data:video/");
 
     const filters: string[] = [];
@@ -247,7 +282,6 @@ async function applyWallpaper() {
 `.trim();
     document.head.appendChild(style);
 
-    // Créer le container avec l'image/vidéo
     const container = document.createElement("div");
     container.id = CONTAINER_ID;
 
@@ -259,8 +293,10 @@ async function applyWallpaper() {
         video.muted = muted;
         video.volume = volume;
         video.playsInline = true;
+        activeVideo = video;
         container.appendChild(video);
     } else {
+        activeVideo = null;
         const img = document.createElement("img");
         img.src = url;
         img.alt = "";
@@ -268,25 +304,29 @@ async function applyWallpaper() {
         container.appendChild(img);
     }
 
-    // Injecter à la fin du body (au-dessus de tout)
     document.body.appendChild(container);
 }
 
-// ── Plugin ─────────────────────────────────────────────────────────────────────
-
 export default definePlugin({
     name: "LiveWallpaper",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Global wallpaper for the entire Discord interface (image, gif, video). Compatible with ChannelWallpaper.",
     authors: [{ name: "Nightcord", id: 0n }],
     settings,
 
     start() {
-        // Petit délai pour que le DOM soit prêt
+        cacheLwSettings();
         setTimeout(applyWallpaper, 300);
+        document.addEventListener("visibilitychange", handleVisChange);
+        window.addEventListener("focus", handleFocusChange);
+        window.addEventListener("blur", handleFocusChange);
     },
 
     stop() {
         removeWallpaperElements();
+        document.removeEventListener("visibilitychange", handleVisChange);
+        window.removeEventListener("focus", handleFocusChange);
+        window.removeEventListener("blur", handleFocusChange);
+        activeVideo = null;
     },
 });

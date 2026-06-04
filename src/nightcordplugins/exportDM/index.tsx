@@ -9,15 +9,9 @@ import "./styles.css";
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
 import { ModalCloseButton,ModalContent, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { findStoreLazy } from "@webpack";
-import { React, useEffect,useState } from "@webpack/common";
-import { Forms } from "@webpack/common";
+import { ChannelStore, Forms, IconUtils, MessageStore, React, UserStore, useEffect, useState } from "@webpack/common";
 
 import { t } from "../autoTranslateNightcord";
-
-const ChannelStore = findStoreLazy("ChannelStore");
-const UserStore = findStoreLazy("UserStore");
-const MessageStore = findStoreLazy("MessageStore");
 
 function ExportIcon({ width = 20, height = 20 }: { width?: number; height?: number; }) {
     return (
@@ -135,7 +129,6 @@ async function fetchAllMessages(channelId: string, token: string, onProgress: (n
         await new Promise(r => setTimeout(r, 250));
     }
 
-    // Source 1: MessageStore cache (basic MessageLogger — in-memory only)
     try {
         const cached = MessageStore.getMessages?.(channelId);
         if (cached) {
@@ -177,7 +170,6 @@ async function fetchAllMessages(channelId: string, token: string, onProgress: (n
         console.error("[ExportDM] Error fetching cached messages:", e);
     }
 
-    // Source 2: MessageLoggerEnhanced IndexedDB (persistent — works without being in the conversation)
     try {
         const idbRecords = await getDeletedMessagesFromIDB(channelId);
         for (const record of idbRecords) {
@@ -285,8 +277,8 @@ function buildHtml(messages: RichMessage[], channelName: string): string {
         const edited = m.editedAt ? `<span class="edited">${t("(edited)")}</span>` : "";
         const pinned = m.pinned ? `<span class="pin">${t("[pinned]")}</span>` : "";
         const avatarUrl = m.authorAvatar
-            ? `https://cdn.discordapp.com/avatars/${m.authorId}/${m.authorAvatar}.webp?size=32`
-            : `https://cdn.discordapp.com/embed/avatars/${Math.abs(parseInt(m.authorId.slice(-4), 16)) % 5}.png`;
+            ? IconUtils.getUserAvatarURL({ id: m.authorId, avatar: m.authorAvatar } as any, false, 32)
+            : IconUtils.getDefaultAvatarURL(m.authorId);
         const replyHtml = m.referencedMessage
             ? `<div class="reply"><b>${m.referencedMessage.authorName}</b>: ${m.referencedMessage.content.replace(/</g, "&lt;")}</div>`
             : "";
@@ -326,7 +318,6 @@ function downloadFile(content: string, filename: string, mime: string) {
     URL.revokeObjectURL(url);
 }
 
-// ── Icône SVG pour la recherche ───────────────────────────────────────────────
 function SearchIcon() {
     return (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ opacity: 0.5, flexShrink: 0 }}>
@@ -335,7 +326,6 @@ function SearchIcon() {
     );
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────
 function ExportDMModal({ rootProps }: { rootProps: any; }) {
     const [channels, setChannels] = useState<any[]>([]);
     const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -374,18 +364,18 @@ function ExportDMModal({ rootProps }: { rootProps: any; }) {
         if (!token) { setStatus("error"); setProgress(t("Token not found")); return; }
 
         setStatus("fetching");
-        const selectedChannels = channels.filter(c => selected.has(c.id));
+        const sel = channels.filter(c => selected.has(c.id));
 
-        for (let i = 0; i < selectedChannels.length; i++) {
-            const ch = selectedChannels[i];
-            const channelPrefix = `[${i + 1}/${selected.size}] ${ch.name}: `;
+        for (let i = 0; i < sel.length; i++) {
+            const ch = sel[i];
+            const prefix = `[${i + 1}/${selected.size}] ${ch.name}: `;
 
-            let msgs = await fetchAllMessages(ch.id, token, n => setProgress(`${channelPrefix}${t("Fetching:")} ${n} ${t("messages")}...`));
+            let msgs = await fetchAllMessages(ch.id, token, n => setProgress(`${prefix}${t("Fetching:")} ${n} ${t("messages")}...`));
             if (!includeMedia) msgs = msgs.map(m => ({ ...m, attachments: [] }));
             if (!includeEmbeds) msgs = msgs.map(m => ({ ...m, embeds: [] }));
             if (!includeReactions) msgs = msgs.map(m => ({ ...m, reactions: [] }));
 
-            setProgress(`${channelPrefix}${msgs.length} ${t("messages")} — ${t("generating file...")}`);
+            setProgress(`${prefix}${msgs.length} ${t("messages")} — ${t("generating file...")}`);
             const safeName = ch.name.replace(/[^a-z0-9_-]/gi, "_").slice(0, 40) || "DM";
             const date = new Date().toISOString().slice(0, 10);
 
@@ -422,11 +412,10 @@ function ExportDMModal({ rootProps }: { rootProps: any; }) {
 
     function getChAvatar(c: any) {
         if (c.type === 1 && c.recipientId && c.avatar)
-            return `https://cdn.discordapp.com/avatars/${c.recipientId}/${c.avatar}.webp?size=32`;
+            return IconUtils.getUserAvatarURL({ id: c.recipientId, avatar: c.avatar } as any, false, 32);
         return null;
     }
 
-    // Filtre la liste selon la recherche
     const filtered = search.trim()
         ? channels.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
         : channels;
@@ -441,7 +430,6 @@ function ExportDMModal({ rootProps }: { rootProps: any; }) {
             </ModalHeader>
             <ModalContent className="edm-content">
 
-                {/* Barre de recherche */}
                 <div className="edm-search-bar">
                     <SearchIcon />
                     <input
@@ -457,7 +445,6 @@ function ExportDMModal({ rootProps }: { rootProps: any; }) {
                     )}
                 </div>
 
-                {/* Liste conversations */}
                 <Forms.FormTitle tag="h5" className="edm-label">{t("CHOOSE A CONVERSATION")}</Forms.FormTitle>
                 <div className="edm-channel-list">
                     {filtered.length === 0 && (
@@ -483,7 +470,6 @@ function ExportDMModal({ rootProps }: { rootProps: any; }) {
                     })}
                 </div>
 
-                {/* Options — sans emojis Google, avec labels texte */}
                 <div className="edm-options-row">
                     <label className="edm-option">
                         <input type="checkbox" checked={includeMedia} onChange={e => setIncludeMedia(e.target.checked)} />
@@ -499,7 +485,6 @@ function ExportDMModal({ rootProps }: { rootProps: any; }) {
                     </label>
                 </div>
 
-                {/* Format */}
                 <Forms.FormTitle tag="h5" className="edm-label">{t("EXPORT FORMAT")}</Forms.FormTitle>
                 <div className="edm-format-row">
                     {FORMATS.map(f => (
@@ -539,7 +524,7 @@ function ExportButton() {
 
 export default definePlugin({
     name: "ExportDM",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Exports your DMs with messages, images, videos, audio, links, embeds, stickers, reactions in TXT/JSON/CSV/MD/HTML.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],

@@ -13,7 +13,7 @@ import { ModalCloseButton,ModalContent, ModalHeader, ModalRoot, openModal } from
 import { PluginNative } from "@utils/types";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByProps } from "@webpack";
-import { React, useCallback, useEffect, useMemo,useRef, useState } from "@webpack/common";
+import { React, useCallback, useEffect, useMemo,useRef, useState, IconUtils } from "@webpack/common";
 import { Forms } from "@webpack/common";
 
 import { t } from "../autoTranslateNightcord";
@@ -37,8 +37,22 @@ let loadPromise: Promise<SavedAccount[]> | null = null;
 function getAccounts(): Promise<SavedAccount[]> {
     if (accountsCache !== null) return Promise.resolve(accountsCache);
     if (!loadPromise) {
-        loadPromise = DataStore.get<SavedAccount[]>(STORE_KEY).then(v => {
-            accountsCache = v ?? [];
+        loadPromise = DataStore.get<SavedAccount[]>(STORE_KEY).then(async v => {
+            const rawAccounts = v ?? [];
+            const decrypted: SavedAccount[] = [];
+            for (const acc of rawAccounts) {
+                let tok = acc.token;
+                if (tok.startsWith("dQw4w9WgXcQ:")) {
+                    try {
+                        const dec = await Native.decryptTokenNative(tok);
+                        if (dec) tok = dec;
+                    } catch (e) {
+                        console.error("[Nightcord] decyption failed for ", acc.username, e);
+                    }
+                }
+                decrypted.push({ ...acc, token: tok });
+            }
+            accountsCache = decrypted;
             loadPromise = null;
             return accountsCache;
         });
@@ -53,7 +67,21 @@ async function saveAccounts(accounts: SavedAccount[]): Promise<void> {
     }
     const deduplicated = Array.from(unique.values());
     accountsCache = deduplicated;
-    await DataStore.set(STORE_KEY, deduplicated);
+
+    const encrypted: SavedAccount[] = [];
+    for (const a of deduplicated) {
+        let tok = a.token;
+        if (!tok.startsWith("dQw4w9WgXcQ:")) {
+            try {
+                const enc = await Native.encryptToken(tok);
+                if (enc) tok = enc;
+            } catch (e) {
+                console.error("[TokenImporter] Failed to encrypt token for", a.username, e);
+            }
+        }
+        encrypted.push({ ...a, token: tok });
+    }
+    await DataStore.set(STORE_KEY, encrypted);
 }
 
 let tokenModulePatched = false;
@@ -252,8 +280,8 @@ function TokenModal({ rootProps }: { rootProps: any; }) {
                 const result = await Native.checkToken(tokens[i]);
                 if (result.valid && result.user) {
                     const u = result.user;
-                    const av = u.avatar ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.webp?size=64`
-                        : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`;
+                    const av = u.avatar ? (IconUtils?.getUserAvatarURL({ id: u.id, avatar: u.avatar } as any, false, 64) ?? "")
+                        : (IconUtils?.getDefaultAvatarURL(u.id) ?? "");
                     if (!existing.find(a => a.id === u.id)) {
                         existing.push({ id: u.id, token: tokens[i], username: u.global_name || u.username, discriminator: u.discriminator ?? "0", avatar: av });
                         await saveAccounts(existing);
@@ -324,8 +352,8 @@ function TokenModal({ rootProps }: { rootProps: any; }) {
                                             const verified = await Native.checkToken(tok);
                                             if (verified.valid && verified.user) {
                                                 const u = verified.user;
-                                                const av = u.avatar ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.webp?size=64`
-                                                    : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`;
+                                                const av = u.avatar ? (IconUtils?.getUserAvatarURL({ id: u.id, avatar: u.avatar } as any, false, 64) ?? "")
+                                                    : (IconUtils?.getDefaultAvatarURL(u.id) ?? "");
                                                 if (!existing.find(a => a.id === u.id)) {
                                                     existing.push({ id: u.id, token: tok, username: u.global_name || u.username, discriminator: u.discriminator ?? "0", avatar: av });
                                                     addedCount++;
@@ -444,7 +472,7 @@ function TokenImporterButton() {
 
 export default definePlugin({
     name: "TokenImporter",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Import and verify Discord tokens.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
@@ -463,8 +491,8 @@ export default definePlugin({
                             if (verified.valid && verified.user) {
                                 const u = verified.user;
                                 if (!current.find(a => a.id === u.id)) {
-                                    const av = u.avatar ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.webp?size=64`
-                                        : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`;
+                                    const av = u.avatar ? (IconUtils?.getUserAvatarURL({ id: u.id, avatar: u.avatar } as any, false, 64) ?? "")
+                                        : (IconUtils?.getDefaultAvatarURL(u.id) ?? "");
                                     current.push({ id: u.id, token: tok, username: u.global_name || u.username, discriminator: u.discriminator ?? "0", avatar: av });
                                     added = true;
                                 }
@@ -495,7 +523,7 @@ export default definePlugin({
                         type: "MULTI_ACCOUNT_VALIDATE_TOKEN_SUCCESS",
                         userId: acc.id,
                         token: acc.token,
-                        user: { id: acc.id, username: acc.username, discriminator: acc.discriminator, avatar: null }
+                        user: { id: acc.id, username: acc.username, discriminator: acc.discriminator ?? "0", avatar: null }
                     });
                 } catch { }
                 await new Promise(r => setTimeout(r, 300));

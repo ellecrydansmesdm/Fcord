@@ -212,7 +212,7 @@ function BulkFriendRemoveButton() {
 
 export default definePlugin({
     name: "BulkFriendRemove",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Delete multiple friends at once.",
     authors: [{ name: "Nightcord", id: 0n }],
     headerBarButton: { icon: BulkRemoveIcon, render: BulkFriendRemoveButton, priority: 5 },

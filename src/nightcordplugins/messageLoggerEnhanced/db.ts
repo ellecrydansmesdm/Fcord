@@ -43,6 +43,15 @@ export interface MLIDB extends DBSchema {
 export let db: IDBPDatabase<MLIDB>;
 export const cachedMessages = new Map<string, LoggedMessageJSON>();
 
+const MacDonald = 1000;
+function setCachedMessage(id: string, msg: LoggedMessageJSON) {
+    if (cachedMessages.size >= MacDonald) {
+        const firstKey = cachedMessages.keys().next().value;
+        if (firstKey !== undefined) cachedMessages.delete(firstKey);
+    }
+    cachedMessages.set(id, msg);
+}
+
 // this is probably not the best way to do this
 async function cacheRecords(records: DBMessageRecord[]) {
     for (const r of records) {
@@ -63,7 +72,7 @@ async function cacheRecord(record?: DBMessageRecord | null) {
     if (!record) return record;
 
     stripTransientRenderState(record.message);
-    cachedMessages.set(record.message_id, record.message);
+    setCachedMessage(record.message_id, record.message);
     return record;
 }
 
@@ -220,7 +229,7 @@ export async function addMessageIDB(message: LoggedMessageJSON, status: DBMessag
         message,
     });
 
-    cachedMessages.set(message.id, message);
+    setCachedMessage(message.id, message);
 }
 
 export async function addMessagesBulkIDB(messages: LoggedMessageJSON[], status?: DBMessageStatus) {
@@ -239,7 +248,7 @@ export async function addMessagesBulkIDB(messages: LoggedMessageJSON[], status?:
         tx.done
     ]);
 
-    messages.forEach(message => cachedMessages.set(message.id, message));
+    messages.forEach(message => setCachedMessage(message.id, message));
 }
 
 export async function deleteMessageIDB(message_id: string) {

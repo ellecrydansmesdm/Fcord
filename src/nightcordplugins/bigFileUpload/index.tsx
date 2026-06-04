@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ApplicationCommandInputType, ApplicationCommandOptionType, Argument, CommandContext, sendBotMessage } from "@api/Commands";
+import { ApplicationCommandInputType, ApplicationCommandOptionType, sendBotMessage } from "@api/Commands";
+import { CommandArgument, CommandContext } from "@vencord/discord-types";
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
@@ -342,7 +343,7 @@ function sendTextToChat(text: string) {
     }
 }
 
-async function resolveFile(options: Argument[], ctx: CommandContext): Promise<File | null> {
+async function resolveFile(options: CommandArgument[], ctx: CommandContext): Promise<File | null> {
     for (const opt of options) {
         if (opt.name === "file") {
             const upload = UploadStore.getUpload(ctx.channel.id, opt.name, DraftType.SlashCommand);
@@ -487,7 +488,7 @@ const ctxMenuPatch: NavContextMenuPatchCallback = (children, props) => {
 
 export default definePlugin({
     name: "BigFileUpload",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Bypasses Discord's upload limit via GoFile, Catbox, or a custom uploader. Button in the right-click menu or /fileupload command.",
     authors: [Devs.ScattrdBlade],
     settings,

@@ -44,7 +44,7 @@ async function undeafenUserViaAPI(userId: string, guildId: string): Promise<void
 
 export default definePlugin({
     name: "AutoUnmute",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Automatically unmutes and undeafens when you are server muted/deafened, if you have permissions",
     authors: [{ name: "Bash", id: 1327483363518582784n }],
 

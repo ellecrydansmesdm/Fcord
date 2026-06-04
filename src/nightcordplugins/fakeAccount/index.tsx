@@ -134,7 +134,7 @@ function simulateSwitch(fake: any) {
             banner: (me as any).banner ?? null,
             bio: (me as any).bio ?? "",
             accentColor: (me as any).accentColor ?? null,
-            discriminator: me.discriminator,
+            discriminator: me.discriminator ?? "0",
             publicFlags: (me as any).publicFlags ?? 0,
             flags: (me as any).flags ?? 0,
             premiumType: (me as any).premiumType ?? 0,
@@ -251,13 +251,13 @@ function onRemoveAccount(action: any) {
     _store?.emitChange?.();
 }
 
-// ── Add user to switcher ────────────────────────────────────────────
 function addToSwitcher(userId: string) {
     if (fakeAccounts.find(f => f.id === userId)) return;
 
     const user = UserStore.getUser(userId);
     const profile = UserProfileStore.getUserProfile?.(userId) ?? {};
     const username = user?.username ?? `User_${userId.slice(-4)}`;
+    const bot = user?.bot ?? false;
 
     fakeAccounts.push({
         id: userId,
@@ -265,6 +265,7 @@ function addToSwitcher(userId: string) {
         globalName: (user as any)?.globalName ?? username,
         discriminator: user?.discriminator ?? "0",
         avatar: user?.avatar ?? null,
+        bot,
         _bio: profile.bio ?? "",
         _banner: profile.banner ?? null,
         _accentColor: profile.accentColor ?? null,
@@ -332,7 +333,7 @@ const ctxPatch: NavContextMenuPatchCallback = (children, { user }) => {
 // ── Plugin ─────────────────────────────────────────────────────────────────
 export default definePlugin({
     name: "FakeSwitcher",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Right-click → add a user to the switcher. Click in the switcher → your profile takes their appearance locally.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
@@ -347,14 +348,7 @@ export default definePlugin({
         addHeaderBarButton("fake-account-restore", () => <RestoreButton />, 5);
 
         waitFor(["getUsers", "getValidUsers", "getHasLoggedInAccounts"], async (mod: any) => {
-            // Critical Validation: verify matched store is indeed the MultiAccountStore
-            // and not another Webpack store sharing these method names.
-            // Patching the wrong store causes all rooms to disappear
-            // on servers with permissions (the permissions store becomes corrupted).
-            if (!isMultiAccountStore(mod)) {
-                console.warn("[FakeAccount] Store ignored — doesn't look like MultiAccountStore:", mod);
-                return;
-            }
+            if (!isMultiAccountStore(mod)) return;
 
             _store = mod;
 
@@ -364,12 +358,14 @@ export default definePlugin({
                 const user = UserStore.getUser(id);
                 if (!user) continue;
                 const profile = UserProfileStore.getUserProfile?.(id) ?? {};
+                const bot = user.bot ?? false;
                 fakeAccounts.push({
                     id: user.id,
                     username: user.username,
                     globalName: (user as any).globalName ?? user.username,
                     discriminator: user.discriminator ?? "0",
                     avatar: user.avatar ?? null,
+                    bot,
                     _bio: profile.bio ?? "",
                     _banner: profile.banner ?? null,
                     _accentColor: profile.accentColor ?? null,

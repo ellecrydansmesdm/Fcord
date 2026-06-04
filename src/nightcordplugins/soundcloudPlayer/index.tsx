@@ -769,7 +769,7 @@ function SCHeaderBarButton() {
 
 export default definePlugin({
     name: "SoundCordPlayer",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Integrated SoundCord player. Client ID is automatically fetched via native Electron process — no account required.",
     authors: [EquicordDevs.nobody],
 

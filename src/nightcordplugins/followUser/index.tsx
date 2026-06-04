@@ -218,7 +218,7 @@ const ctxPatch: NavContextMenuPatchCallback = (children, props) => {
 // ── Plugin ────────────────────────────────────────────────────────────────────
 export default definePlugin({
     name: "FollowUser",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Suit un user en vocal. Clic droit → Follow User. Coeur blanc = suivi actif (clic gauche = rejoindre, clic droit = unfollow). Auto-unfollow apres 30min d'inactivite.",
     authors: [{ name: "Nightcord", id: 0n }],
 

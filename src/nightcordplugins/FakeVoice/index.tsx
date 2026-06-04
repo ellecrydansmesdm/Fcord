@@ -7,19 +7,16 @@
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
 import { UserAreaButton, UserAreaRenderProps } from "@api/UserArea";
 import definePlugin from "@utils/types";
-import { findByProps } from "@webpack";
-import { ContextMenuApi, Menu,React } from "@webpack/common";
+import { ContextMenuApi, Menu, React, SelectedChannelStore, VoiceActions } from "@webpack/common";
 
 let isGhostActive = false;
 let configFakeMute = true;
 let configFakeDeafen = true;
 
 const syncState = () => {
-    const SelectedChannelStore = findByProps("getVoiceChannelId");
-    const vm = findByProps("toggleSelfMute");
-    if (vm && SelectedChannelStore?.getVoiceChannelId()) {
-        vm.toggleSelfMute();
-        vm.toggleSelfMute();
+    if (VoiceActions && SelectedChannelStore?.getVoiceChannelId()) {
+        VoiceActions.toggleSelfMute();
+        VoiceActions.toggleSelfMute();
     }
 };
 
@@ -39,7 +36,7 @@ function FakeDeafenIcon({ className }: { className?: string }) {
 function GhostContextMenu() {
     const [, forceUpdate] = React.useReducer((x: number) => x + 1, 0);
     return (
-        <Menu.Menu navId="fake-voice-menu" aria-label="Fake Voice Configuration">
+        <Menu.Menu navId="fake-voice-menu" aria-label="Fake Voice Configuration" onClose={ContextMenuApi.closeContextMenu}>
             <Menu.MenuGroup label="Ghost Options">
                 <Menu.MenuCheckboxItem
                     id="opt-both"
@@ -101,7 +98,7 @@ export default definePlugin({
     description: "Appear muted or deaf while listening. By mushzi.",
     authors: [{ name: "mushzi", id: 449282863582412850n }],
     dependencies: ["CommandsAPI", "UserAreaAPI"],
-    enabledByDefault: true,
+    enabledByDefault: false,
 
     patches: [
         {
@@ -113,7 +110,7 @@ export default definePlugin({
         }
     ],
 
-    toggle(val: any, what: string) {
+    toggle(val: boolean, what: "mute" | "deaf" | "video") {
         if (!isGhostActive) return val;
         switch (what) {
             case "mute": return configFakeMute ? true : val;
@@ -163,18 +160,5 @@ export default definePlugin({
                 sendBotMessage(ctx.channel.id, { content: `👻 **Fake Deafen & Mute** are ${isGhostActive ? "enabled" : "disabled"}.` });
             },
         },
-    ],
-
-    start() {
-        const { addUserAreaButton } = Vencord.Api.UserArea;
-        addUserAreaButton("fake-voice-option", {
-            icon: FakeDeafenIcon,
-            render: FakeDeafenUserButton
-        });
-    },
-
-    stop() {
-        const { removeUserAreaButton } = Vencord.Api.UserArea;
-        removeUserAreaButton("fake-voice-option");
-    }
+    ]
 });

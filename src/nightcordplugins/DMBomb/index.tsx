@@ -265,7 +265,7 @@ function DMBombModal({ rootProps, guildId }: { rootProps: any; guildId: string; 
 
 export default definePlugin({
     name: "DMBomb",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Sends an aggressive message to ALL server members or a specific role via right click.",
     authors: [{ name: "Nightcord", id: 0n }],
 

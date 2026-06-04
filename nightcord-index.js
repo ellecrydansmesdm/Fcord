@@ -1,5 +1,6 @@
 // Nightcord entry point
 "use strict";
+process.env.ELECTRON_JS_FLAGS = "--expose-gc --optimize_for_size --max-old-space-size=512";
 const path = require("path");
 const Module = require("module");
 const fs = require("fs");
@@ -24,24 +25,15 @@ app.setPath("userData", nightcordData);
 // AppUserModelId unique — Windows reconnaît Nightcord comme app séparée de Discord
 app.setAppUserModelId("com.squirrel.Discord.Discord");
 
-// ── HOTFIX : Partage d'écran (Chargement infini & Crash) ──────────────────
-// NOTE : Les flags disable-gpu-sandbox et WebRtcHideLocalIpsWithMdns ont été retirés
-// car ils causaient :
-//   - Messages vocaux qui ne s'envoient pas (WebRTC encodage cassé)
-//   - Double appel / double connexion vocale
-//   - Plugin voicedictation qui ne détecte pas le micro
-// Ces flags désactivaient la protection IP locale et le sandbox GPU,
-// ce qui empêchait WebRTC de fonctionner correctement.
 app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
+app.commandLine.appendSwitch("js-flags", "--expose-gc --optimize_for_size --max-old-space-size=512");
+app.commandLine.appendSwitch("enable-gpu-rasterization");
+app.commandLine.appendSwitch("enable-zero-copy");
+app.commandLine.appendSwitch("disk-cache-size", "104857600");
+app.commandLine.appendSwitch("enable-low-end-device-mode");
+app.commandLine.appendSwitch("process-per-site");
+app.commandLine.appendSwitch("renderer-process-limit", "2");
 
-// ── FIX MODULES 403 : discord_overlay / discord_rpc / discord_dispatch ────
-// Discord essaie de télécharger ces modules natifs depuis ses CDN mais reçoit
-// un 403 (version de client inconnue). L'échec d'installation de discord_overlay
-// provoque : "Overlay crashed for pid -1" → "Overlay module not found" →
-// webpack.findByProps/findCssClasses échouent → removeChild crash en cascade.
-//
-// Solution : on intercepte le module updater AVANT qu'il tente ces téléchargements,
-// et on lui fait croire que ces modules sont déjà installés et à jour.
 app.once("ready", () => {
     try {
         // Liste des modules natifs qui causent des erreurs 403 inutiles
@@ -67,7 +59,8 @@ app.once("ready", () => {
                     { urls: ["https://discord.com/api/modules/*"] },
                     (details, callback) => {
                         const url = details.url;
-                        const isBlocked = Array.from(BLOCKED_MODULES).some(m => url.includes(m));
+                        let isBlocked = false;
+                        for (const m of BLOCKED_MODULES) { if (url.includes(m)) { isBlocked = true; break; } }
                         if (isBlocked) {
                             // Bloquer silencieusement — évite le 403 + les logs d'erreur
                             console.log("[Nightcord] Module bloqué (inutile pour Nightcord):", url.split("/").slice(-2).join("/"));
@@ -197,17 +190,17 @@ try {
     }
 } catch (e) { }
 
-// Patch Module._resolveLookupPaths une seule fois avec un Set pour éviter
-// la concatenation de tableau à chaque require() — source de latence majeure
-const _globalPathsSet = new Set(Module.globalPaths);
+const _globalPathsArr = [...new Set(Module.globalPaths)];
+const _globalPathsSet = new Set(_globalPathsArr);
 const _origResolve = Module._resolveLookupPaths;
 Module._resolveLookupPaths = function (request, parent) {
     if (parent) {
-        if (!parent.paths) parent.paths = [..._globalPathsSet];
-        else if (parent.paths.length > 0) {
-            // Ajouter uniquement les paths manquants — évite la concat à chaque appel
+        if (!parent.paths) {
+            parent.paths = _globalPathsArr.slice();
+        } else {
+            const existing = new Set(parent.paths);
             for (const p of _globalPathsSet) {
-                if (!parent.paths.includes(p)) parent.paths.push(p);
+                if (!existing.has(p)) parent.paths.push(p);
             }
         }
     }

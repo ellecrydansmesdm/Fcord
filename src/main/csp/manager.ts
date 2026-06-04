@@ -9,6 +9,7 @@ import { IpcEvents } from "@shared/IpcEvents";
 import { dialog, ipcMain, IpcMainInvokeEvent } from "electron";
 
 import { CspPolicies, ImageAndCssSrc } from ".";
+import { validateSender } from "../ipcMain";
 
 export type CspRequestResult = "invalid" | "cancelled" | "unchecked" | "ok" | "conflict";
 
@@ -68,7 +69,18 @@ function getMessage(url: string, directives: string[], callerName: string) {
     return { message, detail };
 }
 
-async function addCspRule(_: IpcMainInvokeEvent, url: string, directives: string[], callerName: string): Promise<CspRequestResult> {
+let cspDialogQueue = Promise.resolve<CspRequestResult>("cancelled");
+
+async function addCspRule(event: IpcMainInvokeEvent, url: string, directives: string[], callerName: string): Promise<CspRequestResult> {
+    if (!validateSender(event)) {
+        throw new Error("Unauthorized IPC invocation");
+    }
+    const result = cspDialogQueue.then(() => _addCspRule(url, directives, callerName));
+    cspDialogQueue = result.catch(() => "cancelled" as CspRequestResult);
+    return result;
+}
+
+async function _addCspRule(url: string, directives: string[], callerName: string): Promise<CspRequestResult> {
     if (!validate(url, directives)) {
         return "invalid";
     }
@@ -102,7 +114,10 @@ async function addCspRule(_: IpcMainInvokeEvent, url: string, directives: string
     return "ok";
 }
 
-function removeCspRule(_: IpcMainInvokeEvent, domain: string) {
+function removeCspRule(event: IpcMainInvokeEvent, domain: string) {
+    if (!validateSender(event)) {
+        throw new Error("Unauthorized IPC invocation");
+    }
     if (domain in NativeSettings.store.customCspRules) {
         delete NativeSettings.store.customCspRules[domain];
         return true;
@@ -111,7 +126,10 @@ function removeCspRule(_: IpcMainInvokeEvent, domain: string) {
     return false;
 }
 
-function isDomainAllowed(_: IpcMainInvokeEvent, url: string, directives: string[]) {
+function isDomainAllowed(event: IpcMainInvokeEvent, url: string, directives: string[]) {
+    if (!validateSender(event)) {
+        return false;
+    }
     try {
         const domain = new URL(url).host;
 

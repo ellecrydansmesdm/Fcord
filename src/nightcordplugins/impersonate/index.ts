@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ApplicationCommandOptionType, Argument, CommandContext,sendBotMessage } from "@api/Commands";
+import { ApplicationCommandOptionType, sendBotMessage } from "@api/Commands";
 import { ApplicationCommandInputType } from "@api/Commands/types";
+import { CommandArgument, CommandContext } from "@vencord/discord-types";
 import { Devs } from "@utils/constants";
 import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
@@ -17,7 +18,7 @@ const logger = new Logger("Impersonate");
 
 const UploadStore = findByPropsLazy("getUpload");
 
-async function resolveFile(options: Argument[], ctx: CommandContext): Promise<File | null> {
+async function resolveFile(options: CommandArgument[], ctx: CommandContext): Promise<File | null> {
     for (const opt of options) {
         if (opt.name === "image") {
             const upload = UploadStore.getUpload(ctx.channel.id, opt.name, DraftType.SlashCommand);
@@ -29,7 +30,7 @@ async function resolveFile(options: Argument[], ctx: CommandContext): Promise<Fi
 
 export default definePlugin({
     name: "Impersonate",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Locally simulates a message sent by any user via the /impersonate command. Only visible to you.",
     authors: [Devs.BigDuck],
     dependencies: ["CommandsAPI"],
@@ -82,7 +83,7 @@ export default definePlugin({
                         id: user.id,
                         username: user.username,
                         avatar: user.avatar,
-                        discriminator: user.discriminator,
+                        discriminator: user.discriminator ?? "0",
                         public_flags: user.publicFlags,
                         premium_type: user.premiumType,
                         flags: user.flags,

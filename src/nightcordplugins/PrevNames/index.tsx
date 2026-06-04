@@ -7,7 +7,7 @@
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { closeModal, ModalCloseButton, ModalContent, ModalHeader, ModalRoot, ModalSize, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { Menu, React, Text, useEffect, useState } from "@webpack/common";
+import { Menu, React, Text, useEffect, useState, IconUtils } from "@webpack/common";
 import { findByPropsLazy } from "@webpack";
 import {domain} from "../../../DOMAIN.json";
 
@@ -79,20 +79,15 @@ async function fetchPrevNames(userId: string): Promise<PrevNamesResponse> {
 
 function getBannerUrl(userId: string, bannerHash: string | null | undefined, size = 480): string | null {
     if (!bannerHash) return null;
-    const ext = bannerHash.startsWith("a_") ? "gif" : "png";
-    return `https://cdn.discordapp.com/banners/${userId}/${bannerHash}.${ext}?size=${size}`;
+    return IconUtils?.getUserBannerURL({ id: userId, banner: bannerHash, size }) ?? null;
 }
 
 function getAvatarUrl(userId: string, avatarHash: string | null | undefined, size = 128): string {
     if (!avatarHash) {
-        const defaultIndex = Number(BigInt(userId) % 6n);
-        return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+        return IconUtils?.getDefaultAvatarURL(userId) ?? "";
     }
-    const ext = avatarHash.startsWith("a_") ? "gif" : "png";
-    return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=${size}`;
+    return IconUtils?.getUserAvatarURL({ id: userId, avatar: avatarHash } as any, false, size) ?? "";
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatRelativeDate(date: Date): string {
     const now = new Date();
@@ -665,7 +660,7 @@ export default definePlugin({
     name: "PrevNames",
     description: "Shows the username history of a user. Right-click → PrevNames.",
     authors: [{ name: "you", id: 0n }],
-    enabledByDefault: true,
+    enabledByDefault: false,
     dependencies: ["ContextMenuAPI"],
 
     start() {

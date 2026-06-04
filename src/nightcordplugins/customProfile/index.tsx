@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Vencord, a Discord client mod
  * Copyright (c) 2026 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -12,7 +12,7 @@ import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api
 import { DataStore } from "@api/index";
 import { ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalRoot, openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
-import { AuthenticationStore, Button, FluxDispatcher, IconUtils, Menu, OAuth2AuthorizeModal, React, Select, SettingsRouter, SnowflakeUtils, UserStore } from "@webpack/common";
+import { AuthenticationStore, Button, FluxDispatcher, GuildMemberStore, IconUtils, Menu, OAuth2AuthorizeModal, React, Select, SettingsRouter, SnowflakeUtils, UserProfileStore, UserStore } from "@webpack/common";
 import { Settings } from "@api/Settings";
 import { getPublicPluginConfig, saveOwnPluginConfig } from "../../api/PluginSync";
 import { getStoredToken, storeToken, beginDiscordOAuth, API_BASE } from "../../api/OAuth2";
@@ -72,7 +72,6 @@ const BOOST_LABELS_RAW = [
     "9 Mois", "12 Mois", "15 Mois", "18 Mois", "24 Mois"
 ];
 const BOOST_LABELS = BOOST_LABELS_RAW.map(l => t(l));
-const BOOST_MONTHS = [1, 2, 3, 6, 9, 12, 15, 18, 24];
 const BOOST_ICONS = [
     "https://cdn.discordapp.com/badge-icons/51040c70d4f20a921ad6674ff86fc95c.png", // 1 mois
     "https://cdn.discordapp.com/badge-icons/0e4080d1d333bc7ad29ef6528b6f2fb7.png", // 2 mois
@@ -148,15 +147,44 @@ let storedData: CustomProfileData = {};
 let isEnabled = false;
 let domObserver: MutationObserver | null = null;
 
-const publicProfilesCache = new Map<string, { fetched: boolean, data: CustomProfileData | null, timestamp: number }>();
-const PUBLIC_CACHE_TTL = 1000 * 30; // 30 seconds — fast enough to see updates without hammering the API
+let cacheDatesR: string[] = [];
+let cacheDatesF: string[] = [];
+let leCacheU: string | null = null;
+let leCacheI: string | null = null;
+function choppeDatesReelles(): string[] {
+    try {
+        const u = UserStore.getCurrentUser();
+        if (!u?.id) return [];
+        if (leCacheU === u.id) return cacheDatesR;
+        leCacheU = u.id;
+        cacheDatesR = getRealDateVariants();
+        return cacheDatesR;
+    } catch { return []; }
+}
 
-// Watch for seeAllCustomProfile being toggled off — flush the cache immediately
+function choppeDatesBidons(iso: string): string[] {
+    if (leCacheI === iso) return cacheDatesF;
+    leCacheI = iso;
+    cacheDatesF = getFakeDateVariants(iso);
+    return cacheDatesF;
+}
+
+const publicProfilesCache = new Map<string, { fetched: boolean, data: CustomProfileData | null, timestamp: number }>();
+const MacDonald = 500;
+function setPublicProfileCache(userId: string, entry: { fetched: boolean, data: CustomProfileData | null, timestamp: number }) {
+    if (publicProfilesCache.size >= MacDonald && !publicProfilesCache.has(userId)) {
+        const firstKey = publicProfilesCache.keys().next().value;
+        if (firstKey !== undefined) publicProfilesCache.delete(firstKey);
+    }
+    publicProfilesCache.set(userId, entry);
+}
+
+const PUBLIC_CACHE_TTL = 1000 * 30;
+
 let _lastSeeAll = false;
 function checkSeeAllSettingChange() {
     const current = !!Settings.seeAllCustomProfile;
     if (_lastSeeAll && !current) {
-        // Turned off — wipe all public profile data so everyone shows their real profile
         publicProfilesCache.clear();
     }
     _lastSeeAll = current;
@@ -168,7 +196,7 @@ async function fetchPublicProfileIfNeeded(userId: string) {
     const existing = publicProfilesCache.get(userId);
     if (existing?.fetched && (Date.now() - existing.timestamp) < PUBLIC_CACHE_TTL) return;
 
-    publicProfilesCache.set(userId, { fetched: false, data: null, timestamp: 0 });
+    setPublicProfileCache(userId, { fetched: false, data: null, timestamp: 0 });
 
     const result = await getPublicPluginConfig("customProfile", userId);
     const dataToSave = result?.settings || null;
@@ -182,7 +210,7 @@ async function fetchPublicProfileIfNeeded(userId: string) {
         delete dataToSave.phone;
         delete dataToSave.copiedUserId;
     }
-    publicProfilesCache.set(userId, { fetched: true, data: dataToSave, timestamp: Date.now() });
+    setPublicProfileCache(userId, { fetched: true, data: dataToSave, timestamp: Date.now() });
 
     try {
         const UPS = (Vencord as any).Webpack?.findByProps?.("getUserProfile", "getGuildMemberProfile");
@@ -260,6 +288,10 @@ function onAccountSwitch() {
     cachedFakeUser = null;
     cachedOriginalUser = null;
     _trueOriginalUser = null;
+    leCacheU = null;
+    leCacheI = null;
+    cacheDatesR = [];
+    cacheDatesF = [];
     _dataVersion++;
     _realUsername = "";
     _realGlobalName = "";
@@ -301,17 +333,12 @@ let _avatarPatchOrig: any = null;
 function applyAvatarPatchEarly() {
     if (_avatarPatchApplied) return;
     try {
-        // findByProps is more reliable than the imported IconUtils as it returns
-        // the actual live webpack module object — patching it affects all consumers.
-        const IU = (window as any).Vencord?.Webpack?.findByProps?.("getUserAvatarURL", "getDefaultAvatarURL")
-            ?? (window as any).Vencord?.Webpack?.findByProps?.("getUserAvatarURL")
-            ?? IconUtils;
-        if (!IU?.getUserAvatarURL) return;
-        _avatarPatchOrig = IU.getUserAvatarURL;
+        if (!IconUtils?.getUserAvatarURL) return;
+        _avatarPatchOrig = IconUtils.getUserAvatarURL;
         const orig = _avatarPatchOrig;
         // The patch reads storedData/isEnabled at call-time, not at install-time
         // so it works even if called before loadData() finishes.
-        IU.getUserAvatarURL = function (user: any, ...args: any[]) {
+        IconUtils.getUserAvatarURL = function (user: any, ...args: any[]) {
             if (!user) return orig(user, ...args);
             const uid = user.id ?? user.userId;
             if (!uid) return orig(user, ...args);
@@ -435,7 +462,7 @@ async function copyUserProfile(userId: string) {
         }
 
         const bannerId = profile.banner ?? user.banner ?? null;
-        if (bannerId) newData.banner = `https://cdn.discordapp.com/banners/${userId}/${bannerId}.${bannerId.startsWith("a_") ? "gif" : "png"}?size=512`;
+        if (bannerId) newData.banner = IconUtils.getUserBannerURL({ id: userId, banner: bannerId, size: 512 }) ?? "";
 
         if (profile.accentColor !== undefined) newData.accentColor = profile.accentColor;
         else if (user.accentColor !== undefined) newData.accentColor = user.accentColor;
@@ -456,6 +483,14 @@ async function copyUserProfile(userId: string) {
         newData.copiedUserId = userId;
         storedData = newData;
         isEnabled = true;
+        cachedFakeUser = null;
+        cachedOriginalUser = null;
+        _trueOriginalUser = null;
+        leCacheU = null;
+        leCacheI = null;
+        cacheDatesR = [];
+        cacheDatesF = [];
+        _dataVersion++;
         saveDataSync(newData, true);
         DataStore.set(DS_ALL_DATA, allAccountsData).catch(() => { });
         DataStore.set(DS_ALL_ENABLED, allAccountsEnabled).catch(() => { });
@@ -493,6 +528,10 @@ const userContextMenuPatch: NavContextMenuPatchCallback = (children, { user }: a
                                 cachedFakeUser = null;
                                 cachedOriginalUser = null;
                                 _trueOriginalUser = null;
+                                leCacheU = null;
+                                leCacheI = null;
+                                cacheDatesR = [];
+                                cacheDatesF = [];
                                 _dataVersion++;
                                 saveAllDataSync();
                                 DataStore.set(DS_ALL_DATA, allAccountsData).catch(() => { });
@@ -517,12 +556,6 @@ const userContextMenuPatch: NavContextMenuPatchCallback = (children, { user }: a
     }
 };
 
-function getRealNames(): { username: string | null; globalName: string | null; } {
-    try {
-        const u = UserStore.getCurrentUser();
-        return { username: u?.username ?? null, globalName: u?.globalName ?? null };
-    } catch { return { username: null, globalName: null }; }
-}
 
 function getRealDateVariants(): string[] {
     try {
@@ -589,7 +622,7 @@ function scanTextNode(node: Text) {
     try { if (_trueOriginalUser) { _realUsername = _trueOriginalUser.username || _realUsername; _realGlobalName = _trueOriginalUser.globalName || _realGlobalName; } } catch { }
     let replaced = false;
     if (storedData.createdAt) {
-        const realDates = getRealDateVariants(); const fakeDates = getFakeDateVariants(storedData.createdAt);
+        const realDates = choppeDatesReelles(); const fakeDates = choppeDatesBidons(storedData.createdAt);
         if (realDates.length > 0 && fakeDates.length > 0) {
             for (let i = 0; i < realDates.length; i++) {
                 const realDate = realDates[i];
@@ -606,25 +639,60 @@ function scanTextNode(node: Text) {
 
 function scanNode(node: Node) {
     if (node.nodeType === Node.TEXT_NODE) { scanTextNode(node as Text); return; }
+    if (node instanceof Element) {
+        const tag = node.tagName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "SVG" || tag === "CANVAS" || tag === "VIDEO" || tag === "IFRAME") return;
+    }
     const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
     let n: Node | null;
-    while ((n = walker.nextNode())) scanTextNode(n as Text);
+    while ((n = walker.nextNode())) {
+        const parent = n.parentElement;
+        if (parent) {
+            const tag = parent.tagName;
+            if (tag === "SCRIPT" || tag === "STYLE" || tag === "SVG" || tag === "CANVAS" || tag === "VIDEO" || tag === "IFRAME") continue;
+        }
+        scanTextNode(n as Text);
+    }
 }
 
 function processDomBatch() {
     _domQueued = false;
     if (!isEnabled) { _domMutations = []; return; }
     const batch = _domMutations; _domMutations = [];
-    for (const m of batch) { if (m.type === "characterData") scanTextNode(m.target as Text); else for (const n of m.addedNodes) scanNode(n); }
+    const obs = domObserver;
+    if (obs) obs.disconnect();
+    try {
+        for (const m of batch) {
+            if (m.type === "characterData") {
+                scanTextNode(m.target as Text);
+            } else {
+                for (const n of m.addedNodes) {
+                    scanNode(n);
+                }
+            }
+        }
+    } finally {
+        if (isEnabled && obs) {
+            obs.observe(document.body, { childList: true, subtree: true, characterData: true });
+        }
+    }
 }
 
 function startDomObserver() {
-    stopDomObserver(); if (!isEnabled) return;
+    stopDomObserver();
+    if (!isEnabled || document.visibilityState === "hidden") return;
     scanNode(document.body);
     domObserver = new MutationObserver(mutations => {
         if (!isEnabled || !mutations.length) return;
+        if (document.visibilityState === "hidden") {
+            _domMutations = [];
+            return;
+        }
         _domMutations.push(...mutations);
-        if (!_domQueued) { _domQueued = true; setTimeout(() => requestAnimationFrame(processDomBatch), 10); }
+        if (!_domQueued) {
+            _domQueued = true;
+            setTimeout(processDomBatch, 20);
+        }
     });
     domObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
 }
@@ -634,6 +702,17 @@ function stopDomObserver() {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     let n: Node | null;
     while ((n = walker.nextNode())) { if ((n as any).__cp_orig !== undefined) { n.nodeValue = (n as any).__cp_orig; delete (n as any).__cp_orig; } }
+}
+
+function handleVisibilityChange() {
+    if (!isEnabled) return;
+    if (document.visibilityState === "visible") {
+        startDomObserver();
+    } else {
+        stopDomObserver();
+        _domMutations = [];
+        _domQueued = false;
+    }
 }
 
 function isMe(userId: string | null | undefined): boolean {
@@ -785,15 +864,13 @@ function BadgePicker({ selected, onChange, nitroType, onNitroType, boostLevel, o
 
 function forceAccountPanelRerender() {
     try {
-        const WP = (Vencord as any).Webpack;
-        const UserStore = WP?.findByStoreName("UserStore");
         if (UserStore && UserStore.emitChange) UserStore.emitChange();
 
         // Force UserProfileStore (side profile panel and popouts)
-        const UPS = WP?.findByStoreName("UserProfileStore");
-        if (UPS && UPS.emitChange) UPS.emitChange();
+        if (UserProfileStore && UserProfileStore.emitChange) UserProfileStore.emitChange();
 
         // Force MultiAccountStore to re-notify the "Switch Account" switcher
+        const WP = (Vencord as any).Webpack;
         const MAS = WP?.findByProps?.("getUsers", "getValidUsers", "getHasLoggedInAccounts");
         if (MAS && MAS.emitChange) MAS.emitChange();
 
@@ -866,6 +943,10 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                 saveDataSync(storedData, true);
                 cachedFakeUser = null;
                 cachedOriginalUser = null;
+                leCacheU = null;
+                leCacheI = null;
+                cacheDatesR = [];
+                cacheDatesF = [];
                 _dataVersion++;
 
                 if (Settings.syncOwnCustomProfile) {
@@ -947,6 +1028,10 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
             cachedFakeUser = null;
             cachedOriginalUser = null;
             _trueOriginalUser = null;
+            leCacheU = null;
+            leCacheI = null;
+            cacheDatesR = [];
+            cacheDatesF = [];
             _dataVersion++;
 
             // Push private:true to server so others immediately stop seeing the profile
@@ -1178,18 +1263,9 @@ function CPDMNotice({ userId }: { userId: string; }) {
     );
 }
 
-function fakeUser(user: any): any {
-    if (!user) return user;
-    try {
-        const uid = user?.id ?? user?.userId;
-        if (!isMe(uid)) return user;
-        return this.fakeCurrentUser(user);
-    } catch { return user; }
-}
-
 export default definePlugin({
     name: "CustomProfile",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: t("Visually customize your Discord profile (username, PFP, banner, badges, bio...) — persistent, only visible to you."),
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI", "ContextMenuAPI"],
@@ -1714,6 +1790,7 @@ export default definePlugin({
     _forceNative: false, // Tool variable for local reset
 
     async start() {
+        document.addEventListener("visibilitychange", handleVisibilityChange);
         applyAvatarPatchEarly();
         addHeaderBarButton("custom-profile-btn", () => <CustomProfileButton />, 10);
         addContextMenuPatch("user-context", userContextMenuPatch);
@@ -1964,7 +2041,7 @@ export default definePlugin({
                 const origDeco = decoMod.getAvatarDecorationURL.bind(decoMod);
                 decoMod.getAvatarDecorationURL = (opts: any) => {
                     try {
-                        const { avatarDecoration, userId, canAnimate } = opts ?? {};
+                        const { avatarDecoration, userId } = opts ?? {};
 
                         // Own user decoration
                         if (isEnabled && storedData.decorationAsset) {
@@ -1996,18 +2073,15 @@ export default definePlugin({
             }
         } catch { }
 
-        // Avatar patch is already applied by applyAvatarPatchEarly() above.
-        // We only apply this fallback if the early patch somehow missed.
-        if (IconUtils?.getUserAvatarURL && !_avatarPatchApplied) {
+        if (!_avatarPatchApplied) {
             applyAvatarPatchEarly();
         }
 
         // Hook GuildMemberStore.getMember — only patches nick for own user
         try {
-            const GMS = (Vencord as any).Webpack?.findByProps?.("getMember", "getMembers", "getMemberIds");
-            if (GMS?.getMember && !GMS._cp_member_hook) {
-                const _origGetMember = GMS.getMember.bind(GMS);
-                GMS.getMember = (guildId: string, userId: string) => {
+            if (GuildMemberStore?.getMember && !(GuildMemberStore as any)._cp_member_hook) {
+                const _origGetMember = GuildMemberStore.getMember.bind(GuildMemberStore);
+                (GuildMemberStore as any).getMember = (guildId: string, userId: string) => {
                     const member = _origGetMember(guildId, userId);
                     try {
                         const myId = UserStore.getCurrentUser()?.id;
@@ -2021,8 +2095,8 @@ export default definePlugin({
                     } catch { }
                     return member;
                 };
-                GMS._cp_member_hook = true;
-                GMS._cp_orig_getMember = _origGetMember;
+                (GuildMemberStore as any)._cp_member_hook = true;
+                (GuildMemberStore as any)._cp_orig_getMember = _origGetMember;
             }
         } catch { }
     },
@@ -2211,6 +2285,7 @@ export default definePlugin({
     ] as ProfileBadge[],
 
     stop() {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
         removeHeaderBarButton("custom-profile-btn");
         removeContextMenuPatch("user-context", userContextMenuPatch);
         FluxDispatcher.unsubscribe("CONNECTION_OPEN", onAccountSwitch);
@@ -2226,11 +2301,10 @@ export default definePlugin({
         }
         // Clean up GuildMemberStore hook
         try {
-            const GMS = (Vencord as any).Webpack?.findByProps?.("getMember", "getMembers", "getMemberIds");
-            if (GMS?._cp_member_hook) {
-                if (GMS._cp_orig_getMember) GMS.getMember = GMS._cp_orig_getMember;
-                delete GMS._cp_member_hook;
-                delete GMS._cp_orig_getMember;
+            if ((GuildMemberStore as any)?._cp_member_hook) {
+                if ((GuildMemberStore as any)._cp_orig_getMember) GuildMemberStore.getMember = (GuildMemberStore as any)._cp_orig_getMember;
+                delete (GuildMemberStore as any)._cp_member_hook;
+                delete (GuildMemberStore as any)._cp_orig_getMember;
             }
         } catch { }
         // Nettoyer le patch avatarDecoration

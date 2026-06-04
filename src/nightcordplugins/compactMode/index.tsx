@@ -17,7 +17,7 @@ export function isCompactEnabled(): boolean {
 
 export default definePlugin({
     name: "CompactMode",
-    enabledByDefault: true,
+    enabledByDefault: false,
     description: "Hides all Nightcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons.",
     authors: [{ name: "Nightcord", id: 0n }],
     required: true,
