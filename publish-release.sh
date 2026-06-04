@@ -197,10 +197,7 @@ RELEASE_RESPONSE=$(curl -s -X POST "$GITEA_API/repos/$GITEA_REPO/releases" \
 }")
 
 # 8b. Extraire l'ID de la release
-RELEASE_ID=$(echo "$RELEASE_RESPONSE" | node -e "
-let d=''; process.stdin.on('data',c=>d+=c).on('end',()=>{
-  try { console.log(JSON.parse(d).id); } catch(e) { process.exit(1); }
-}")
+RELEASE_ID=$(printf '%s' "$RELEASE_RESPONSE" | node -e "let d=''; process.stdin.on('data', c => d += c); process.stdin.on('end', () => { try { const parsed = JSON.parse(d); if (parsed && parsed.id != null) console.log(parsed.id); } catch (e) { process.exit(1); } });")
 
 if [[ -z "$RELEASE_ID" ]]; then
     echo " [ERREUR] Impossible de recuperer l'ID de la release Gitea."
