@@ -1,7 +1,7 @@
 {
     "name": "nightcord",
     "private": "true",
-    "version": "1.19.3",
+    "version": "1.19.4",
     "description": "Everything Discord doesn't build, we create",
     "main": "dist/js/main.js",
     "homepage": "https://git.nightcord.ru/nightcord/nightcord",
