@@ -236,12 +236,26 @@ upload_asset() {
     local FILE="$1"
     local NAME="$2"
     local MIME="$3"
+    local ASSET_CHECK_RESPONSE
+    local ASSET_EXISTS
+
+    ASSET_CHECK_RESPONSE=$(curl -s "$GITEA_API/repos/$GITEA_REPO/releases/$RELEASE_ID/assets" \
+        -H "Authorization: token $GITEA_TOKEN")
+    ASSET_EXISTS=$(printf '%s' "$ASSET_CHECK_RESPONSE" | node -e "let d=''; process.stdin.on('data', c => d += c); process.stdin.on('end', () => { try { const parsed = JSON.parse(d); const exists = Array.isArray(parsed) && parsed.some(asset => asset && asset.name === process.argv[1]); if (exists) console.log('yes'); } catch (e) { process.exit(1); } });" "$NAME")
+
+    if [[ "$ASSET_EXISTS" == "yes" ]]; then
+        echo " Asset $NAME deja present, upload ignore."
+        return 0
+    fi
+
     echo " Upload de $NAME..."
-    curl -s -X POST "$GITEA_API/repos/$GITEA_REPO/releases/$RELEASE_ID/assets?name=$NAME" \
+    if ! curl -s -X POST "$GITEA_API/repos/$GITEA_REPO/releases/$RELEASE_ID/assets?name=$NAME" \
         -H "Authorization: token $GITEA_TOKEN" \
         -H "Content-Type: $MIME" \
-        --data-binary "@$FILE" > /dev/null \
-    || { echo " [ERREUR] Upload $NAME echoue."; exit 1; }
+        --data-binary "@$FILE" > /dev/null; then
+        echo " [ERREUR] Upload $NAME echoue."
+        exit 1
+    fi
 }
 
 # 8c. Upload des assets
