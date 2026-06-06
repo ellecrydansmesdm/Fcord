@@ -6,8 +6,8 @@
   "version": "1.3.0",
   "license": "MIT",
   "scripts": {
-    "dev": "node --openssl-legacy-provider ./node_modules/.bin/electron-webpack dev",
-    "compile": "node --openssl-legacy-provider ./node_modules/.bin/electron-webpack",
+    "dev": "electron-webpack dev",
+    "compile": "electron-webpack",
     "lint": "eslint --ext .svelte,.js src/",
     "dist": "npm run compile && electron-builder --win -p never",
     "dist:dir": "npm run compile && electron-builder --win --dir -c.compression=store"

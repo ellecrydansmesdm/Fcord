@@ -42,8 +42,16 @@ if (-not (Test-Path $nodeModules)) {
 # ── Compilation webpack ──────────────────────────────────────────────────────
 Write-Host "  [2/3] electron-webpack (compilation)..." -ForegroundColor DarkGray
 Push-Location $SrcDir
+$previousNodeOptions = $env:NODE_OPTIONS
+if ([string]::IsNullOrWhiteSpace($previousNodeOptions)) {
+    $env:NODE_OPTIONS = "--openssl-legacy-provider"
+} else {
+    $env:NODE_OPTIONS = "--openssl-legacy-provider $previousNodeOptions"
+}
 & npm run compile
-if ($LASTEXITCODE -ne 0) {
+$compileExitCode = $LASTEXITCODE
+$env:NODE_OPTIONS = $previousNodeOptions
+if ($compileExitCode -ne 0) {
     Write-Host "  [ERREUR] Compilation webpack echouee." -ForegroundColor Red
     Pop-Location
     exit 1

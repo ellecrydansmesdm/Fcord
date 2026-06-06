@@ -41,7 +41,7 @@ fi
 echo ""
 echo " [2/3] Compilation webpack (electron-webpack)..."
 
-if ! npm run compile; then
+if ! NODE_OPTIONS="--openssl-legacy-provider ${NODE_OPTIONS:-}" npm run compile; then
     echo " [ERREUR] Compilation webpack echouee."
     cd ..
     exit 1
