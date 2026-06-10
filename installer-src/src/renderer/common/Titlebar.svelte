@@ -1,4 +1,4 @@
-<script>
+﻿<script>
     import {remote} from "electron";
     import quit from "../actions/quit";
     import {onMount} from "svelte";
@@ -20,17 +20,12 @@
     const prefsPath = path.join(process.env.APPDATA, "Nightcord", "settings", "installer-prefs.json");
 
     async function loadPrefs() {
-        try {
-            const raw = await fs.readFile(prefsPath, "utf-8");
-            const obj = JSON.parse(raw);
-            prefDefaultPlugins = obj.defaultPlugins !== false;
-            prefAutoUpdate = obj.autoUpdate !== false;
-            prefAutoRestart = obj.autoRestart !== false;
-        } catch {
-            prefDefaultPlugins = true;
-            prefAutoUpdate = true;
-            prefAutoRestart = true;
-        }
+        // Toujours forcer les 3 options à true à l'ouverture des settings.
+        // L'utilisateur peut les changer dans la session, mais au prochain démarrage
+        // de l'installeur elles reviennent à ON.
+        prefDefaultPlugins = true;
+        prefAutoUpdate = true;
+        prefAutoRestart = true;
     }
 
     async function savePrefs() {
@@ -47,7 +42,16 @@
         showSettings = true;
     }
 
-    onMount(() => {
+    onMount(async () => {
+        // Forcer les 3 options à true sur disque au démarrage de l'installeur,
+        // pour que le main process (readInstallerPrefs) lise bien true même sans
+        // que l'utilisateur ouvre la modal settings.
+        try {
+            await fs.mkdir(path.dirname(prefsPath), { recursive: true });
+            await fs.writeFile(prefsPath, JSON.stringify({ defaultPlugins: true, autoUpdate: true, autoRestart: true }, null, 2), "utf-8");
+        } catch {}
+
+        // Récupérer la dernière version depuis Gitea pour l'afficher dans la titlebar
         const https = require("https");
         const options = {
             hostname: "git.nightcord.online",

@@ -1,4 +1,4 @@
-import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
+﻿import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { definePluginSettings } from "@api/Settings";
 import { showApiKeyWarning } from "@utils/apiKeyWarning";
 import definePlugin, { OptionType } from "@utils/types"; // Import conservé mais syntaxe d'export en bas sécurisée
@@ -112,7 +112,7 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
     useEffect(() => () => { stopDictation(); }, []);
 
     async function processBlob(blob: Blob) {
-        if (blob.size < 500) return;
+        if (blob.size < 100) return;
         setProcessing(true);
         try {
             const text = await transcribe(blob);
@@ -260,7 +260,16 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
     }
 
     async function startFallback() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error("getUserMedia not available in this context");
+        }
+        console.log("[VoiceDictation] Requesting microphone via getUserMedia...");
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            sampleRate: 16000,
+        }});
+        console.log("[VoiceDictation] Got mic stream, tracks:", stream.getAudioTracks().map(t => t.label));
         streamRef.current = stream;
         startRecorder(stream);
         setRecording(true);
@@ -278,26 +287,31 @@ const VoiceDictationButton: ChatBarButtonFactory = ({ isMainChat }) => {
         }
 
         activeRef.current = true;
-        const discordVoice = getDiscordVoice();
 
+        // Sur Discord Desktop, getUserMedia fonctionne mieux que startLocalAudioRecording
+        // car le module discord_voice peut refuser si Discord utilise déjà le micro.
+        // On tente getUserMedia en premier et on fall back sur native si ça échoue.
+        console.log("[VoiceDictation] Using getUserMedia");
+        try {
+            await startFallback();
+            return;
+        } catch (e: any) {
+            console.warn("[VoiceDictation] getUserMedia failed, trying native:", e.message);
+        }
+
+        const discordVoice = getDiscordVoice();
         if (discordVoice?.startLocalAudioRecording) {
-            console.log("[VoiceDictation] Using DiscordNative discord_voice");
+            console.log("[VoiceDictation] Using DiscordNative discord_voice fallback");
             try {
                 await startNative(discordVoice);
                 return;
             } catch (e: any) {
-                console.warn("[VoiceDictation] Native mode failed, falling back:", e.message);
+                console.warn("[VoiceDictation] Native mode also failed:", e.message);
             }
         }
 
-        console.log("[VoiceDictation] Using getUserMedia fallback");
-        try {
-            await startFallback();
-        } catch (e: any) {
-            console.error("[VoiceDictation] startFallback failed:", e);
-            setErrorMsg("Mic error: " + (e.message?.slice(0, 80) ?? e.name));
-            activeRef.current = false;
-        }
+        setErrorMsg("Could not access microphone");
+        activeRef.current = false;
     }
 
     function stopDictation() {
