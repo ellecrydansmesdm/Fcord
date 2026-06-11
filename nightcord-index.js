@@ -1,38 +1,23 @@
 // Nightcord entry point
 "use strict";
-process.env.ELECTRON_JS_FLAGS = "--expose-gc --optimize_for_size --max-old-space-size=512";
 const path = require("path");
 const Module = require("module");
 const fs = require("fs");
 const { app } = require("electron");
 
-
-
 // ── CRITIQUE : userData = dossier Nightcord pour les settings/plugins
-// Mais on garde le cache Discord (images, données serveurs) du vrai Discord
-// pour éviter de devoir tout retélécharger à chaque installation.
 const nightcordData = path.join(app.getPath("appData"), "Nightcord");
 app.setPath("userData", nightcordData);
-
-// FIX BUG SALONS INVISIBLES : NE PAS partager le cache HTTP de Discord stable.
-// Le cache de Discord stable contient des données de session/permissions calculées
-// pour le token Discord stable. Quand Nightcord charge ce cache, il lit des permissions
-// appartenant à la session stable — résultat : seuls les salons publics (@everyone) sont
-// visibles, les salons privés/restreints disparaissent même pour l'owner.
-// Chaque client doit avoir son propre cache isolé (dans userData = Equicord).
-// Le léger délai au premier chargement est acceptable vs le bug de permissions.
 
 // AppUserModelId unique — Windows reconnaît Nightcord comme app séparée de Discord
 app.setAppUserModelId("com.squirrel.Discord.Discord");
 
-app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
-app.commandLine.appendSwitch("js-flags", "--expose-gc --optimize_for_size --max-old-space-size=512");
+// Flags Chromium utiles uniquement (suppression des flags qui nuisent au démarrage :
+// process-per-site, renderer-process-limit, enable-low-end-device-mode forçaient
+// des sous-processus et désactivaient l'accélération GPU → freeze sur splash screen)
 app.commandLine.appendSwitch("enable-gpu-rasterization");
 app.commandLine.appendSwitch("enable-zero-copy");
 app.commandLine.appendSwitch("disk-cache-size", "104857600");
-app.commandLine.appendSwitch("enable-low-end-device-mode");
-app.commandLine.appendSwitch("process-per-site");
-app.commandLine.appendSwitch("renderer-process-limit", "2");
 
 app.once("ready", () => {
     try {
@@ -141,8 +126,16 @@ try {
     console.warn("[Nightcord] Impossible de détecter les modules natifs Discord:", e.message);
 }
 
+// Utilise un Set pour les ajouts O(1) (au lieu de .includes() O(n) en boucle)
+const _globalPathsSet = new Set(Module.globalPaths);
+
 function addGlobalPath(p) {
-    try { if (fs.existsSync(p) && !Module.globalPaths.includes(p)) Module.globalPaths.push(p); } catch (_) { }
+    try {
+        if (!_globalPathsSet.has(p) && fs.existsSync(p)) {
+            _globalPathsSet.add(p);
+            Module.globalPaths.push(p);
+        }
+    } catch (_) { }
 }
 
 // Priorité aux modules bundlés (portables, dans nightcord-dist/modules/)
@@ -154,25 +147,29 @@ if (discordNativeModulesPath) {
     try {
         for (const mod of fs.readdirSync(discordNativeModulesPath)) {
             const modDir = path.join(discordNativeModulesPath, mod);
-            if (!fs.existsSync(modDir) || !fs.statSync(modDir).isDirectory()) continue;
+            try { if (!fs.statSync(modDir).isDirectory()) continue; } catch { continue; }
             addGlobalPath(modDir);
             // Entrer dans le sous-dossier du module (ex: discord_voice-1/discord_voice/)
-            for (const sub of fs.readdirSync(modDir)) {
-                const subDir = path.join(modDir, sub);
-                if (fs.existsSync(subDir) && fs.statSync(subDir).isDirectory()) addGlobalPath(subDir);
-            }
+            try {
+                for (const sub of fs.readdirSync(modDir)) {
+                    const subDir = path.join(modDir, sub);
+                    try { if (fs.statSync(subDir).isDirectory()) addGlobalPath(subDir); } catch { }
+                }
+            } catch { }
         }
     } catch (e) { console.warn("[Nightcord] Erreur lors du scan des modules natifs:", e.message); }
 }
 try {
     for (const mod of fs.readdirSync(bundledModulesPath)) {
         const modDir = path.join(bundledModulesPath, mod);
-        if (!fs.existsSync(modDir) || !fs.statSync(modDir).isDirectory()) continue;
+        try { if (!fs.statSync(modDir).isDirectory()) continue; } catch { continue; }
         addGlobalPath(modDir);
-        for (const ver of fs.readdirSync(modDir)) {
-            const verDir = path.join(modDir, ver);
-            if (fs.existsSync(verDir) && fs.statSync(verDir).isDirectory()) addGlobalPath(verDir);
-        }
+        try {
+            for (const ver of fs.readdirSync(modDir)) {
+                const verDir = path.join(modDir, ver);
+                try { if (fs.statSync(verDir).isDirectory()) addGlobalPath(verDir); } catch { }
+            }
+        } catch { }
     }
 } catch (e) { }
 
@@ -181,26 +178,40 @@ addGlobalPath(moduleDataPath);
 try {
     for (const mod of fs.readdirSync(moduleDataPath)) {
         const modDir = path.join(moduleDataPath, mod);
-        if (!fs.statSync(modDir).isDirectory()) continue;
+        try { if (!fs.statSync(modDir).isDirectory()) continue; } catch { continue; }
         addGlobalPath(modDir);
-        for (const ver of fs.readdirSync(modDir)) {
-            const verDir = path.join(modDir, ver);
-            if (fs.existsSync(verDir) && fs.statSync(verDir).isDirectory()) addGlobalPath(verDir);
-        }
+        try {
+            for (const ver of fs.readdirSync(modDir)) {
+                const verDir = path.join(modDir, ver);
+                try { if (fs.statSync(verDir).isDirectory()) addGlobalPath(verDir); } catch { }
+            }
+        } catch { }
     }
 } catch (e) { }
 
-const _globalPathsArr = [...new Set(Module.globalPaths)];
-const _globalPathsSet = new Set(_globalPathsArr);
+// FIX PERF CRITIQUE : le patch de Module._resolveLookupPaths créait un
+// `new Set(parent.paths)` à chaque appel require() de Discord (des milliers
+// lors du boot) ce qui gelait le processus sur le splash screen.
+// Node.js consulte déjà Module.globalPaths nativement — le patch était redondant.
+// On marque uniquement les modules sans paths pour compatibilité asar.
+const _globalPathsArr = Module.globalPaths.slice();
 const _origResolve = Module._resolveLookupPaths;
 Module._resolveLookupPaths = function (request, parent) {
-    if (parent) {
-        if (!parent.paths) {
+    // Uniquement compléter si le module n'a aucun paths (ex: contexte asar isolé)
+    // et qu'on ne l'a pas déjà patché (évite le travail répété sur le même module)
+    if (parent && !parent.__ncPatched) {
+        parent.__ncPatched = true;
+        if (!parent.paths || parent.paths.length === 0) {
             parent.paths = _globalPathsArr.slice();
         } else {
-            const existing = new Set(parent.paths);
-            for (const p of _globalPathsSet) {
-                if (!existing.has(p)) parent.paths.push(p);
+            // Ajouter seulement les paths manquants, sans recréer un Set
+            const len = parent.paths.length;
+            for (const p of _globalPathsArr) {
+                let found = false;
+                for (let i = 0; i < len; i++) {
+                    if (parent.paths[i] === p) { found = true; break; }
+                }
+                if (!found) parent.paths.push(p);
             }
         }
     }
@@ -223,20 +234,21 @@ global.mainAppDirname = fs.existsSync(coreModuleDir)
 console.log("[Nightcord] mainAppDirname:", global.mainAppDirname);
 
 // ── FIX AUDIO NATIF : patch build_info.json pour que Discord trouve les modules ──
-// paths.js (dans _app.asar) utilise buildInfo.localModulesRoot comme chemin prioritaire
-// pour tous les modules natifs (discord_voice, discord_krisp, gain micro, Krisp...).
-// Sans ça, il cherche dans AppData\Roaming\discord\module_data\ qui est VIDE.
+// On ne patche qu'une fois (vérification rapide avant toute lecture disque)
 try {
     const buildInfoPath = path.join(
         path.dirname(process.execPath), "resources", "build_info.json"
     );
-    const buildInfoRaw = fs.readFileSync(buildInfoPath, "utf-8");
-    const buildInfo = JSON.parse(buildInfoRaw);
     const nativeModulesDir = path.join(path.dirname(process.execPath), "modules");
-    if (fs.existsSync(nativeModulesDir) && !buildInfo.localModulesRoot) {
-        buildInfo.localModulesRoot = nativeModulesDir;
-        fs.writeFileSync(buildInfoPath, JSON.stringify(buildInfo, null, 2));
-        console.log("[Nightcord] build_info.json patché → localModulesRoot:", nativeModulesDir);
+    // Lire le fichier seulement si le dossier modules existe
+    if (fs.existsSync(nativeModulesDir)) {
+        const buildInfoRaw = fs.readFileSync(buildInfoPath, "utf-8");
+        const buildInfo = JSON.parse(buildInfoRaw);
+        if (!buildInfo.localModulesRoot) {
+            buildInfo.localModulesRoot = nativeModulesDir;
+            fs.writeFileSync(buildInfoPath, JSON.stringify(buildInfo, null, 2));
+            console.log("[Nightcord] build_info.json patché → localModulesRoot:", nativeModulesDir);
+        }
     }
 } catch (e) {
     console.warn("[Nightcord] Impossible de patcher build_info.json:", e.message);
