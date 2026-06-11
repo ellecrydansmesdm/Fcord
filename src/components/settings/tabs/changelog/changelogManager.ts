@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -272,7 +272,7 @@ export async function saveUpdateSession(
     }
 
     const session: UpdateSession = {
-        id: crypto.randomUUID(),
+        id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Math.random().toString(36).slice(2),
         timestamp: Date.now(),
         fromHash: fromHash,
         toHash: toHash,

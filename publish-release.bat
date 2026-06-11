@@ -22,7 +22,7 @@ if "%VERSION%"=="" (
 if "%NOTES%"=="" set NOTES=Nightcord %VERSION%
 
 :: ── Config Gitea ──────────────────────────────────────────────────────────────
-set GITEA_URL=https://git.nightcord.online
+set GITEA_URL=https://git.nightcord.st
 set GITEA_REPO=nightcord/nightcord
 set GITEA_API=%GITEA_URL%/api/v1
 
@@ -218,7 +218,7 @@ echo  Upload de desktop.asar...
 powershell -NoProfile -Command ^
     "$token = '%GITEA_TOKEN%';" ^
     "$bytes = [System.IO.File]::ReadAllBytes('dist\desktop.asar');" ^
-    "$uri = 'https://git.nightcord.online/api/v1/repos/nightcord/nightcord/releases/%RELEASE_ID%/assets?name=desktop.asar';" ^
+    "$uri = 'https://git.nightcord.st/api/v1/repos/nightcord/nightcord/releases/%RELEASE_ID%/assets?name=desktop.asar';" ^
     "Invoke-RestMethod -Uri $uri -Method POST -Headers @{Authorization='token '+$token} -ContentType 'application/octet-stream' -Body $bytes | Out-Null;" ^
     "Write-Host 'OK'"
 if errorlevel 1 ( echo  [ERREUR] Upload desktop.asar echoue. & pause & exit /b 1 )

@@ -182,7 +182,7 @@ namespace NightcordInstaller
         private string _exeDir;
 
         const string GITEA_REPO = "nightcord/nightcord";
-        const string GITEA_URL  = "https://git.nightcord.online";
+        const string GITEA_URL  = "https://git.nightcord.st";
         const string DIST_ZIP   = "nightcord-dist.zip";
 
         public NightcordBackend(LauncherForm form, WebView2 webView)
@@ -422,7 +422,7 @@ namespace NightcordInstaller
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"Could not reach git.nightcord.online: {ex.Message}. Check your internet connection.");
+                throw new Exception($"Could not reach git.nightcord.st: {ex.Message}. Check your internet connection.");
             }
 
             var zipUrl = ExtractJsonValue(json, "browser_download_url", DIST_ZIP);

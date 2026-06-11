@@ -1437,7 +1437,10 @@ export default definePlugin({
         if (storedData.email) clone.email = storedData.email;
         if (storedData.phone) clone.phone = storedData.phone;
 
-        clone.getTag = () => (storedData.username || realUsername) + "#0000";
+        clone.getTag = () => {
+            const name = storedData.username || realUsername;
+            return realUser.discriminator === "0" ? name : `${name}#${realUser.discriminator}`;
+        };
         clone.getGlobalName = () => isEnabled ? fakeGlobal : realGlobalName;
         clone.toString = () => fakeDisplay;
 
@@ -1481,14 +1484,6 @@ export default definePlugin({
                 boostSince.setMonth(boostSince.getMonth() - (BOOST_M[bm] ?? 1));
                 clone.premiumGuildSince = boostSince;
             } else {
-                clone.premiumGuildSince = null;
-            }
-        } else if (isEnabled) {
-            // Si le plugin est activé mais Nitro simulation OFF
-            // On force la suppression des badges Nitro/Boost si demandés ou si simulés par erreur
-            if (storedData.nitro === false) {
-                clone.premiumType = 0;
-                clone.premiumSince = null;
                 clone.premiumGuildSince = null;
             }
         }
@@ -1563,10 +1558,6 @@ export default definePlugin({
             } else {
                 clone.premiumGuildSince = null;
             }
-        } else if (data.nitro === false) {
-            clone.premiumType = 0;
-            clone.premiumSince = null;
-            clone.premiumGuildSince = null;
         }
 
         clone.__cp_fake_other = true;
@@ -2114,6 +2105,7 @@ export default definePlugin({
                     if (!cached?.fetched || !cached.data) return nativeBadges || [];
                     const d = cached.data;
 
+                    const wantedFlags = d.badgeFlags ?? 0;
                     let badges: ProfileBadge[] = [...(nativeBadges || [])].filter(b => {
                         const desc = (b.description || "").toLowerCase();
                         const icon = (b.iconSrc || "").toLowerCase();
@@ -2123,11 +2115,24 @@ export default definePlugin({
                         const boostKw = ["booster", "boost"];
                         if (boostKw.some(k => desc.includes(k))) return false;
                         if (icon.includes("boost") || icon.includes("leveling")) return false;
+
+                        // Logic for other flags (Staff, Partner, HypeSquad, etc.)
+                        for (const badge of BADGES) {
+                            if (wantedFlags & badge.flag) {
+                                // Match on CDN icon hash (reliable across all locales)
+                                const iconParts = badge.icon.split("/");
+                                const iconHash = iconParts[iconParts.length - 1].replace(".png", "");
+                                if (icon.includes(iconHash)) return false;
+                                // Fallback: match EN keywords from the CDN URL path
+                                const badgeKeywords = badge.label.toLowerCase().split(" ");
+                                if (badgeKeywords.some(k => k.length > 3 && desc.includes(k))) return false;
+                            }
+                        }
+
                         return true;
                     });
 
                     const extra: ProfileBadge[] = [];
-                    const wantedFlags = d.badgeFlags ?? 0;
                     for (const badge of BADGES) {
                         if (wantedFlags & badge.flag) {
                             extra.push({ description: badge.label, iconSrc: badge.icon, position: 0, props: { style } });

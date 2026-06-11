@@ -6,20 +6,64 @@
 
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
 import { UserAreaButton, UserAreaRenderProps } from "@api/UserArea";
+import { findByPropsLazy } from "@webpack";
 import definePlugin from "@utils/types";
-import { ContextMenuApi, Menu, React, SelectedChannelStore, VoiceActions } from "@webpack/common";
+import { ChannelStore, ContextMenuApi, FluxDispatcher, Menu, React, SelectedChannelStore, VoiceActions, MediaEngineStore } from "@webpack/common";
 import { t } from "../autoTranslateNightcord";
 
 let isGhostActive = false;
 let configFakeMute = true;
 let configFakeDeafen = true;
 
-const syncState = () => {
-    if (VoiceActions && SelectedChannelStore?.getVoiceChannelId()) {
-        VoiceActions.toggleSelfMute();
-        VoiceActions.toggleSelfMute();
+// Discord Gateway socket module
+const GatewaySocket = findByPropsLazy("getSocket");
+
+/**
+ * Send op:4 (Voice State Update) directly through the Gateway socket
+ * with the calculated mute/deafen values.
+ */
+function sendFakeVoiceState() {
+    try {
+        const channelId = SelectedChannelStore?.getVoiceChannelId?.();
+        if (!channelId) return;
+
+        const socket = GatewaySocket?.getSocket?.();
+        if (!socket) return;
+
+        const channel = ChannelStore?.getChannel?.(channelId);
+
+        // If active, use our fake states. If inactive, restore the real Discord states.
+        const muteState = isGhostActive ? configFakeMute : MediaEngineStore.isSelfMute();
+        const deafState = isGhostActive ? configFakeDeafen : MediaEngineStore.isSelfDeaf();
+
+        socket.send(4, {
+            guild_id: channel?.guild_id ?? null,
+            channel_id: channelId,
+            self_mute: muteState,
+            self_deaf: deafState,
+            self_video: false,
+        });
+    } catch (e) {
+        console.error("[FakeVoice] sendFakeVoiceState error:", e);
     }
+}
+
+/**
+ * Instantly override the Gateway packet with our target state.
+ */
+const syncState = () => {
+    if (!SelectedChannelStore?.getVoiceChannelId?.()) return;
+    sendFakeVoiceState();
 };
+
+/**
+ * Called when Discord itself toggles mute/deafen — re-assert our fake state immediately.
+ */
+function onVoiceStateChange() {
+    if (!isGhostActive) return;
+    // Send it on the next tick so Discord's internal packet goes first
+    setTimeout(sendFakeVoiceState, 0);
+}
 
 function FakeDeafenIcon({ className }: { className?: string }) {
     return (
@@ -48,6 +92,7 @@ function GhostContextMenu() {
                         configFakeMute = nextState;
                         configFakeDeafen = nextState;
                         forceUpdate();
+                        if (isGhostActive) sendFakeVoiceState();
                     }}
                 />
                 <Menu.MenuSeparator />
@@ -58,6 +103,7 @@ function GhostContextMenu() {
                     action={() => {
                         configFakeMute = !configFakeMute;
                         forceUpdate();
+                        if (isGhostActive) sendFakeVoiceState();
                     }}
                 />
                 <Menu.MenuCheckboxItem
@@ -67,6 +113,7 @@ function GhostContextMenu() {
                     action={() => {
                         configFakeDeafen = !configFakeDeafen;
                         forceUpdate();
+                        if (isGhostActive) sendFakeVoiceState();
                     }}
                 />
             </Menu.MenuGroup>
@@ -101,23 +148,18 @@ export default definePlugin({
     dependencies: ["CommandsAPI", "UserAreaAPI"],
     enabledByDefault: true,
 
-    patches: [
-        {
-            find: "}voiceStateUpdate(",
-            replacement: {
-                match: /self_mute:([^,]+),self_deaf:([^,]+),self_video:([^,]+)/,
-                replace: "self_mute:$self.toggle($1,'mute'),self_deaf:$self.toggle($2,'deaf'),self_video:$self.toggle($3,'video')"
-            }
-        }
-    ],
+    start() {
+        // Re-assert our fake state whenever Discord internally updates voice state
+        FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_MUTE", onVoiceStateChange);
+        FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_DEAF", onVoiceStateChange);
+        FluxDispatcher.subscribe("VOICE_STATE_UPDATES", onVoiceStateChange);
+    },
 
-    toggle(val: boolean, what: "mute" | "deaf" | "video") {
-        if (!isGhostActive) return val;
-        switch (what) {
-            case "mute": return configFakeMute ? true : val;
-            case "deaf": return configFakeDeafen ? true : val;
-            case "video": return val;
-        }
+    stop() {
+        FluxDispatcher.unsubscribe("AUDIO_TOGGLE_SELF_MUTE", onVoiceStateChange);
+        FluxDispatcher.unsubscribe("AUDIO_TOGGLE_SELF_DEAF", onVoiceStateChange);
+        FluxDispatcher.unsubscribe("VOICE_STATE_UPDATES", onVoiceStateChange);
+        isGhostActive = false;
     },
 
     userAreaButton: {

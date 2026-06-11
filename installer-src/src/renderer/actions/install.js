@@ -1,4 +1,4 @@
-import {progress, status} from "../stores/installation";
+﻿import {progress, status} from "../stores/installation";
 import {remote} from "electron";
 import {promises as fs} from "fs";
 import {createWriteStream} from "fs";
@@ -251,10 +251,24 @@ async function applyDefaultPluginsSetting() {
             defaultPlugins = raw.defaultPlugins !== false;
         } catch { }
 
-        if (!defaultPlugins) {
-            const settingsDir = path.join(process.env.APPDATA, "Nightcord", "settings");
-            const settingsPath = path.join(settingsDir, "settings.json");
-            await fs.mkdir(settingsDir, { recursive: true });
+        const settingsDir = path.join(process.env.APPDATA, "Nightcord", "settings");
+        const settingsPath = path.join(settingsDir, "settings.json");
+        await fs.mkdir(settingsDir, { recursive: true });
+
+        if (defaultPlugins) {
+            // Supprimer la cle "plugins" du settings.json existant pour que
+            // Nightcord charge ses valeurs enabledByDefault nativement.
+            let existing = null;
+            try { existing = JSON.parse(await fs.readFile(settingsPath, "utf-8")); } catch { }
+            if (existing && typeof existing === "object" && "plugins" in existing) {
+                delete existing.plugins;
+                await fs.writeFile(settingsPath, JSON.stringify(existing, null, 2), "utf-8");
+                log("✅ Default plugins enabled (reset to built-in defaults)");
+            } else {
+                log("✅ Default plugins enabled (no override needed)");
+            }
+        } else {
+            // defaultPlugins = false : ecraser plugins avec objet vide pour tout desactiver
             let existing = {};
             try { existing = JSON.parse(await fs.readFile(settingsPath, "utf-8")); } catch {}
             existing.plugins = {};

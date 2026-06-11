@@ -54,7 +54,7 @@
         // Récupérer la dernière version depuis Gitea pour l'afficher dans la titlebar
         const https = require("https");
         const options = {
-            hostname: "git.nightcord.online",
+            hostname: "git.nightcord.st",
             path: "/api/v1/repos/nightcord/nightcord/releases/latest",
             method: "GET",
             rejectUnauthorized: false,

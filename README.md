@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://nightcord.online/image.png" width="96" height="96" alt="Nightcord Logo">
+  <img src="https://nightcord.st/image.png" width="96" height="96" alt="Nightcord Logo">
 
 # Nightcord
 
@@ -7,8 +7,8 @@
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?logo=discord\&logoColor=white)](https://discord.gg/nightcord)
 [![License](https://img.shields.io/badge/license-GPL%20v3-a855f7)](./LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows-3b82f6.svg?logo=windows\&logoColor=white)](https://git.nightcord.online/nightcord/nightcord)
-[![Website](https://img.shields.io/badge/website-nightcord.online-5865F2?logo=googlechrome\&logoColor=white)](https://nightcord.online)
+[![Platform](https://img.shields.io/badge/platform-Windows-3b82f6.svg?logo=windows\&logoColor=white)](https://git.nightcord.st/nightcord/nightcord)
+[![Website](https://img.shields.io/badge/website-nightcord.st-5865F2?logo=googlechrome\&logoColor=white)](https://nightcord.st)
 
 ---
 
@@ -51,7 +51,7 @@ npm install -g pnpm
 ### Clone & Build
 
 ```bash
-git clone https://git.nightcord.online/nightcord/nightcord.git
+git clone https://git.nightcord.st/nightcord/nightcord.git
 cd nightcord
 pnpm install
 pnpm build
@@ -75,7 +75,7 @@ pnpm uninject
 
 Source code:
 
-https://git.nightcord.online/nightcord/nightcord
+https://git.nightcord.st/nightcord/nightcord
 
 ---
 

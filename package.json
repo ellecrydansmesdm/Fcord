@@ -4,18 +4,18 @@
     "version": "1.19.6",
     "description": "Everything Discord doesn't build, we create",
     "main": "dist/js/main.js",
-    "homepage": "https://git.nightcord.online/nightcord/nightcord",
+    "homepage": "https://git.nightcord.st/nightcord/nightcord",
     "bugs": {
-        "url": "https://git.nightcord.online/nightcord/nightcord/issues"
+        "url": "https://git.nightcord.st/nightcord/nightcord/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://git.nightcord.online/nightcord/nightcord.git"
+        "url": "https://git.nightcord.st/nightcord/nightcord.git"
     },
     "license": "GPL-3.0-or-later",
     "author": "Equicord",
     "scripts": {
-        "build": "pnpm depCheck && node --require=./scripts/suppressExperimentalWarnings.js scripts/build/build.mjs",
+        "build": "pnpm depCheck && pnpm generatePluginJson && node --require=./scripts/suppressExperimentalWarnings.js scripts/build/build.mjs",
         "buildStandalone": "pnpm build --standalone",
         "buildDesktop": "tsx scripts/build/buildDesktop.mts",
         "package": "pnpm run buildDesktop && pnpm run buildStandalone && electron-builder --config electron-builder.config.cjs",

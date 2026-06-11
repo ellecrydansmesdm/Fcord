@@ -79,7 +79,7 @@ function loadPersistLogs() {
             const parsed = JSON.parse(s);
             if (Array.isArray(parsed)) {
                 logs = parsed.concat(logs).sort((a, b) => b.timestamp - a.timestamp);
-                logCount = logs.length;
+                logCount = Math.max(logCount, logs.length);
             }
         }
     } catch { }
@@ -803,11 +803,16 @@ export default definePlugin({
         loadPersistLogs();
         addHeaderBarButton("nightcord-event-logs", () => <LogsButton />, 7);
         subscribeToEvents();
+        // Also save on page unload (Discord force-close / crash)
+        window.addEventListener("beforeunload", savePersistLogs);
     },
     stop() {
+        window.removeEventListener("beforeunload", savePersistLogs);
         removeHeaderBarButton("nightcord-event-logs");
         unsubs.forEach(fn => fn()); unsubs = [];
+        // Save before clearing — cancel the debounce timer then immediately persist
         if (flushTimer !== null) { clearTimeout(flushTimer); flushTimer = null; }
+        savePersistLogs();
         logs = []; msgCache.clear(); prevVS.clear(); updateListeners.clear();
         isLoadingMessages = false;
         myVoiceChannelId = null;

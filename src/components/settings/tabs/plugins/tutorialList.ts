@@ -9,7 +9,7 @@
 
 /**
  * Set of plugin names that have a tutorial video available in nightcord-tutorials.
- * Using a static list avoids CORS issues when fetching from git.nightcord.online at runtime.
+ * Using a static list avoids CORS issues when fetching from git.nightcord.st at runtime.
  */
 export const TUTORIAL_PLUGIN_NAMES: ReadonlySet<string> = new Set([
     "Abbreviation",

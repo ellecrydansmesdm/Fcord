@@ -322,6 +322,18 @@ async function init() {
     syncSettings();
     initTrayIpc();
 
+    const hasOpened = localStorage.getItem("nightcord_telegram_opened");
+    if (!hasOpened) {
+        localStorage.setItem("nightcord_telegram_opened", "true");
+        setTimeout(() => {
+            if (window.nightcord && typeof window.nightcord.openUrl === "function") {
+                window.nightcord.openUrl("https://t.me/nightcordoff");
+            } else {
+                window.open("https://t.me/nightcordoff", "_blank");
+            }
+        }, 3000);
+    }
+
     if (!IS_WEB && !IS_UPDATER_DISABLED) {
         runUpdateCheck();
         setInterval(runUpdateCheck, 1000 * 60 * 30); // 30 minutes
