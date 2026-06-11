@@ -28,32 +28,30 @@ import { IS_VANILLA } from "./utils/constants";
 
 console.log("[Nightcord] Starting up...");
 
-// Caching for _resolveLookupPaths to avoid extreme slowdowns during Discord's heavy module loading
+// FIX PERF CRITIQUE : le patch de Module._resolveLookupPaths par défaut 
+// crée un `new Set(parent.paths)` à chaque appel require() (des milliers 
+// lors du boot) ce qui gèle le processus sur le splash screen ("Starting...").
 const Module = require("module");
 if (Module._resolveLookupPaths) {
-    const originalResolveLookupPaths = Module._resolveLookupPaths;
-    const lookupCache = new Map();
-    // Cache for 10 seconds to avoid extreme lag when many modules load at startup
-    const CACHE_TTL = 10000;
-
-    Module._resolveLookupPaths = function(request: string, parent: any, newReturn: boolean) {
-        const cacheKey = request + (parent ? '|' + parent.id : '');
-        const cached = lookupCache.get(cacheKey);
-        
-        if (cached && Date.now() - cached.time < CACHE_TTL) {
-            return cached.paths;
+    const fastResolve = function (request: string, parent: any) {
+        if (!parent || !parent.paths) return Module.globalPaths;
+        for (let i = 0; i < Module.globalPaths.length; i++) {
+            if (!parent.paths.includes(Module.globalPaths[i])) {
+                parent.paths.push(Module.globalPaths[i]);
+            }
         }
-
-        const result = originalResolveLookupPaths.call(this, request, parent, newReturn);
-        
-        lookupCache.set(cacheKey, {
-            time: Date.now(),
-            paths: result
-        });
-        
-        return result;
+        return parent.paths;
     };
+
+    // Protéger notre patch ultra-rapide pour éviter que Discord ne l'écrase
+    // avec sa version lente plus tard dans le chargement
+    Object.defineProperty(Module, "_resolveLookupPaths", {
+        get: () => fastResolve,
+        set: () => { /* Silencieusement ignorer les tentatives d'écrasement */ },
+        configurable: true
+    });
 }
+
 
 // Our injector file at app/index.js
 const injectorPath = require.main!.filename;
