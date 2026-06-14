@@ -43,8 +43,6 @@ function avatarUrl(userId: string, hash: string | null): string {
 
 // ── Tooltip Component ──────────────────────────────────────────────────────
 
-const MAX_DISPLAY = 4;
-
 function Tooltip({ channelId, rect }: { channelId: string; rect: DOMRect; }) {
     const [messages, setMessages] = React.useState<any[]>([]);
     
@@ -107,7 +105,7 @@ function Tooltip({ channelId, rect }: { channelId: string; rect: DOMRect; }) {
                     </div>
                 ) : (
                     <div className="pm-messages">
-                        {messages.slice(0, MAX_DISPLAY).map((m: any, i: number) => {
+                        {messages.slice(0, unread > 0 ? unread : 1).reverse().map((m: any, i: number) => {
                             const { text, attach } = getPreview(m);
                             return (
                                 <div className="pm-message" key={m.id ?? i}>
@@ -116,9 +114,6 @@ function Tooltip({ channelId, rect }: { channelId: string; rect: DOMRect; }) {
                                 </div>
                             );
                         })}
-                        {unread > MAX_DISPLAY && (
-                            <div className="pm-more">+{unread - MAX_DISPLAY} autres non lus</div>
-                        )}
                     </div>
                 )}
             </div>

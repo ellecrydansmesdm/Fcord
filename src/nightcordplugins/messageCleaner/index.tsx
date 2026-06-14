@@ -217,6 +217,124 @@ async function cleanChannel(channelId: string) {
     }
 }
 
+async function cleanGuild(guildId: string) {
+    if (!settings.store.enabled || isCleaningInProgress) return;
+
+    try {
+        const currentUserId = UserStore.getCurrentUser()?.id;
+        if (!currentUserId) return;
+
+        log(`🧹 Starting cleanup of guild ${guildId}`);
+
+        isCleaningInProgress = true;
+        shouldStopCleaning = false;
+        cleaningStats = { total: 0, deleted: 0, failed: 0, skipped: 0, startTime: Date.now() };
+
+        let maxId: string | undefined;
+        let totalProcessed = 0;
+
+        while (!shouldStopCleaning) {
+            try {
+                let url = `/guilds/${guildId}/messages/search?author_id=${currentUserId}`;
+                if (maxId) url += `&max_id=${maxId}`;
+
+                const response = await RestAPI.get({ url });
+                if (!response || !response.body || !response.body.messages || response.body.messages.length === 0) {
+                    log("Plus de messages à traiter dans le serveur");
+                    break;
+                }
+
+                let messages: any[] = [];
+                for (const group of response.body.messages) {
+                    for (const msg of group) {
+                        if (msg.author && msg.author.id === currentUserId) {
+                            messages.push(msg);
+                        }
+                    }
+                }
+
+                // Unique messages
+                const uniqueMsgs = [];
+                const seen = new Set();
+                for (const m of messages) {
+                    if (!seen.has(m.id)) {
+                        seen.add(m.id);
+                        uniqueMsgs.push(m);
+                    }
+                }
+                messages = uniqueMsgs;
+
+                if (messages.length === 0) {
+                    log("Aucun message trouvé dans ce lot.");
+                    break; // or continue with offset? max_id should guarantee progress if we set it properly
+                }
+
+                // Find oldest ID for next pagination
+                let oldestId = messages[0].id;
+                for (const m of messages) {
+                    if (BigInt(m.id) < BigInt(oldestId)) {
+                        oldestId = m.id;
+                    }
+                }
+                maxId = (BigInt(oldestId) - 1n).toString();
+
+                const validMessages = messages.filter(msg => canDeleteMessage(msg, currentUserId));
+                cleaningStats.total += validMessages.length;
+
+                if (validMessages.length === 0) {
+                    cleaningStats.skipped += messages.length;
+                    continue;
+                }
+
+                for (const message of validMessages) {
+                    if (shouldStopCleaning) { log("Arrêt demandé par l'utilisateur"); break; }
+
+                    const channelId = message.channel_id;
+                    if (!channelId) continue;
+
+                    const success = await deleteMessage(channelId, message.id);
+                    if (success) cleaningStats.deleted++;
+                    else cleaningStats.failed++;
+
+                    totalProcessed++;
+                    if (settings.store.delayBetweenDeletes > 0) {
+                        await new Promise(resolve => setTimeout(resolve, settings.store.delayBetweenDeletes));
+                    }
+                }
+
+                cleaningStats.skipped += messages.filter(msg => !canDeleteMessage(msg, currentUserId)).length;
+
+            } catch (error: any) {
+                const statusCode = error?.status || error?.statusCode || "N/A";
+                log(`❌ Error dans la boucle serveur: status ${statusCode}`, "error");
+                cleaningStats.failed++;
+
+                if (statusCode === 429) {
+                    log("Rate limit atteint, pause 30s...", "warn");
+                    await new Promise(resolve => setTimeout(resolve, 30000));
+                } else if (statusCode === 403 || statusCode === 400) {
+                    log("Impossible de chercher dans ce serveur (permissions ?)", "error");
+                    break;
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                }
+
+                if (cleaningStats.failed > 15) { log("Trop d'erreurs, arrêt", "error"); break; }
+            }
+        }
+
+        isCleaningInProgress = false;
+        const { deleted, failed, skipped } = cleaningStats;
+        const totalTime = Date.now() - cleaningStats.startTime;
+        const timeStr = totalTime < 60000 ? `${Math.round(totalTime / 1000)}s` : `${Math.round(totalTime / 60000)}min`;
+        log(`✅ Nettoyage du serveur terminé: ${deleted} supprimés, ${failed} échecs, ${skipped} ignorés — ${timeStr}`);
+
+    } catch (error) {
+        isCleaningInProgress = false;
+        log(`❌ Error globale serveur: ${error}`, "error");
+    }
+}
+
 function stopCleaning() {
     if (isCleaningInProgress) {
         shouldStopCleaning = true;
@@ -256,6 +374,39 @@ const ChannelContextMenuPatch: NavContextMenuPatchCallback = (children, ctx: { c
     group.push(...menuItems);
 };
 
+const GuildContextMenuPatch: NavContextMenuPatchCallback = (children, ctx: { guild?: any; } = {}) => {
+    const { guild } = ctx;
+    if (!guild) return;
+
+    // Discord uses various IDs for guild context menus. We look for a common group like "mark-guild-read" or just append to children.
+    const group = findGroupChildrenByChildId("mark-guild-read", children) ?? findGroupChildrenByChildId("hide-muted-channels", children) ?? children;
+    if (!group) return;
+
+    const menuItems: any[] = [<Menu.MenuSeparator key="separator-guild" />];
+
+    if (isCleaningInProgress) {
+        const { total, deleted, failed, skipped } = cleaningStats;
+        const processed = deleted + failed + skipped;
+        const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
+
+        menuItems.push(
+            <Menu.MenuItem key="cleaning-status-guild" id="vc-cleaning-status-guild"
+                label={`Nettoyage en cours: ${percentage}% (${processed}/${total})`}
+                color="brand" disabled={true} />,
+            <Menu.MenuItem key="stop-cleaning-guild" id="vc-stop-cleaning-guild"
+                label="Stop le nettoyage" color="danger" action={stopCleaning} />
+        );
+    } else {
+        menuItems.push(
+            <Menu.MenuItem key="clean-guild-messages" id="vc-clean-guild-messages"
+                label="Nettoyer tous mes messages" color="danger"
+                action={() => cleanGuild(guild.id)} />
+        );
+    }
+
+    group.push(...menuItems);
+};
+
 export default definePlugin({
     name: "MessageCleaner",
     enabledByDefault: true,
@@ -267,7 +418,8 @@ export default definePlugin({
     contextMenus: {
         "channel-context": ChannelContextMenuPatch,
         "gdm-context": ChannelContextMenuPatch,
-        "user-context": ChannelContextMenuPatch
+        "user-context": ChannelContextMenuPatch,
+        "guild-context": GuildContextMenuPatch
     },
 
     start() {
