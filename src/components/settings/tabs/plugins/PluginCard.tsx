@@ -240,7 +240,7 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
 
     return (
         <AddonCard
-            name={tPlugin(plugin.name)}
+            name={plugin.name}
             iconType={iconType}
             sourceBadge={hasTutorial ? sourceBadge : undefined}
             tooltip={tooltip}

@@ -108,11 +108,71 @@ const AVATAR_DECORATIONS = [
     { id: "1220514048068812901", label: "Summer" },
     { id: "1427463138634109026", label: "Autumn" },
     { id: "1341506443865489408", label: "Darkness" },
+    { id: "1144003752978829455", label: "Flaming Sword" },
+    { id: "1144006094134456352", label: "Magical Potion" },
+    { id: "1144046002110738634", label: "Fairy Sprites" },
+    { id: "1144048390594908212", label: "Wizard's Staff" },
+    { id: "1144048977138946230", label: "Glowing Runes" },
+    { id: "1144049316009353338", label: "Defensive Shield" },
+    { id: "1144049603109470370", label: "Skull Medallion" },
+    { id: "1144049924397334651", label: "Treasure and Key" },
+    { id: "1207047014769234001", label: "Fire Element" },
+    { id: "1207047597294886923", label: "Water" },
+    { id: "1207047808838799410", label: "Air" },
+    { id: "1207048049571139584", label: "Earth" },
+    { id: "1207048289610899526", label: "Lightning" },
+    { id: "1207048656289534022", label: "Balance" },
+    { id: "1232070870093008937", label: "Stardust" },
+    { id: "1232071157746765906", label: "Black Hole" },
+    { id: "1232072121950146560", label: "Solar Orbit" },
+    { id: "1232072520249643028", label: "UFO" },
+    { id: "1232072859485208687", label: "Astronaut Helmet" },
+    { id: "1197344326133502032", label: "Glitch" },
+    { id: "1197344396983664670", label: "Cybernetic" },
+    { id: "1197344575832981605", label: "Digital Sunrise" },
+    { id: "1197344636558114986", label: "Implant" },
 ];
 
 function getDecorationUrl(assetId: string, animated = false): string {
     return `https://cdn.discordapp.com/media/v1/collectibles-shop/${assetId}/${animated ? "animated" : "static"}`;
 }
+
+function getProfileEffectUrl(assetId: string, animated = false): string {
+    return `https://cdn.discordapp.com/media/v1/collectibles-shop/${assetId}/${animated ? "animated" : "static"}`;
+}
+
+const PROFILE_EFFECTS = [
+    { id: "1139323092645183591", label: "Hydro Blast" },
+    { id: "1139323093991575696", label: "Sakura Dreams" },
+    { id: "1139323099251232828", label: "Mystic Vines" },
+    { id: "1139323099687436419", label: "Pixie Dust" },
+    { id: "1212582298893946880", label: "Dreamy" },
+    { id: "1212582372877541427", label: "Ki Detonate" },
+    { id: "1212582452640350238", label: "Sushi Mania" },
+    { id: "1139323100568244355", label: "Magic Hearts" },
+    { id: "1139323093551165533", label: "Shatter" },
+    { id: "1139323101008642101", label: "Shuriken Strike" },
+    { id: "1139323101881061466", label: "Power Surge" },
+    { id: "1158572178179108968", label: "Ghoulish Graffiti" },
+    { id: "1158572275507937342", label: "Dark Omens" },
+    { id: "1197344693630009424", label: "Nightrunner" },
+    { id: "1197344764174008452", label: "Uplink Error" },
+    { id: "1217626509737459852", label: "Petal Serenade" },
+    { id: "1217627051217911848", label: "Fellowship of the Spring" },
+    { id: "1217627230818009171", label: "Spring Bloom" },
+    { id: "1228233390260486164", label: "Study Spot" },
+    { id: "1228234634379132958", label: "All Nighter" },
+    { id: "1237654783209508904", label: "Jolly Roger" },
+    { id: "1237654867330469949", label: "Forgotten Treasure" },
+    { id: "1237654942202990602", label: "Haunted Man O' War" },
+    { id: "1232073286582538261", label: "Shooting Stars" },
+    { id: "1232073608168472638", label: "Twilight" },
+    { id: "1207049115339591681", label: "Rock Slide" },
+    { id: "1207049364464345158", label: "Vortex" },
+    { id: "1207049498065375343", label: "Mastery" },
+    { id: "1245088205330710539", label: "Turbo Drive" },
+    { id: "1245088254647205991", label: "Twinkle Trails" },
+];
 
 interface CustomProfileData {
     username?: string;
@@ -133,6 +193,7 @@ interface CustomProfileData {
     customBadgeIds?: string[];
     oldName?: string;
     decorationAsset?: string;
+    profileEffectId?: string;
     copiedUserId?: string;
 }
 
@@ -893,6 +954,52 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
     const boostLevel = data.boostMonths ?? -1;
     const customIds = data.customBadgeIds ?? [];
     const oldName = data.oldName ?? "";
+    const [shareEnabled, setShareEnabled] = React.useState(!!Settings.syncOwnCustomProfile);
+
+    async function toggleShareProfile(v: boolean) {
+        if (v) {
+            try {
+                const oauthData = await beginDiscordOAuth();
+                const clientId = new URL(oauthData.url).searchParams.get("client_id") ?? "";
+                openModal((p: any) => <OAuth2AuthorizeModal
+                    {...p}
+                    scopes={oauthData.scopes}
+                    responseType="code"
+                    redirectUri={oauthData.redirectUri}
+                    permissions={0n}
+                    clientId={clientId}
+                    cancelCompletesFlow={false}
+                    callback={async ({ location }: { location: string; }) => {
+                        if (!location) return;
+                        try {
+                            const res = await fetch(location, { headers: { Accept: "application/json" } });
+                            const json = await res.json();
+                            if (json?.token) {
+                                await storeToken(json.token);
+                                Settings.syncOwnCustomProfile = true;
+                                Settings.seeAllCustomProfile = true;
+                                setShareEnabled(true);
+                            }
+                        } catch (e) {
+                            console.error("[CustomProfile] OAuth callback error:", e);
+                        }
+                    }}
+                />);
+            } catch (e) {
+                console.error("[CustomProfile] OAuth initiation failed:", e);
+            }
+        } else {
+            Settings.syncOwnCustomProfile = false;
+            Settings.seeAllCustomProfile = false;
+            setShareEnabled(false);
+            getStoredToken().then(token => {
+                if (token) {
+                    saveOwnPluginConfig("customProfile", token, { private: true }).catch(() => { });
+                    publicProfilesCache.delete(myId);
+                }
+            });
+        }
+    }
 
     // Retrieve all connected accounts
     const accounts = React.useMemo(() => {
@@ -1101,6 +1208,28 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                 <ModalCloseButton onClick={rootProps.onClose} />
             </ModalHeader>
             <ModalContent className="cp-content">
+                <Toggle
+                    label={t("Share my Custom Profile")}
+                    sublabel={t("Lets other Nightcord users see your Custom Profile, and lets you see theirs")}
+                    checked={shareEnabled}
+                    onChange={toggleShareProfile}
+                />
+                <div style={{
+                    margin: "0 0 14px 0",
+                    padding: "10px 14px",
+                    background: "rgba(250, 166, 26, 0.1)",
+                    border: "1px solid rgba(250, 166, 26, 0.4)",
+                    borderRadius: 6,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 10,
+                }}>
+                    <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+                    <span style={{ color: "var(--text-warning, #faa61a)", fontSize: 13, lineHeight: 1.4 }}>
+                        {t("This requires Discord authorization. Once enabled, everyone using Nightcord will be able to see your Custom Profile, and you will be able to see theirs.")}
+                    </span>
+                </div>
+                <div className="cp-divider" />
                 {/* Account selector bar removed since it's now a Select in the header */}
                 <Field label={t("Username")} value={data.username ?? ""} placeholder="my_username_00" onChange={v => set("username", v)} />
                 <Field label={t("Display name")} value={data.globalName ?? ""} placeholder="My Name" onChange={v => set("globalName", v)} />
@@ -1164,44 +1293,26 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                         </button>
                     ))}
                 </div>
-                <div className="cp-hint">
-                    <a
-                        role="button"
-                        style={{ color: "var(--text-link)", cursor: "pointer", fontWeight: 500 }}
-                        onClick={async () => {
-                            try {
-                                const oauthData = await beginDiscordOAuth();
-                                const clientId = new URL(oauthData.url).searchParams.get("client_id") ?? "";
-                                openModal((p: any) => <OAuth2AuthorizeModal
-                                    {...p}
-                                    scopes={oauthData.scopes}
-                                    responseType="code"
-                                    redirectUri={oauthData.redirectUri}
-                                    permissions={0n}
-                                    clientId={clientId}
-                                    cancelCompletesFlow={false}
-                                    callback={async ({ location }: { location: string; }) => {
-                                        if (!location) return;
-                                        try {
-                                            const res = await fetch(location, { headers: { Accept: "application/json" } });
-                                            const json = await res.json();
-                                            if (json?.token) {
-                                                await storeToken(json.token);
-                                                Settings.syncOwnCustomProfile = true;
-                                                Settings.seeAllCustomProfile = true;
-                                            }
-                                        } catch (e) {
-                                            console.error("[CustomProfile] OAuth callback error:", e);
-                                        }
-                                    }}
-                                />);
-                            } catch (e) {
-                                console.error("[CustomProfile] OAuth initiation failed:", e);
-                            }
-                        }}
-                    >
-                        {t("Share your Custom Profile with everyone " + String.fromCharCode(8212) + " click to manage in Nightcord Settings")}
-                    </a>
+                <div className="cp-divider" />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <SectionLabel>{t("Profile Effect")}</SectionLabel>
+                </div>
+                <div className="cp-badges" style={{ flexWrap: "wrap", gap: 6 }}>
+                    <button onClick={() => set("profileEffectId", undefined)}
+                        className={`cp-badge ${!data.profileEffectId ? "cp-badge--on" : ""}`} style={{ minWidth: 60 }}>
+                        {t("None")}
+                    </button>
+                    {PROFILE_EFFECTS.map(eff => (
+                        <button key={eff.id}
+                            onClick={() => set("profileEffectId", data.profileEffectId === eff.id ? undefined : eff.id)}
+                            className={`cp-badge ${data.profileEffectId === eff.id ? "cp-badge--on" : ""}`}
+                            title={eff.label} style={{ padding: 3, lineHeight: 0, width: 52, height: 52, borderRadius: 6 }}>
+                            <img src={getProfileEffectUrl(eff.id)} alt={eff.label}
+                                style={{ width: 46, height: 46, objectFit: "contain", display: "block" }}
+                                onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; const sib = (e.currentTarget as HTMLImageElement).nextElementSibling as HTMLElement; if (sib) sib.style.display = "block"; }} />
+                            <span style={{ display: "none", fontSize: 9, lineHeight: 1.1, textAlign: "center", color: "var(--text-muted)" }}>{eff.label}</span>
+                        </button>
+                    ))}
                 </div>
             </ModalContent>
             <ModalFooter className="cp-footer">
@@ -1225,7 +1336,7 @@ function CPDMNotice({ userId }: { userId: string; }) {
     const hasRealModifications = data && (
         data.username || data.globalName || data.avatar || data.banner ||
         data.bio || data.pronouns || data.accentColor != null ||
-        data.badgeFlags || data.nitro || data.decorationAsset ||
+        data.badgeFlags || data.nitro || data.decorationAsset || data.profileEffectId ||
         (data.customBadgeIds && data.customBadgeIds.length > 0) ||
         data.createdAt
     );
@@ -1650,6 +1761,12 @@ export default definePlugin({
             }
             if (badgesArr.length > 0) merged.badges = badgesArr;
 
+            if (data.profileEffectId) {
+                merged.profileEffectId = data.profileEffectId;
+                merged.profileEffect = { expireAt: null, skuId: data.profileEffectId };
+                if (!merged.premiumType) merged.premiumType = profile.premiumType || 2;
+            }
+
             return virtualMerge(profile, merged);
         } catch (e) {
             return profile;
@@ -1726,6 +1843,12 @@ export default definePlugin({
                 if (profile.premiumGuildSince) merged.premiumGuildSince = profile.premiumGuildSince;
             }
 
+            if (storedData.profileEffectId) {
+                merged.profileEffectId = storedData.profileEffectId;
+                merged.profileEffect = { expireAt: null, skuId: storedData.profileEffectId };
+                if (!merged.premiumType) merged.premiumType = profile.premiumType || 2;
+            }
+
             const result = virtualMerge(profile, merged);
             this._cachedProfileInput = profile;
             this._cachedProfile = result;
@@ -1765,7 +1888,7 @@ export default definePlugin({
             const d = cached.data;
             const hasRealModifications = d.username || d.globalName || d.avatar || d.banner ||
                 d.bio || d.pronouns || d.accentColor != null || d.badgeFlags ||
-                d.nitro || d.decorationAsset || (d.customBadgeIds && d.customBadgeIds.length > 0) || d.createdAt;
+                d.nitro || d.decorationAsset || d.profileEffectId || (d.customBadgeIds && d.customBadgeIds.length > 0) || d.createdAt;
             if (!hasRealModifications) return null;
             return <CPDMNotice userId={recipientId} />;
         } catch { return null; }
