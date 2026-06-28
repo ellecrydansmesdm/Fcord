@@ -204,6 +204,20 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
 
             const key = stablePopoutKey(frameName);
             setupPopout(childWin, key);
+        } else {
+            // If it's not a popout or a captcha (e.g. opened via about:blank for external redirect),
+            // intercept the navigation to open in the external browser and close the ghost window.
+            childWin.webContents.on("will-navigate", (e, navUrl) => {
+                const { action } = handleExternalUrl(navUrl);
+                if (action === "deny") {
+                    e.preventDefault();
+                    setImmediate(() => {
+                        if (!childWin.isDestroyed()) {
+                            childWin.close();
+                        }
+                    });
+                }
+            });
         }
     });
 }
