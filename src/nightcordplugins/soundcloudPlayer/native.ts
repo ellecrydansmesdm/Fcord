@@ -4,19 +4,41 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow, IpcMainInvokeEvent, ipcMain, net } from "electron";
+// ─── Environment detection ────────────────────────────────────────────────────
+// Works in Electron (Discord desktop) AND browser extensions (Chrome/Firefox)
 
-// ─── Fetch via net.fetch d'Electron ──────────────────────────────────────────
+const IS_ELECTRON = typeof process !== "undefined" && process.versions?.electron;
+
+let _electronNet: typeof import("electron")["net"] | null = null;
+let _BrowserWindow: typeof import("electron")["BrowserWindow"] | null = null;
+
+if (IS_ELECTRON) {
+    try {
+        const electron = require("electron");
+        _electronNet = electron.net;
+        _BrowserWindow = electron.BrowserWindow;
+    } catch { }
+}
+
+// ─── Unified fetch (Electron net OR browser fetch) ────────────────────────────
 
 async function netGet(url: string, headers?: Record<string, string>): Promise<string> {
-    const resp = await net.fetch(url, {
-        headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Referer": "https://soundcloud.com/",
-            ...(headers ?? {}),
-        }
-    });
+    const defaultHeaders: Record<string, string> = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Referer": "https://soundcloud.com/",
+        ...(headers ?? {}),
+    };
+
+    if (_electronNet) {
+        const resp = await _electronNet.fetch(url, { headers: defaultHeaders });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        return resp.text();
+    }
+
+    // Browser extension mode: use standard fetch
+    // SoundCloud API supports CORS for api-v2.soundcloud.com endpoints
+    const resp = await fetch(url, { headers: defaultHeaders });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     return resp.text();
 }
@@ -26,7 +48,7 @@ async function netGet(url: string, headers?: Record<string, string>): Promise<st
 //   Étape 1 : GET soundcloud.com → extraire les <script src="...">
 //   Étape 2 : GET le dernier bundle JS → chercher client_id:"XXXXXXXX"
 
-export async function fetchSoundCloudClientId(_: IpcMainInvokeEvent): Promise<string | null> {
+export async function fetchSoundCloudClientId(_?: any): Promise<string | null> {
     try {
         // Étape 1 : charger soundcloud.com
         const html = await netGet("https://soundcloud.com/", {
@@ -76,12 +98,12 @@ export async function fetchSoundCloudClientId(_: IpcMainInvokeEvent): Promise<st
 // ─── Recherche de pistes ──────────────────────────────────────────────────────
 
 export async function searchSoundCloud(
-    _: IpcMainInvokeEvent,
+    _: any,
     query: string,
     clientId: string
 ): Promise<string | null> {
     try {
-        const url = `https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(query)}&client_id=${clientId}&limit=20`;
+        const url = `https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(query)}&client_id=${clientId}&limit=50`;
         return await netGet(url);
     } catch (e: any) {
         // Retourner le code HTTP pour détecter l'expiration du client_id
@@ -91,34 +113,34 @@ export async function searchSoundCloud(
 
 // ─── Résolution de l'URL de stream ───────────────────────────────────────────
 
-export async function resolveStreamUrl(_: IpcMainInvokeEvent, url: string, clientId: string): Promise<string | null> {
+export async function resolveStreamUrl(_: any, url: string, clientId: string): Promise<string | null> {
     try {
-        // Ajouter le client_id à l'URL de stream si absent
         const streamUrl = new URL(url);
         streamUrl.searchParams.set("client_id", clientId);
 
-        // On fait un fetch manuel en suivant les redirections pour obtenir l'URL finale
-        const resp = await net.fetch(streamUrl.toString(), {
-            redirect: "follow",
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                "Accept": "*/*",
-                "Referer": "https://soundcloud.com/",
-            }
-        });
+        const fetchHeaders = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Referer": "https://soundcloud.com/",
+        };
+
+        let resp: Response;
+        if (_electronNet) {
+            resp = await _electronNet.fetch(streamUrl.toString(), { redirect: "follow", headers: fetchHeaders });
+        } else {
+            resp = await fetch(streamUrl.toString(), { redirect: "follow", headers: fetchHeaders });
+        }
 
         if (!resp.ok) {
             console.error(`[SoundCloudNative] Stream resolution failed: ${resp.status}`);
             return null;
         }
 
-        // Si c'est un flux HLS (m3u8), l'API renvoie un JSON contenant l'URL réelle
         const text = await resp.text();
         try {
             const json = JSON.parse(text);
             return json.url || null;
         } catch {
-            // Si ce n'est pas du JSON, c'est peut-être déjà l'URL directe (cas rare)
             return resp.url;
         }
     } catch (e: any) {
@@ -128,7 +150,7 @@ export async function resolveStreamUrl(_: IpcMainInvokeEvent, url: string, clien
 }
 
 export async function resolveTrack(
-    _: IpcMainInvokeEvent,
+    _: any,
     trackId: string,
     clientId: string
 ): Promise<string | null> {
@@ -141,48 +163,81 @@ export async function resolveTrack(
 }
 
 // ─── Listening Together ─────────────────────────────────────────────────────────────────
-// When someone clicks "Listening Together" button on Discord, it tries to open
-// https://nightcord.st/listen?sc_id=TRACK_ID in the browser.
-// We intercept that before it leaves Discord and emit an IPC event to the renderer.
+// Electron : intercept navigation events on BrowserWindow
+// Browser extension : intercept clicks on <a> tags pointing to nightcord.st/listen
 
 const LISTEN_URL_PREFIX = "https://nightcord.st/listen?";
 
-export function setupListeningTogetherHandler(_: IpcMainInvokeEvent): void {
-    // no-op: real setup happens at plugin start via setupListeningTogther()
+export function setupListeningTogetherHandler(_?: any): void {
+    // no-op
 }
 
 let _listenerInstalled = false;
 
-export function installListeningTogetherIntercept(_: IpcMainInvokeEvent): void {
+function _dispatchListenEvent(url: string) {
+    try {
+        const params = new URL(url).searchParams;
+        const scId = params.get("sc_id") ?? "";
+        window.dispatchEvent(new CustomEvent("soundcord-listen-together", { detail: { scId } }));
+    } catch { }
+}
+
+// Browser extension: intercept anchor clicks
+function _browserClickHandler(e: MouseEvent) {
+    const target = (e.target as HTMLElement)?.closest("a") as HTMLAnchorElement | null;
+    if (!target) return;
+    const href = target.href || "";
+    if (!href.startsWith(LISTEN_URL_PREFIX)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    _dispatchListenEvent(href);
+}
+
+export function installListeningTogetherIntercept(_?: any): void {
     if (_listenerInstalled) return;
     _listenerInstalled = true;
 
-    // Hook all existing and future BrowserWindows
-    const hook = (win: Electron.BrowserWindow) => {
-        const origHandler = win.webContents.getWindowOpenHandler?.();
-        win.webContents.setWindowOpenHandler(details => {
-            if (details.url.startsWith(LISTEN_URL_PREFIX)) {
+    if (IS_ELECTRON && _BrowserWindow) {
+        // Electron mode: hook BrowserWindow navigation events
+        const electron = require("electron") as typeof import("electron");
+        const hook = (win: Electron.BrowserWindow) => {
+            win.webContents.on("will-navigate" as any, (event: any, url: string) => {
+                if (!url.startsWith(LISTEN_URL_PREFIX)) return;
+                event.preventDefault();
                 try {
-                    const params = new URL(details.url).searchParams;
+                    const params = new URL(url).searchParams;
                     const scId = params.get("sc_id") ?? "";
-                    const scUrl = params.get("sc_url") ?? "";
-                    // Send to all renderer windows via CustomEvent
-                    // Security: use JSON.stringify to safely escape scId and prevent XSS injection
-                    BrowserWindow.getAllWindows().forEach(w => {
-                        try { 
+                    _BrowserWindow!.getAllWindows().forEach(w => {
+                        try {
                             const safeId = JSON.stringify(scId);
-                            w.webContents.executeJavaScript(`window.dispatchEvent(new CustomEvent('soundcord-listen-together', { detail: { scId: ${safeId} } }))`).catch(() => {});
+                            w.webContents.executeJavaScript(
+                                `window.dispatchEvent(new CustomEvent('soundcord-listen-together', { detail: { scId: ${safeId} } }))`
+                            ).catch(() => {});
                         } catch { }
                     });
                 } catch { }
-                return { action: "deny" };
-            }
-            // Fall through to original handler
-            if (origHandler) return origHandler(details);
-            return { action: "deny" };
-        });
-    };
-
-    BrowserWindow.getAllWindows().forEach(hook);
-    (require("electron") as typeof import("electron")).app.on("browser-window-created" as any, (_e: any, win: Electron.BrowserWindow) => hook(win));
+            });
+            win.webContents.on("new-window" as any, (event: any, url: string) => {
+                if (!url.startsWith(LISTEN_URL_PREFIX)) return;
+                event.preventDefault();
+                try {
+                    const params = new URL(url).searchParams;
+                    const scId = params.get("sc_id") ?? "";
+                    _BrowserWindow!.getAllWindows().forEach(w => {
+                        try {
+                            const safeId = JSON.stringify(scId);
+                            w.webContents.executeJavaScript(
+                                `window.dispatchEvent(new CustomEvent('soundcord-listen-together', { detail: { scId: ${safeId} } }))`
+                            ).catch(() => {});
+                        } catch { }
+                    });
+                } catch { }
+            });
+        };
+        _BrowserWindow.getAllWindows().forEach(hook);
+        electron.app.on("browser-window-created" as any, (_e: any, win: Electron.BrowserWindow) => hook(win));
+    } else {
+        // Browser extension mode: intercept anchor clicks at document level
+        document.addEventListener("click", _browserClickHandler, true);
+    }
 }

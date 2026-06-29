@@ -22,6 +22,10 @@ export default definePlugin({
     enabledByDefault: true,
     dependencies: ["HeaderBarAPI"],
 
+    headerBarButton: {
+        icon: TrophyIcon,
+    },
+
     start() {
         addHeaderBarButton("wordbomb", () => (
             <HeaderBarButton

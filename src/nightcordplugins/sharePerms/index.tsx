@@ -549,6 +549,10 @@ export default definePlugin({
     authors: [{ name: "Nightcord", id: 0n }],
     settings,
 
+    headerBarButton: {
+        icon: InternalFolderIcon,
+    },
+
     start() {
         FluxDispatcher.subscribe("MESSAGE_CREATE", this.onMessage);
 

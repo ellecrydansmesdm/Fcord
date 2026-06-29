@@ -329,7 +329,7 @@ async function init() {
             if (window.nightcord && typeof window.nightcord.openUrl === "function") {
                 window.nightcord.openUrl("https://t.me/nightcordoff");
             } else {
-                window.open("https://t.me/nightcordoff", "_blank");
+                VencordNative.native.openExternal("https://t.me/nightcordoff");
             }
         }, 3000);
     }

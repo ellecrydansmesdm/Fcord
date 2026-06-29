@@ -805,6 +805,11 @@ export default definePlugin({
     description: "Logs: deleted/edited messages, voice, friends, servers.",
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
+
+    headerBarButton: {
+        icon: LogsIconWithBadge,
+    },
+
     start() {
         // Initialize current voice channel on start
         try {

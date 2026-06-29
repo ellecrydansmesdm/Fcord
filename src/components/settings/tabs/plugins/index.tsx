@@ -61,14 +61,14 @@ function VencordEquicordTabIcon() {
 }
 
 function UserPluginsTabIcon() {
-    return <img src="https://equicord.org/assets/icons/misc/userplugin.png" alt="User Plugins" style={{ width: 18, height: 18, borderRadius: 4 }} />;
+    return <img src="https://equicord.org/assets/icons/misc/userplugin.png" alt={t("User Plugins")} style={{ width: 18, height: 18, borderRadius: 4 }} />;
 }
 
 const categoryOptions = [
     { label: "Vencord & Equicord", value: SearchStatus.OTHERS },
     { label: "Nightcord", value: SearchStatus.NIGHTCORD },
-    { label: "User Plugins", value: SearchStatus.USER_PLUGINS },
-    { label: "Community Plugins", value: "community", disabled: true }
+    { label: t("User Plugins"), value: SearchStatus.USER_PLUGINS },
+    { label: t("Community Plugins"), value: "community", disabled: true }
 ];
 export const cl = classNameFactory("vc-plugins-");
 export const logger = new Logger("PluginSettings", "#a6d189");
@@ -297,12 +297,26 @@ export default function PluginSettings({ premiumOnly = false }: PluginSettingsPr
     const BATCH_SIZE = 40;
     const [visibleCount, setVisibleCount] = React.useState(BATCH_SIZE);
 
-    // isLoadingMore prevents the sentinel from triggering multiple concurrent loads
-    const isLoadingMore = React.useRef(false);
-    const sentinelRef = React.useRef<HTMLDivElement>(null);
+    const observer = React.useRef<IntersectionObserver>();
+    const sentinelRef = React.useCallback((node: HTMLDivElement | null) => {
+        if (observer.current) observer.current.disconnect();
+        if (node) {
+            observer.current = new IntersectionObserver(
+                entries => {
+                    if (entries[0].isIntersecting) {
+                        const total = allDataLengthRef.current;
+                        React.startTransition(() => {
+                            setVisibleCount(v => Math.min(v + BATCH_SIZE, total));
+                        });
+                    }
+                },
+                { rootMargin: "400px" } // trigger loading before it comes into view
+            );
+            observer.current.observe(node);
+        }
+    }, []);
 
     const onStatusChange = useCallback((status: SearchStatus) => {
-        isLoadingMore.current = false;
         setVisibleCount(BATCH_SIZE);
         React.startTransition(() => {
             setSearchValue(prev => ({ ...prev, status }));
@@ -419,32 +433,7 @@ export default function PluginSettings({ premiumOnly = false }: PluginSettingsPr
     const allDataLengthRef = React.useRef(allDataLength);
     allDataLengthRef.current = allDataLength;
 
-    // Mount the IntersectionObserver only once — never reconnect on re-renders.
-    React.useEffect(() => {
-        const el = sentinelRef.current;
-        if (!el) return;
-
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting && !isLoadingMore.current) {
-                    const total = allDataLengthRef.current;
-                    setVisibleCount(v => {
-                        if (v >= total) return v; // nothing left to load
-                        isLoadingMore.current = true;
-                        React.startTransition(() => {
-                            setTimeout(() => { isLoadingMore.current = false; }, 250);
-                        });
-                        return Math.min(v + BATCH_SIZE, total);
-                    });
-                }
-            },
-            { threshold: 0.1 }
-        );
-
-        observer.observe(el);
-        return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // empty deps — observer is mounted once, uses refs for fresh values
+    // Sentinel ref and observer are now defined using a callback ref above.
 
     function resetCheckAndDo() {
         let restartNeeded = false;
@@ -702,8 +691,10 @@ export default function PluginSettings({ premiumOnly = false }: PluginSettingsPr
                                 if (native?.process?.env) {
                                     const home = native.process.env.USERPROFILE || native.process.env.HOME;
                                     if (home) {
+                                        const isWindows = !!native.process.env.USERPROFILE;
+                                        const folderPath = isWindows ? `${home}\\Documents\\Nightcord\\userplugins` : `${home}/Documents/Nightcord/userplugins`;
                                         // Open the directory itself (will open its parent and highlight it)
-                                        showItemInFolder(`${home}/Documents/Nightcord/userplugins`);
+                                        showItemInFolder(folderPath);
                                     }
                                 }
                             }}
@@ -776,7 +767,7 @@ export default function PluginSettings({ premiumOnly = false }: PluginSettingsPr
                             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, padding: "8px 0" }}>
                                 <UserPluginsTabIcon />
                                 <span style={{ color: "var(--header-primary)", fontWeight: 600, fontSize: 14 }}>
-                                    User Plugins — from your local folder
+                                    {t("User Plugins — from your local folder")}
                                 </span>
                             </div>
                             {nightcordPlugins.length > 0 || othersVisible.length > 0 ? (
@@ -786,8 +777,8 @@ export default function PluginSettings({ premiumOnly = false }: PluginSettingsPr
                             ) : (
                                 <div style={{ textAlign: "center", padding: "48px 16px", color: "var(--text-muted)" }}>
                                     <div style={{ fontSize: 32, marginBottom: 12 }}>📁</div>
-                                    <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8 }}>No user plugins found</div>
-                                    <div style={{ fontSize: 13 }}>Add .tsx files to your <code>Documents/Nightcord/userplugins/</code> folder and rebuild.</div>
+                                    <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8 }}>{t("No user plugins found")}</div>
+                                    <div style={{ fontSize: 13 }}>{t("Add .tsx files to your")} <code>Documents/Nightcord/userplugins/</code> {t("folder and rebuild.")}</div>
                                 </div>
                             )}
                         </>

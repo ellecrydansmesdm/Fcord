@@ -98,7 +98,7 @@ function DevTeamSection() {
                 <QuickAction
                     Icon={GithubIcon}
                     text="Source Code"
-                    action={() => window.open("https://gitea.nightcord.st/nightcord/nightcord", "_blank")}
+                    action={() => VencordNative.native.openExternal("https://gitea.nightcord.st/nightcord/nightcord")}
                 />
                 <QuickAction
                     Icon={PaintbrushIcon}
@@ -125,7 +125,7 @@ function DevTeamSection() {
                 <QuickAction
                     Icon={PlanetIcon}
                     text="Nightcord Channel"
-                    action={() => window.open("https://t.me/nightcordoff", "_blank")}
+                    action={() => VencordNative.native.openExternal("https://t.me/nightcordoff")}
                 />
             </QuickActionCard>
 

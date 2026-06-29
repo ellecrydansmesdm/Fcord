@@ -19,7 +19,7 @@ import {domain} from "../../DOMAIN.json";
 
 import { registerCspIpcHandlers } from "./csp/manager";
 import { ALLOWED_PROTOCOLS, DATA_DIR, QUICK_CSS_PATH, SETTINGS_DIR, THEMES_DIR } from "./utils/constants";
-import { makeLinksOpenExternally } from "./utils/externalLinks";
+import { makeLinksOpenExternally } from "../nightcord/main/utils/makeLinksOpenExternally";
 
 const RENDERER_CSS_PATH = join(__dirname, "renderer.css");
 const USERPLUGINS_DIR = join(DATA_DIR, "userplugins");

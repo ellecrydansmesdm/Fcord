@@ -529,6 +529,10 @@ export default definePlugin({
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
 
+    headerBarButton: {
+        icon: ExportIcon,
+    },
+
     start() { addHeaderBarButton("nightcord-export-dm", () => <ExportButton />, 4); },
     stop() { removeHeaderBarButton("nightcord-export-dm"); },
 });

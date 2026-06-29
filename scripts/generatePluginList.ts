@@ -16,12 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { readdirSync, writeFileSync } from "fs";
+import { readdirSync, writeFileSync, existsSync, mkdirSync, symlinkSync } from "fs";
+import { join } from "path";
+import { homedir } from "os";
 import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, PluginData } from "./utils";
 
 (async () => {
     parseDevs();
     parseEquicordDevs();
+
+    // Setup userplugins
+    try {
+        const userTarget = join(homedir(), "Documents", "Nightcord", "userplugins");
+        const srcLink = join(process.cwd(), "src", "userplugins");
+        if (!existsSync(userTarget)) mkdirSync(userTarget, { recursive: true });
+        if (!existsSync(srcLink)) {
+            // "junction" works on Windows without admin rights, "dir" is fallback for others
+            symlinkSync(userTarget, srcLink, process.platform === "win32" ? "junction" : "dir");
+        }
+    } catch (e) {
+        console.error("[Nightcord] Failed to setup userplugins link", e);
+    }
 
     const args = process.argv.slice(2);
 
@@ -31,12 +46,13 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
     let dirs: string[];
 
     if (equicordFlag) {
-        dirs = ["src/nightcordplugins"];
+        dirs = ["src/nightcordplugins", "src/userplugins"];
     } else if (vencordFlag) {
         dirs = ["src/plugins", "src/plugins/_core"];
     } else {
-        dirs = ["src/plugins", "src/plugins/_core", "src/nightcordplugins"];
+        dirs = ["src/plugins", "src/plugins/_core", "src/nightcordplugins", "src/userplugins"];
     }
+
 
     const outputPath = args.find(a => !a.startsWith("--")) ?? null;
 

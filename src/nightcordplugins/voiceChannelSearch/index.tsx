@@ -295,6 +295,10 @@ export default definePlugin({
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
 
+    headerBarButton: {
+        icon: SearchIcon,
+    },
+
     start() {
         addHeaderBarButton("nightcord-voice-channel-search", () => <VCSHeaderButton />, 9);
     },

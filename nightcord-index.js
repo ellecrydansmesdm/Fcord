@@ -32,12 +32,117 @@ app.once("ready", () => {
             "discord_erinn",
         ]);
 
-        // Patch du net.request d'Electron pour bloquer silencieusement les 403 prévisibles
-        const originalRequest = app.constructor.prototype.constructor;
-        const { session } = require("electron");
+        const { session, shell } = require("electron");
+        const { webContents: webContentsModule } = require("electron");
 
-        // Intercepter les requêtes vers discord.com/api/modules/* pour les modules bloqués
-        app.once("browser-window-created", () => {
+        // URLs Discord légitimes à ne pas bloquer dans will-navigate
+        function isDiscordUrl(url) {
+            return url.startsWith("https://discord.com") ||
+                url.startsWith("https://canary.discord.com") ||
+                url.startsWith("https://ptb.discord.com") ||
+                url.startsWith("file://") ||
+                url.startsWith("devtools://") ||
+                url.startsWith("about:");
+        }
+
+        function patchWebContents(wc) {
+            // Éviter de patcher deux fois le même webContents
+            if (wc._nightcordPatched) return;
+            wc._nightcordPatched = true;
+
+            // Intercepte les window.open() :
+            // - about:blank est autorisé (Discord en a besoin pour ses popups légitimes)
+            //   MAIS on écoute did-create-window pour patcher immédiatement la fenêtre enfant
+            // - devtools:// est autorisé
+            // - tout le reste → navigateur externe
+            wc.setWindowOpenHandler(({ url }) => {
+                if (!url || url === "about:blank" || url.startsWith("devtools://")) {
+                    return { action: "allow" };
+                }
+                shell.openExternal(url).catch(() => {});
+                console.log("[Nightcord][LINK] Ouverture externe:", url);
+                return { action: "deny" };
+            });
+
+            // FIX CLEF : quand about:blank crée une fenêtre enfant,
+            // Discord navigue ensuite vers une URL externe (TikTok, GitHub, etc.)
+            // dans cette fenêtre enfant. On la patche immédiatement à sa création
+            // pour bloquer cette navigation et l'ouvrir dans le navigateur.
+            wc.on("did-create-window", (childWin) => {
+                const childWc = childWin.webContents;
+                if (childWc._nightcordPatched) return;
+                childWc._nightcordPatched = true;
+
+                // La fenêtre enfant démarre sur about:blank mais va naviguer vers une URL externe
+                // On bloque toute navigation non-Discord dès qu'elle se produit
+                childWc.on("will-navigate", (event, url) => {
+                    if (!isDiscordUrl(url)) {
+                        event.preventDefault();
+                        shell.openExternal(url).catch(() => {});
+                        console.log("[Nightcord][CHILD-NAV] Redirection externe:", url);
+                        // Fermer la fenêtre enfant vide après redirection
+                        try { childWin.close(); } catch (_) {}
+                    }
+                });
+
+                // did-navigate couvre les cas ou la navigation a deja eu lieu (OAuth, TikTok) avant will-navigate
+                childWc.on('did-navigate', function(_event, url) {
+                    if (!isDiscordUrl(url)) {
+                        shell.openExternal(url).catch(function() {});
+                        console.log('[Nightcord][CHILD-DID-NAV] Redirection externe apres navigation:', url);
+                        try { childWin.close(); } catch (_) {}
+                    }
+                });
+
+                // Aussi bloquer les nouvelles navigations via setWindowOpenHandler dans l'enfant
+                childWc.setWindowOpenHandler(({ url }) => {
+                    if (!url || url === "about:blank" || url.startsWith("devtools://")) return { action: "allow" };
+                    shell.openExternal(url).catch(() => {});
+                    console.log("[Nightcord][CHILD-LINK] Ouverture externe:", url);
+                    return { action: "deny" };
+                });
+
+                // Bloquer aussi did-finish-load si la fenêtre a chargé une URL externe
+                childWc.on("did-finish-load", () => {
+                    const url = childWc.getURL();
+                    if (url && url !== "about:blank" && !isDiscordUrl(url)) {
+                        shell.openExternal(url).catch(() => {});
+                        console.log("[Nightcord][CHILD-LOAD] Fermeture et redirection:", url);
+                        try { childWin.close(); } catch (_) {}
+                    }
+                });
+            });
+
+            // Bloquer les navigations de la fenêtre mère vers des URLs externes
+            wc.on("will-navigate", (event, url) => {
+                const currentUrl = wc.getURL();
+                if (url !== currentUrl && !isDiscordUrl(url)) {
+                    event.preventDefault();
+                    shell.openExternal(url).catch(() => {});
+                    console.log("[Nightcord][NAV] Redirection externe:", url);
+                }
+            });
+        }
+
+        // Patcher tous les webContents créés (fenêtres ET popups)
+        app.on("browser-window-created", (_, win) => {
+            patchWebContents(win.webContents);
+        });
+
+        // Patcher aussi les webContents créés sans BrowserWindow (popups détachés, etc.)
+        app.on("web-contents-created", (_, wc) => {
+            patchWebContents(wc);
+        });
+
+        // Patcher les webContents déjà existants au moment du ready
+        for (const wc of webContentsModule.getAllWebContents()) {
+            patchWebContents(wc);
+        }
+
+        console.log("[Nightcord] Patch liens externes activé sur TOUS les webContents (avec did-create-window) ✓");
+
+        app.once("browser-window-created", (_, win) => {
+
             try {
                 const ses = session.defaultSession;
                 ses.webRequest.onBeforeRequest(

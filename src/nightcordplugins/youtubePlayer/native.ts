@@ -1,53 +1,92 @@
-import { BrowserWindow, IpcMainInvokeEvent, net } from "electron";
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2026 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+// ─── Environment detection ────────────────────────────────────────────────────
+
+const IS_ELECTRON = typeof process !== "undefined" && process.versions?.electron;
+
+let _electronNet: typeof import("electron")["net"] | null = null;
+let _BrowserWindow: typeof import("electron")["BrowserWindow"] | null = null;
+let _electronSession: any = null;
+
+if (IS_ELECTRON) {
+    try {
+        const electron = require("electron");
+        _electronNet = electron.net;
+        _BrowserWindow = electron.BrowserWindow;
+        _electronSession = electron.session;
+    } catch { }
+}
+
+// ─── Unified fetch ────────────────────────────────────────────────────────
 
 async function netGet(url: string): Promise<string> {
-    const resp = await net.fetch(url, {
-        headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-        }
-    });
+    const headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    };
+    if (_electronNet) {
+        const resp = await _electronNet.fetch(url, { headers });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        return resp.text();
+    }
+    const resp = await fetch(url, { headers });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     return resp.text();
 }
 
-export async function installWatchingTogetherIntercept(_: IpcMainInvokeEvent) {
-    const { session } = require("electron");
-    try {
-        const adPatterns = [
-            "*://*.doubleclick.net/*",
-            "*://*.googlevideo.com/*oad=*",
-            "*://*.googlevideo.com/*adformat=*",
-            "*://*.youtube.com/pagead/*",
-            "*://*.youtube.com/api/stats/ads*",
-            "*://*.youtube.com/ptracking*",
-            "*://*.youtube-nocookie.com/pagead/*",
-            "*://*.youtube-nocookie.com/api/stats/ads*",
-        ];
-        session.defaultSession.webRequest.onBeforeRequest({ urls: adPatterns }, (_d: any, cb: any) => cb({ cancel: true }));
-        
-        session.defaultSession.webRequest.onBeforeSendHeaders({
-            urls: [
-                "*://*.youtube.com/youtubei/v1/player*",
-                "*://*.youtube-nocookie.com/youtubei/v1/player*"
-            ]
-        }, (details: any, cb: any) => {
-            const headers = { ...details.requestHeaders };
-            headers["Referer"] = "https://www.youtube.com/";
-            headers["Origin"] = "https://www.youtube.com";
-            cb({ requestHeaders: headers });
-        });
-    } catch (e) { console.error("YTD adblocker error:", e); }
+const WATCH_URL_PREFIX = "https://nightcord.st/watch?";
+let _ytListenerInstalled = false;
 
-    const win = BrowserWindow.getAllWindows()[0];
-    if (win) {
-        win.webContents.setWindowOpenHandler((details) => {
-            if (details.url.startsWith("https://nightcord.st/watch?")) {
+export async function installWatchingTogetherIntercept(_?: any) {
+    // Electron only: ad blocking via session.webRequest
+    if (IS_ELECTRON && _electronSession) {
+        try {
+            const adPatterns = [
+                "*://*.doubleclick.net/*",
+                "*://*.googlevideo.com/*oad=*",
+                "*://*.googlevideo.com/*adformat=*",
+                "*://*.youtube.com/pagead/*",
+                "*://*.youtube.com/api/stats/ads*",
+                "*://*.youtube.com/ptracking*",
+                "*://*.youtube-nocookie.com/pagead/*",
+                "*://*.youtube-nocookie.com/api/stats/ads*",
+            ];
+            _electronSession.defaultSession.webRequest.onBeforeRequest({ urls: adPatterns }, (_d: any, cb: any) => cb({ cancel: true }));
+            _electronSession.defaultSession.webRequest.onBeforeSendHeaders({
+                urls: [
+                    "*://*.youtube.com/youtubei/v1/player*",
+                    "*://*.youtube-nocookie.com/youtubei/v1/player*"
+                ]
+            }, (details: any, cb: any) => {
+                const headers = { ...details.requestHeaders };
+                headers["Referer"] = "https://www.youtube.com/";
+                headers["Origin"] = "https://www.youtube.com";
+                cb({ requestHeaders: headers });
+            });
+        } catch (e) { console.error("YTD adblocker error:", e); }
+    }
+
+    if (_ytListenerInstalled) return;
+    _ytListenerInstalled = true;
+
+    if (_ytListenerInstalled) return;
+    _ytListenerInstalled = true;
+
+    if (IS_ELECTRON && _BrowserWindow) {
+        // Electron mode: hook BrowserWindow navigation
+        const electron = require("electron") as typeof import("electron");
+        const hook = (win: Electron.BrowserWindow) => {
+            win.webContents.on("will-navigate" as any, (event: any, url: string) => {
+                if (!url.startsWith(WATCH_URL_PREFIX)) return;
+                event.preventDefault();
                 try {
-                    const url = new URL(details.url);
-                    const ytId = url.searchParams.get("v") ?? "";
-                    BrowserWindow.getAllWindows().forEach(w => {
+                    const ytId = new URL(url).searchParams.get("v") ?? "";
+                    _BrowserWindow!.getAllWindows().forEach(w => {
                         try {
                             w.webContents.executeJavaScript(
                                 `window.dispatchEvent(new CustomEvent('youtube-watch-together', { detail: { ytId: ${JSON.stringify(ytId)} } }))`
@@ -55,14 +94,42 @@ export async function installWatchingTogetherIntercept(_: IpcMainInvokeEvent) {
                         } catch { }
                     });
                 } catch { }
-                return { action: "deny" };
-            }
-            return { action: "allow" };
-        });
+            });
+            win.webContents.on("new-window" as any, (event: any, url: string) => {
+                if (!url.startsWith(WATCH_URL_PREFIX)) return;
+                event.preventDefault();
+                try {
+                    const ytId = new URL(url).searchParams.get("v") ?? "";
+                    _BrowserWindow!.getAllWindows().forEach(w => {
+                        try {
+                            w.webContents.executeJavaScript(
+                                `window.dispatchEvent(new CustomEvent('youtube-watch-together', { detail: { ytId: ${JSON.stringify(ytId)} } }))`
+                            ).catch(() => {});
+                        } catch { }
+                    });
+                } catch { }
+            });
+        };
+        _BrowserWindow.getAllWindows().forEach(hook);
+        electron.app.on("browser-window-created" as any, (_e: any, win: Electron.BrowserWindow) => hook(win));
+    } else {
+        // Browser extension mode: intercept anchor clicks
+        document.addEventListener("click", (e: MouseEvent) => {
+            const target = (e.target as HTMLElement)?.closest("a") as HTMLAnchorElement | null;
+            if (!target) return;
+            const href = target.href || "";
+            if (!href.startsWith(WATCH_URL_PREFIX)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            try {
+                const ytId = new URL(href).searchParams.get("v") ?? "";
+                window.dispatchEvent(new CustomEvent("youtube-watch-together", { detail: { ytId } }));
+            } catch { }
+        }, true);
     }
 }
 
-export async function searchYouTube(_: IpcMainInvokeEvent, query: string): Promise<string> {
+export async function searchYouTube(_: any, query: string): Promise<string> {
     if (!query?.trim()) return JSON.stringify({ videos: [], channels: [] });
     const html = await netGet(`https://www.youtube.com/results?search_query=${encodeURIComponent(query.trim())}`);
 
@@ -101,7 +168,7 @@ export async function searchYouTube(_: IpcMainInvokeEvent, query: string): Promi
 
     const videos = contents
         .filter((c: any) => c.videoRenderer)
-        .slice(0, 24)
+        .slice(0, 50)
         .map((c: any) => {
             const v = c.videoRenderer;
             const thumbs: any[] = v.thumbnail?.thumbnails ?? [];
@@ -123,7 +190,7 @@ export async function searchYouTube(_: IpcMainInvokeEvent, query: string): Promi
     return JSON.stringify({ videos, channels });
 }
 
-export async function resolveVideoDetails(_: IpcMainInvokeEvent, videoId: string): Promise<string> {
+export async function resolveVideoDetails(_: any, videoId: string): Promise<string> {
     if (!videoId) throw new Error("No video ID");
     const html = await netGet(`https://www.youtube.com/watch?v=${videoId}`);
     const match = html.match(/var ytInitialPlayerResponse = (\{.*?\});<\/script>/);
@@ -141,21 +208,18 @@ export async function resolveVideoDetails(_: IpcMainInvokeEvent, videoId: string
     });
 }
 
-export async function searchChannelVideos(_: IpcMainInvokeEvent, handleOrId: string): Promise<string> {
+export async function searchChannelVideos(_: any, handleOrId: string): Promise<string> {
     let url = `https://www.youtube.com/channel/${handleOrId}/videos`;
     if (handleOrId.startsWith("@") || handleOrId.startsWith("/")) {
         const h = handleOrId.startsWith("/") ? handleOrId : `/${handleOrId}`;
         url = `https://www.youtube.com${h}/videos`;
     }
     const html = await netGet(url);
-    // YouTube embeds ytInitialData as a JS variable; extract the JSON.
-    // We use a two-step extraction: find the start marker, then parse manually.
     let json: any = null;
     try {
         const startIdx = html.indexOf("var ytInitialData = ");
         if (startIdx === -1) return JSON.stringify({ videos: [], channels: [], channelInfo: null });
         const jsonStart = startIdx + "var ytInitialData = ".length;
-        // Find the closing </script> to bound our search
         const scriptEnd = html.indexOf("</script>", jsonStart);
         const rawStr = scriptEnd > -1 ? html.slice(jsonStart, scriptEnd).replace(/;\s*$/, "") : html.slice(jsonStart, jsonStart + 500000);
         json = JSON.parse(rawStr);
@@ -201,7 +265,6 @@ export async function searchChannelVideos(_: IpcMainInvokeEvent, handleOrId: str
                 .map((i: any) => {
                     const content = i.richItemRenderer.content;
 
-                    // New YouTube structure (lockupViewModel)
                     if (content.lockupViewModel) {
                         const lvm = content.lockupViewModel;
                         const thumbs: any[] = lvm.contentImage?.thumbnailViewModel?.image?.sources ?? [];
@@ -224,7 +287,6 @@ export async function searchChannelVideos(_: IpcMainInvokeEvent, handleOrId: str
                         };
                     }
 
-                    // Legacy structure (videoRenderer)
                     if (content.videoRenderer) {
                         const v = content.videoRenderer;
                         const thumbs: any[] = v.thumbnail?.thumbnails ?? [];
@@ -237,7 +299,6 @@ export async function searchChannelVideos(_: IpcMainInvokeEvent, handleOrId: str
                 })
                 .filter(Boolean);
             
-            // Fallback: sectionListRenderer (older channel pages)
             if (vids.length === 0) {
                 const sections = tab.tabRenderer?.content?.sectionListRenderer?.contents ?? [];
                 for (const sec of sections) {
@@ -256,7 +317,7 @@ export async function searchChannelVideos(_: IpcMainInvokeEvent, handleOrId: str
                 }
             }
             
-            if (vids.length > 0) { videos = vids.slice(0, 24); break; }
+            if (vids.length > 0) { videos = vids.slice(0, 50); break; }
         }
         return JSON.stringify({ videos, channels: [], channelInfo });
     } catch { return JSON.stringify({ videos: [], channels: [], channelInfo: null }); }

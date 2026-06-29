@@ -487,6 +487,11 @@ export default definePlugin({
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
     settings,
+
+    headerBarButton: {
+        icon: FolderIcon,
+    },
+
     start() {
         addHeaderBarButton("nightcord-token-importer", () => <TokenImporterButton />, 10);
         getAccounts().then(async existing => {

@@ -548,6 +548,10 @@ export default definePlugin({
     authors: [{ name: "Nightcord", id: 0n }],
     dependencies: ["HeaderBarAPI"],
 
+    headerBarButton: {
+        icon: MultiInstanceIcon,
+    },
+
     _fluxUnsub: null as (() => void) | null,
 
     async start() {

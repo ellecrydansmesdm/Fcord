@@ -11,6 +11,7 @@ import { EquicordDevs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 
 import { FloodPanelButton } from "./components/ChatBarButton";
+import { FloodIcon } from "./components/Icons";
 
 const enabled = false;
 
@@ -37,6 +38,7 @@ export default definePlugin({
     settings,
 
     chatBarButton: {
+        icon: FloodIcon,
         render: FloodPanelButton
     },
 });

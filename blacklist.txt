@@ -3,3 +3,4 @@ cursorMacOS
 wordBomb
 multiInstance
 soundcloudPlayer
+youtubePlayer

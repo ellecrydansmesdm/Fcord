@@ -77,7 +77,23 @@ if (!IS_VANILLA) {
 
     class BrowserWindow extends electron.BrowserWindow {
         constructor(options: BrowserWindowConstructorOptions) {
-            if (options?.webPreferences?.preload && options.title) {
+            // On n'injecte le preload Nightcord QUE dans les fenêtres Discord/Nightcord légitimes.
+            // Toutes les autres (overlay in-game, popups OAuth/connexion Spotify/Steam/GitHub/etc.,
+            // fenêtres de profil tierces) passent en super() sans modification pour éviter
+            // l'écran blanc / la fenêtre bloquée.
+            //
+            // Règle : on injecte SEULEMENT si le preload vient de nous (pointe vers notre preload.js).
+            // Toute fenêtre créée par Discord avec son propre preload ou un preload tiers est laissée intacte.
+            const ourPreload = join(__dirname, "preload.js");
+            const preloadIsOurs = options.webPreferences.preload === ourPreload;
+            // Exception : la fenêtre principale Discord a un preload à elle (l'original Discord),
+            // et c'est précisément ce qu'on veut remplacer — donc on accepte aussi le cas où
+            // le titre est une fenêtre Nightcord/Equicord/Discord connue.
+            const KNOWN_TITLES = /^(Discord|Vesktop|Equibop)$|^(Nightcord|Equicord)/;
+            const isTrustedTitle = !!(options.title && KNOWN_TITLES.test(options.title));
+            const isVBCable = !!(options.title && options.title.includes("VB-Cable"));
+
+            if (options?.webPreferences?.preload && (isTrustedTitle || isVBCable || preloadIsOurs)) {
                 const original = options.webPreferences.preload;
                 const isMainWindow = options.title === "Discord";
                 options.webPreferences.preload = join(__dirname, "preload.js");
@@ -236,7 +252,14 @@ if (!IS_VANILLA) {
                 if (settings.disableMinSize) {
                     this.setMinimumSize = (_width: number, _height: number) => { };
                 }
-            } else super(options);
+
+                // NOTE : le setWindowOpenHandler / will-navigate pour les liens externes
+                // est géré exclusivement par nightcord-index.js (app.on("web-contents-created"))
+                // afin d'éviter qu'un second handler ici n'écrase la logique did-create-window
+                // qui patche les fenêtres enfants about:blank (popups TikTok, settings, etc.).
+            } else {
+                super(options);
+            }
         }
     }
     Object.assign(BrowserWindow, electron.BrowserWindow);

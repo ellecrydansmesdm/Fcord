@@ -87,6 +87,7 @@ export function handleExternalUrl(url: string, protocol?: string): { action: "de
 
 export function makeLinksOpenExternally(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url, frameName, features }) => {
+        console.log("[Nightcord][LINK] setWindowOpenHandler url=", url, "frameName=", frameName);
         try {
             var { protocol, hostname, pathname, searchParams } = new URL(url);
         } catch {
@@ -158,6 +159,7 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
     });
 
     win.webContents.on("did-create-window", (childWin, { frameName, options, url }: any) => {
+        console.log("[Nightcord][LINK] did-create-window url=", url, "frameName=", frameName);
         // Detect captcha windows and handle them gracefully
         let isCaptcha = false;
         if (url) {
@@ -205,19 +207,23 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
             const key = stablePopoutKey(frameName);
             setupPopout(childWin, key);
         } else {
-            // If it's not a popout or a captcha (e.g. opened via about:blank for external redirect),
-            // intercept the navigation to open in the external browser and close the ghost window.
+            // Fenêtre non-popout / non-captcha : c'est une redirection externe (about:blank → lien).
+            // On cache la fenêtre immédiatement pour éviter le flash blanc, puis on ferme
+            // dès que la navigation vers le vrai lien se déclenche.
+            childWin.hide();
             childWin.webContents.on("will-navigate", (e, navUrl) => {
-                const { action } = handleExternalUrl(navUrl);
-                if (action === "deny") {
-                    e.preventDefault();
-                    setImmediate(() => {
-                        if (!childWin.isDestroyed()) {
-                            childWin.close();
-                        }
-                    });
+                e.preventDefault();
+                setImmediate(() => {
+                    if (!childWin.isDestroyed()) childWin.close();
+                });
+                if (navUrl && navUrl !== "about:blank") {
+                    handleExternalUrl(navUrl);
                 }
             });
+            // Filet de sécurité : si rien ne navigue dans les 2s, fermer quand même
+            setTimeout(() => {
+                if (!childWin.isDestroyed()) childWin.close();
+            }, 2000);
         }
     });
 }

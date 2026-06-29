@@ -228,7 +228,7 @@ function OtherThemeCard({ theme, enabled, onChange, onDelete, showDeleteButton, 
                         id="open-website"
                         label="Open Website"
                         icon={HomeIcon}
-                        action={() => window.open(theme.website, "_blank")}
+                        action={() => VencordNative.native.openExternal(theme.website)}
                     />
                 )}
                 {theme.invite && (
