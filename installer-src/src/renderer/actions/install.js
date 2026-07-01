@@ -167,7 +167,10 @@ const getJSON = phin.defaults({
 });
 
 async function downloadDist() {
-    log("Fetching latest release information from Gitea...");
+    const tmpZip = path.join(remote.app.getPath("temp"), "fcord-dist.zip");
+    const bundledZip = path.join(__static, "fcord-dist.zip");
+
+    log("Fetching latest release information...");
     let assetUrl;
     let fcordVersion;
     try {
@@ -180,16 +183,8 @@ async function downloadDist() {
             throw new Error(`Asset '${DIST_ZIP}' not found in the latest release`);
         }
         progress.set(FETCH_RELEASE_PROGRESS);
-    }
-    catch (error) {
-        log(`❌ Failed to query release API at ${RELEASE_API}`);
-        log(`❌ ${error.message}`);
-        throw error;
-    }
 
-    const tmpZip = path.join(remote.app.getPath("temp"), "fcord-dist.zip");
-    log("Downloading Fcord Release package...");
-    try {
+        log("Downloading Fcord Release package...");
         await downloadFileAsync(assetUrl, tmpZip, (percent, downloaded, total) => {
             const dlMB = (downloaded / (1024 * 1024)).toFixed(1);
             const totalMB = (total / (1024 * 1024)).toFixed(1);
@@ -201,9 +196,18 @@ async function downloadDist() {
         progress.set(DOWNLOAD_PACKAGE_PROGRESS);
     }
     catch (error) {
-        log(`❌ Failed to download package from ${assetUrl}`);
-        log(`❌ ${error.message}`);
-        throw error;
+        log(`⚠️ Failed to download from GitHub: ${error.message}`);
+        log("🔄 Falling back to bundled offline Fcord package...");
+
+        const hasBundled = await safeExists(bundledZip);
+        if (!hasBundled) {
+            log("❌ Offline package not found in installer assets.");
+            throw error;
+        }
+
+        await fs.copyFile(bundledZip, tmpZip);
+        log("✅ Loaded bundled offline package successfully");
+        progress.set(DOWNLOAD_PACKAGE_PROGRESS);
     }
 
     lognewline("Extracting package...");
