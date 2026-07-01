@@ -1,9 +1,9 @@
 <script>
     import {tooltip} from "./tooltip";
     
-    const telegramUrl = "https://t.me/nightcordoff";
-    const giteaUrl = "https://gitea.nightcord.st/nightcord/nightcord";
-    const webUrl = "https://nightcord.st";
+    const telegramUrl = "https://t.me/fcordoff";
+    const giteaUrl = "https://gitea.fcord.st/fcord/fcord";
+    const webUrl = "https://fcord.st";
 </script>
 
 <div class="social-links">

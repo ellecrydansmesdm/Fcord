@@ -5,7 +5,7 @@
  */
 
 import { isPluginEnabled } from "@api/PluginManager";
-import anonymiseFileNames, { tarExtMatcher } from "@nightcordplugins/antiMoveDeco/antiGroup/anonymiseFileNames";
+import anonymiseFileNames, { tarExtMatcher } from "@fcordplugins/antiMoveDeco/antiGroup/anonymiseFileNames";
 import { Devs } from "@utils/constants";
 import definePlugin, { ReporterTestable } from "@utils/types";
 import { CloudUpload } from "@vencord/discord-types";

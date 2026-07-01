@@ -1,9 +1,9 @@
 {
-  "name": "nightcord-installer",
-  "productName": "Nightcord Installer",
-  "description": "A simple standalone program which automates the installation, removal and maintenance of Nightcord.",
-  "author": "Nightcord",
-  "version": "1.3.0",
+  "name": "fcord-installer",
+  "productName": "Fcord Installer",
+  "description": "A simple standalone program which automates the installation, removal and maintenance of Fcord.",
+  "author": "Fcord",
+  "version": "1.20.6",
   "license": "MIT",
   "scripts": {
     "dev": "electron-webpack dev",
@@ -34,14 +34,14 @@
     "webpack-bundle-analyzer": "^4.4.0"
   },
   "build": {
-    "appId": "app.nightcord.installer",
-    "productName": "Nightcord",
-    "copyright": "Copyright © 2026 Nightcord",
+    "appId": "app.fcord.installer",
+    "productName": "Fcord",
+    "copyright": "Copyright © 2026 Fcord",
     "directories": {
       "output": "../release/installer"
     },
     "win": {
-      "artifactName": "Nightcord-Installer.${ext}",
+      "artifactName": "Fcord-Installer.${ext}",
       "icon": "assets/icon.ico",
       "target": {
         "target": "portable",

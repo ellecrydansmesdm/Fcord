@@ -10,7 +10,7 @@ import { classes } from "@utils/misc";
 import { findComponentByCodeLazy, findCssClassesLazy } from "@webpack";
 import { Clickable, Tooltip, useEffect, useState, Popout, useRef } from "@webpack/common";
 import type { ComponentType, JSX, MouseEventHandler, ReactNode } from "react";
-import { openNightcordModal } from "@nightcordplugins/compactMode/NightcordModal";
+import { openFcordModal } from "@fcordplugins/compactMode/FcordModal";
 
 const logger = new Logger("HeaderBarAPI");
 
@@ -126,19 +126,19 @@ export function removeChannelToolbarButton(id: string) {
 // ══════════════════════════════════════════════════════════════════
 
 let _stealthActive = false;
-try { _stealthActive = localStorage.getItem("Nightcord_stealthMode") === "1"; } catch { }
+try { _stealthActive = localStorage.getItem("Fcord_stealthMode") === "1"; } catch { }
 
 export function isStealthModeEnabled(): boolean {
     return _stealthActive;
 }
 
 function persistStealth(v: boolean) {
-    try { v ? localStorage.setItem("Nightcord_stealthMode", "1") : localStorage.removeItem("Nightcord_stealthMode"); } catch { }
+    try { v ? localStorage.setItem("Fcord_stealthMode", "1") : localStorage.removeItem("Fcord_stealthMode"); } catch { }
 }
 
 const NON_REACT_SELECTORS = [
-    "#nightcord-titlebar-btn",
-    "#nightcord-titlebar-link-style",
+    "#fcord-titlebar-btn",
+    "#fcord-titlebar-link-style",
     ".nai-nav-item",
 ];
 
@@ -156,7 +156,7 @@ function hideNonReactElements(hide: boolean) {
 }
 
 export function syncStealthBodyClass() {
-    try { if (_stealthActive) document.body?.classList.add("nightcord-stealth"); else document.body?.classList.remove("nightcord-stealth"); } catch { }
+    try { if (_stealthActive) document.body?.classList.add("fcord-stealth"); else document.body?.classList.remove("fcord-stealth"); } catch { }
     hideNonReactElements(_stealthActive);
 }
 
@@ -165,14 +165,14 @@ export function toggleStealthMode() {
     persistStealth(_stealthActive);
     hideNonReactElements(_stealthActive);
     _notifyStealthChange();
-    try { if (_stealthActive) document.body?.classList.add("nightcord-stealth"); else document.body?.classList.remove("nightcord-stealth"); } catch { }
+    try { if (_stealthActive) document.body?.classList.add("fcord-stealth"); else document.body?.classList.remove("fcord-stealth"); } catch { }
     console.log("[StealthMode] toggled →", _stealthActive);
     return _stealthActive;
 }
 
 if (_stealthActive) {
     try { hideNonReactElements(true); } catch { }
-    try { document.body?.classList.add("nightcord-stealth"); } catch { }
+    try { document.body?.classList.add("fcord-stealth"); } catch { }
 }
 
 try {
@@ -204,7 +204,7 @@ try {
         if (document.body) startObserver();
         else document.addEventListener("DOMContentLoaded", startObserver);
     }
-    window.addEventListener("nightcord-stealth-change", () => {
+    window.addEventListener("fcord-stealth-change", () => {
         if (_stealthActive) startObserver();
         else stopObserver();
     });
@@ -213,7 +213,7 @@ try {
 const stealthListeners = new Set<() => void>();
 export function _notifyStealthChange() {
     stealthListeners.forEach(fn => fn());
-    window.dispatchEvent(new Event("nightcord-stealth-change"));
+    window.dispatchEvent(new Event("fcord-stealth-change"));
 }
 export function addStealthListener(fn: () => void) { stealthListeners.add(fn); }
 export function removeStealthListener(fn: () => void) { stealthListeners.delete(fn); }
@@ -224,19 +224,19 @@ export function removeStealthListener(fn: () => void) { stealthListeners.delete(
 // ══════════════════════════════════════════════════════════════════
 
 let _compactActive = false;
-try { _compactActive = localStorage.getItem("Nightcord_compactMode") === "1"; } catch { }
+try { _compactActive = localStorage.getItem("Fcord_compactMode") === "1"; } catch { }
 
 export function isCompactModeEnabled(): boolean {
     return _compactActive;
 }
 
 function persistCompact(v: boolean) {
-    try { v ? localStorage.setItem("Nightcord_compactMode", "1") : localStorage.removeItem("Nightcord_compactMode"); } catch { }
+    try { v ? localStorage.setItem("Fcord_compactMode", "1") : localStorage.removeItem("Fcord_compactMode"); } catch { }
 }
 
 export function syncCompactBodyClass() {
     try {
-        const stored = localStorage.getItem("Nightcord_compactMode");
+        const stored = localStorage.getItem("Fcord_compactMode");
         if (stored === "1" && !_compactActive) {
             _compactActive = true;
         } else if (stored !== "1" && _compactActive) {
@@ -246,9 +246,9 @@ export function syncCompactBodyClass() {
 
     try {
         if (_compactActive) {
-            document.body?.classList.add("nightcord-compact");
+            document.body?.classList.add("fcord-compact");
         } else {
-            document.body?.classList.remove("nightcord-compact");
+            document.body?.classList.remove("fcord-compact");
         }
     } catch { }
 
@@ -259,19 +259,19 @@ export function toggleCompactMode() {
     _compactActive = !_compactActive;
     persistCompact(_compactActive);
     _notifyCompactChange();
-    try { if (_compactActive) document.body?.classList.add("nightcord-compact"); else document.body?.classList.remove("nightcord-compact"); } catch { }
+    try { if (_compactActive) document.body?.classList.add("fcord-compact"); else document.body?.classList.remove("fcord-compact"); } catch { }
     console.log("[CompactMode] toggled →", _compactActive);
     return _compactActive;
 }
 
 if (_compactActive) {
-    try { document.body?.classList.add("nightcord-compact"); } catch { }
+    try { document.body?.classList.add("fcord-compact"); } catch { }
 }
 
 export const compactListeners = new Set<() => void>();
 export function _notifyCompactChange() {
     compactListeners.forEach(fn => fn());
-    window.dispatchEvent(new Event("nightcord-compact-change"));
+    window.dispatchEvent(new Event("fcord-compact-change"));
 }
 export function addCompactListener(fn: () => void) { compactListeners.add(fn); }
 export function removeCompactListener(fn: () => void) { compactListeners.delete(fn); }
@@ -326,13 +326,13 @@ function CompactSettingsPopout({ closePopout }: { closePopout: () => void; }) {
         const listener = () => forceUpdate(n => n + 1);
         compactListeners.add(listener);
         stealthListeners.add(listener);
-        window.addEventListener("nightcord-compact-change", listener);
-        window.addEventListener("nightcord-stealth-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
+        window.addEventListener("fcord-stealth-change", listener);
         return () => {
             compactListeners.delete(listener);
             stealthListeners.delete(listener);
-            window.removeEventListener("nightcord-compact-change", listener);
-            window.removeEventListener("nightcord-stealth-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
+            window.removeEventListener("fcord-stealth-change", listener);
         };
     }, []);
 
@@ -358,7 +358,7 @@ function CompactSettingsPopout({ closePopout }: { closePopout: () => void; }) {
             <div className="nc-settings-popout-row" onClick={() => toggleStealthMode()}>
                 <div className="nc-settings-popout-row-info">
                     <div className="nc-settings-popout-row-name">Stealth Mode</div>
-                    <div className="nc-settings-popout-row-desc">Hide all Nightcord UI elements</div>
+                    <div className="nc-settings-popout-row-desc">Hide all Fcord UI elements</div>
                 </div>
                 <div className={`nc-settings-popout-toggle ${stealth ? "nc-on" : ""}`} onClick={e => { e.stopPropagation(); toggleStealthMode(); }}>
                     <div className="nc-settings-popout-toggle-knob" />
@@ -395,10 +395,10 @@ function CompactHeaderBarToggle() {
     useEffect(() => {
         const listener = () => forceUpdate(n => n + 1);
         compactListeners.add(listener);
-        window.addEventListener("nightcord-compact-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
         return () => {
             compactListeners.delete(listener);
-            window.removeEventListener("nightcord-compact-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
         };
     }, []);
 
@@ -426,8 +426,8 @@ function CompactHeaderBarToggle() {
             </Popout>
             <HeaderBarButton
                 icon={GearIcon}
-                tooltip="Nightcord Settings"
-                onClick={() => openNightcordModal()}
+                tooltip="Fcord Settings"
+                onClick={() => openFcordModal()}
             />
         </div>
     );
@@ -441,10 +441,10 @@ function CompactChannelToolbarToggle() {
     useEffect(() => {
         const listener = () => forceUpdate(n => n + 1);
         compactListeners.add(listener);
-        window.addEventListener("nightcord-compact-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
         return () => {
             compactListeners.delete(listener);
-            window.removeEventListener("nightcord-compact-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
         };
     }, []);
 
@@ -484,14 +484,14 @@ function HeaderBarButtons() {
         headerBarListeners.add(listener);
         stealthListeners.add(listener);
         compactListeners.add(listener);
-        window.addEventListener("nightcord-stealth-change", listener);
-        window.addEventListener("nightcord-compact-change", listener);
+        window.addEventListener("fcord-stealth-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
         return () => {
             headerBarListeners.delete(listener);
             stealthListeners.delete(listener);
             compactListeners.delete(listener);
-            window.removeEventListener("nightcord-stealth-change", listener);
-            window.removeEventListener("nightcord-compact-change", listener);
+            window.removeEventListener("fcord-stealth-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
         };
     }, []);
 
@@ -526,14 +526,14 @@ function ChannelToolbarButtons() {
         channelToolbarListeners.add(listener);
         stealthListeners.add(listener);
         compactListeners.add(listener);
-        window.addEventListener("nightcord-stealth-change", listener);
-        window.addEventListener("nightcord-compact-change", listener);
+        window.addEventListener("fcord-stealth-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
         return () => {
             channelToolbarListeners.delete(listener);
             stealthListeners.delete(listener);
             compactListeners.delete(listener);
-            window.removeEventListener("nightcord-stealth-change", listener);
-            window.removeEventListener("nightcord-compact-change", listener);
+            window.removeEventListener("fcord-stealth-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
         };
     }, []);
 

@@ -15,11 +15,11 @@ import {domain} from "../../../DOMAIN.json";
 import { serializeErrors } from "./common";
 
 const GITEA_BASE     = `https://gitea.${domain}`;
-const API_BASE      = `${GITEA_BASE}/api/v1/repos/nightcord/nightcord`;
-const REPO_URL      = `${GITEA_BASE}/nightcord/nightcord`;
+const API_BASE      = `${GITEA_BASE}/api/v1/repos/fcord/fcord`;
+const REPO_URL      = `${GITEA_BASE}/fcord/fcord`;
 declare const VERSION: string;
 const CURRENT_VERSION = `v${VERSION}`;
-const ZIP_FILE = "nightcord-dist.zip";
+const ZIP_FILE = "fcord-dist.zip";
 
 let pendingDownloadUrl: string | null = null;
 let pendingVersion: string | null = null;
@@ -65,7 +65,7 @@ async function getUpdates() {
     if (!outdated) return [];
     return [{
         hash:    pendingVersion ?? "new",
-        author:  "Nightcord",
+        author:  "Fcord",
         message: `Nouvelle version disponible : ${pendingVersion}`
     }];
 }
@@ -79,7 +79,7 @@ async function applyUpdates(): Promise<boolean> {
         const data = await fetchBuffer(pendingDownloadUrl);
 
         // Save zip to temp
-        const zipPath = join(app.getPath("temp"), `nightcord-update-${Date.now()}.zip`);
+        const zipPath = join(app.getPath("temp"), `fcord-update-${Date.now()}.zip`);
         writeFileSync(zipPath, data, { flush: true });
 
         // The zip was created from dist/desktop/ with includeBaseDirectory=false,
@@ -89,7 +89,7 @@ async function applyUpdates(): Promise<boolean> {
 
         // Extract using PowerShell Expand-Archive (reliable ZIP support on all Windows 10/11)
         // We extract to a temp folder first, then move files over to avoid half-extracted state
-        const tmpExtract = join(app.getPath("temp"), `nightcord-extract-${Date.now()}`);
+        const tmpExtract = join(app.getPath("temp"), `fcord-extract-${Date.now()}`);
 
         return await new Promise<boolean>((resolve, reject) => {
             // Step 1 — extract zip to temp folder

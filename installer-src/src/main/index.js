@@ -4,13 +4,13 @@ import URL from "url";
 import updateInstaller from "./update_installer";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-app.name = "Nightcord";
+app.name = "Fcord";
 
 let mainWindow;
 
 function createMainWindow() {
     const window = new BrowserWindow({
-        title: "Nightcord Installer",
+        title: "Fcord Installer",
         frame: false,
         width: 550,
         height: 350,

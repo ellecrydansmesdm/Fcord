@@ -3,29 +3,29 @@ const current = {
   "1348347939474374786": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord",
+      "tooltip": "Helper FCord",
       "auto": true
     }
   ],
   "235278667511496704": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord",
+      "tooltip": "Developer FCord",
       "auto": true
     },
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord",
+      "tooltip": "Helper FCord",
       "auto": true
     }
   ],
@@ -118,11 +118,11 @@ const old = {
   "472971966333321216": [
     {
       "badge": "https://i.imgur.com/MbOlTw3.png",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/A1Bxe25.gif",
@@ -132,21 +132,21 @@ const old = {
   "1486134878243127438": [
     {
       "badge": "https://i.imgur.com/MbOlTw3.png",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
   "1463560204259164404": [
     {
       "badge": "https://i.imgur.com/RwDByY6.png",
-      "tooltip": "Staff NightCord",
+      "tooltip": "Staff FCord",
       "auto": true
     }
   ],
   "1355136568033022042": [
     {
       "badge": "https://i.imgur.com/MbOlTw3.png",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
@@ -157,14 +157,14 @@ const old = {
   "1473635887891087390": [
     {
       "badge": "https://i.imgur.com/MbOlTw3.png",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
   "407134577748869122": [
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord"
+      "tooltip": "Developer FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -174,7 +174,7 @@ const old = {
   "587626543874834463": [
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord"
+      "tooltip": "Developer FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -188,7 +188,7 @@ const old = {
     },
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord"
+      "tooltip": "Developer FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -206,7 +206,7 @@ const old = {
     },
     {
       "badge": "https://i.imgur.com/zhdipRq.png",
-      "tooltip": "Creator Of NightCord"
+      "tooltip": "Creator Of FCord"
     },
     {
       "badge": "https://i.imgur.com/gVC6iEZ.png",
@@ -216,7 +216,7 @@ const old = {
   "1356682833954996376": [
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord",
+      "tooltip": "Developer FCord",
       "auto": true
     }
   ],
@@ -253,7 +253,7 @@ const old = {
     },
     {
       "badge": "https://i.imgur.com/MbOlTw3.png",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
@@ -268,7 +268,7 @@ const old = {
   "1455375632794910855": [
     {
       "badge": "https://i.imgur.com/MbOlTw3.png",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
@@ -310,7 +310,7 @@ const old = {
   "1475754814624366753": [
     {
       "badge": "https://i.imgur.com/olCxFHJ.gif",
-      "tooltip": "Donor NightCord"
+      "tooltip": "Donor FCord"
     },
     {
       "badge": "https://i.imgur.com/4hLdFnO.png",
@@ -334,14 +334,14 @@ const old = {
   "1500689375120330772": [
     {
       "badge": "https://i.imgur.com/UVWeD4M.png",
-      "tooltip": "Staff NightCord",
+      "tooltip": "Staff FCord",
       "auto": true
     }
   ],
   "1402078137671749684": [
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord",
+      "tooltip": "Helper FCord",
       "auto": true
     }
   ],
@@ -390,7 +390,7 @@ const old = {
   "1006980582212907048": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
@@ -402,7 +402,7 @@ const old = {
   "1258544075712364544": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
@@ -415,7 +415,7 @@ const old = {
   "264549075930578945": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
@@ -427,7 +427,7 @@ const old = {
   "523567699004227609": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
@@ -443,11 +443,11 @@ const old = {
     },
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/nWE1O2F.gif",
@@ -461,21 +461,21 @@ const old = {
   "242001121672036352": [
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     }
   ],
   "1487862786083127429": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord"
+      "tooltip": "Developer FCord"
     },
     {
       "badge": "https://i.imgur.com/olCxFHJ.gif",
-      "tooltip": "Donor NightCord"
+      "tooltip": "Donor FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -485,11 +485,11 @@ const old = {
   "1156649068295110796": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -499,7 +499,7 @@ const old = {
   "1480844053754155028": [
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -509,11 +509,11 @@ const old = {
   "745391667703709728": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -523,49 +523,49 @@ const old = {
   "799364797870375013": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1457055283690868967": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1439760330275164332": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "163704635960328192": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "832641869337985106": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "652888396842139668": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "532626420976058408": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1143986011999834162": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     },
     {
@@ -577,25 +577,25 @@ const old = {
   "474828930109669386": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "166931302262505473": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1453892754273992716": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "440547565335740428": [
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -605,39 +605,39 @@ const old = {
   "1438607981779484795": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1399358581949599867": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1039978099548377088": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/UVWeD4M.png",
-      "tooltip": "Staff NightCord"
+      "tooltip": "Staff FCord"
     }
   ],
   "1439999101549809705": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "910153578377797662": [
     {
       "badge": "https://i.imgur.com/dvgfcuW.png",
-      "tooltip": "Helper NightCord"
+      "tooltip": "Helper FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -647,31 +647,31 @@ const old = {
   "1172305545554825259": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1339691683595681823": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1316810581876936708": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "1248925757162524724": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "800789023664111646": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     }
   ],
   "229423089241423872": [
@@ -685,7 +685,7 @@ const old = {
   "1488181371699593357": [
     {
       "badge": "https://i.imgur.com/vVTYtji.png",
-      "tooltip": "Developer NightCord",
+      "tooltip": "Developer FCord",
       "auto": true
     },
     {
@@ -721,11 +721,11 @@ const old = {
   "213872536063180800": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord"
+      "tooltip": "Supporters FCord"
     },
     {
       "badge": "https://i.imgur.com/7A3sexF.png",
-      "tooltip": "Gifter NightCord"
+      "tooltip": "Gifter FCord"
     },
     {
       "badge": "https://i.imgur.com/tkxNYVs.png",
@@ -755,21 +755,21 @@ const old = {
   "498881990896910339": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
   "934325874931675167": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
   "663118442471227424": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],
@@ -786,7 +786,7 @@ const old = {
   "1115303190951383160": [
     {
       "badge": "https://i.imgur.com/Rr3Ixu0.gif",
-      "tooltip": "Supporters NightCord",
+      "tooltip": "Supporters FCord",
       "auto": true
     }
   ],

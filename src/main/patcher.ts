@@ -21,12 +21,12 @@ import electron, { app, BrowserWindowConstructorOptions, Menu, session } from "e
 import { existsSync as fsExistsSync, statSync as fsStatSync } from "original-fs";
 import { dirname, join } from "path";
 
-import { registerMediaPermissionsForSession } from "../nightcord/main/mediaPermissions";
+import { registerMediaPermissionsForSession } from "../fcord/main/mediaPermissions";
 import { RendererSettings } from "./settings";
 import { patchTrayMenu } from "./trayMenu";
 import { IS_VANILLA } from "./utils/constants";
 
-console.log("[Nightcord] Starting up...");
+console.log("[Fcord] Starting up...");
 
 
 // Our injector file at app/index.js
@@ -77,7 +77,7 @@ if (!IS_VANILLA) {
 
     class BrowserWindow extends electron.BrowserWindow {
         constructor(options: BrowserWindowConstructorOptions) {
-            // On n'injecte le preload Nightcord QUE dans les fenêtres Discord/Nightcord légitimes.
+            // On n'injecte le preload Fcord QUE dans les fenêtres Discord/Fcord légitimes.
             // Toutes les autres (overlay in-game, popups OAuth/connexion Spotify/Steam/GitHub/etc.,
             // fenêtres de profil tierces) passent en super() sans modification pour éviter
             // l'écran blanc / la fenêtre bloquée.
@@ -88,8 +88,8 @@ if (!IS_VANILLA) {
             const preloadIsOurs = options.webPreferences.preload === ourPreload;
             // Exception : la fenêtre principale Discord a un preload à elle (l'original Discord),
             // et c'est précisément ce qu'on veut remplacer — donc on accepte aussi le cas où
-            // le titre est une fenêtre Nightcord/Equicord/Discord connue.
-            const KNOWN_TITLES = /^(Discord|Vesktop|Equibop)$|^(Nightcord|Equicord)/;
+            // le titre est une fenêtre Fcord/Equicord/Discord connue.
+            const KNOWN_TITLES = /^(Discord|Vesktop|Equibop)$|^(Fcord|Equicord)/;
             const isTrustedTitle = !!(options.title && KNOWN_TITLES.test(options.title));
             const isVBCable = !!(options.title && options.title.includes("VB-Cable"));
 
@@ -242,10 +242,10 @@ if (!IS_VANILLA) {
                             applied = true;
                         }
                         if (!applied) {
-                            console.warn("[Nightcord] No background material API available on this system");
+                            console.warn("[Fcord] No background material API available on this system");
                         }
                     } catch (e) {
-                        console.error("[Nightcord] setBackgroundMaterial failed:", e);
+                        console.error("[Fcord] setBackgroundMaterial failed:", e);
                     }
                 }
 
@@ -254,7 +254,7 @@ if (!IS_VANILLA) {
                 }
 
                 // NOTE : le setWindowOpenHandler / will-navigate pour les liens externes
-                // est géré exclusivement par nightcord-index.js (app.on("web-contents-created"))
+                // est géré exclusivement par fcord-index.js (app.on("web-contents-created"))
                 // afin d'éviter qu'un second handler ici n'écrase la logique did-create-window
                 // qui patche les fenêtres enfants about:blank (popups TikTok, settings, etc.).
             } else {
@@ -280,7 +280,7 @@ if (!IS_VANILLA) {
         });
     }
 
-    process.env.DATA_DIR = join(app.getPath("userData"), "..", "Nightcord");
+    process.env.DATA_DIR = join(app.getPath("userData"), "..", "Fcord");
 
     app.whenReady().then(() => {
         registerMediaPermissionsForSession(session.defaultSession);
@@ -321,7 +321,7 @@ if (!IS_VANILLA) {
                 return _originalHandle(channel, listener);
             } catch (e: any) {
                 if (e?.message?.includes?.("Attempted to register a second handler")) {
-                    console.warn(`[Nightcord] Ignored duplicate IPC handler for '${channel}'`);
+                    console.warn(`[Fcord] Ignored duplicate IPC handler for '${channel}'`);
                     return;
                 }
                 throw e;
@@ -344,8 +344,8 @@ if (!IS_VANILLA) {
     app.commandLine.appendSwitch("disable-background-timer-throttling");
     app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 } else {
-    console.log("[Nightcord] Running in vanilla mode. Not loading Nightcord");
+    console.log("[Fcord] Running in vanilla mode. Not loading Fcord");
 }
 
-console.log("[Nightcord] Loading original Discord app.asar");
+console.log("[Fcord] Loading original Discord app.asar");
 require(require.main!.filename);

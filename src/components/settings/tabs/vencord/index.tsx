@@ -31,7 +31,7 @@ import { openModal } from "@utils/modal";
 import { relaunch } from "@utils/native";
 import { Avatar, OAuth2AuthorizeModal, React, Select, UserStore } from "@webpack/common";
 
-import { ContributeModal } from "../../../../nightcord/renderer/components/ContributeModal";
+import { ContributeModal } from "../../../../fcord/renderer/components/ContributeModal";
 import { openNotificationSettingsModal } from "./NotificationSettings";
 
 const cl = classNameFactory("vc-vencord-tab-");
@@ -98,7 +98,7 @@ function DevTeamSection() {
                 <QuickAction
                     Icon={GithubIcon}
                     text="Source Code"
-                    action={() => VencordNative.native.openExternal("https://gitea.nightcord.st/nightcord/nightcord")}
+                    action={() => VencordNative.native.openExternal("https://gitea.fcord.st/fcord/fcord")}
                 />
                 <QuickAction
                     Icon={PaintbrushIcon}
@@ -124,8 +124,8 @@ function DevTeamSection() {
                 />
                 <QuickAction
                     Icon={PlanetIcon}
-                    text="Nightcord Channel"
-                    action={() => VencordNative.native.openExternal("https://t.me/nightcordoff")}
+                    text="Fcord Channel"
+                    action={() => VencordNative.native.openExternal("https://t.me/fcordoff")}
                 />
             </QuickActionCard>
 
@@ -155,8 +155,8 @@ function useCompactActive() {
     const [active, setActive] = React.useState(isCompactModeEnabled);
     React.useEffect(() => {
         const handler = () => setActive(isCompactModeEnabled());
-        window.addEventListener("nightcord-compact-change", handler);
-        return () => window.removeEventListener("nightcord-compact-change", handler);
+        window.addEventListener("fcord-compact-change", handler);
+        return () => window.removeEventListener("fcord-compact-change", handler);
     }, []);
     return active;
 }
@@ -165,8 +165,8 @@ function useStealthActive() {
     const [active, setActive] = React.useState(isStealthModeEnabled);
     React.useEffect(() => {
         const handler = () => setActive(isStealthModeEnabled());
-        window.addEventListener("nightcord-stealth-change", handler);
-        return () => window.removeEventListener("nightcord-stealth-change", handler);
+        window.addEventListener("fcord-stealth-change", handler);
+        return () => window.removeEventListener("fcord-stealth-change", handler);
     }, []);
     return active;
 }
@@ -179,8 +179,8 @@ function StealthModeSection() {
             <Heading className={Margins.top20}>{t("Stealth Mode")}</Heading>
             <Paragraph className={Margins.bottom16}>
                 {enabled
-                    ? "Stealth mode is enabled â€” all Nightcord visual elements are hidden. Shortcut: Ctrl+Shift+H"
-                    : t("Hides all Nightcord visual elements without disabling plugins. Shortcut: Ctrl+Shift+H")}
+                    ? "Stealth mode is enabled â€” all Fcord visual elements are hidden. Shortcut: Ctrl+Shift+H"
+                    : t("Hides all Fcord visual elements without disabling plugins. Shortcut: Ctrl+Shift+H")}
             </Paragraph>
             <Button
                 onClick={toggleStealthMode}
@@ -311,7 +311,7 @@ function EquicordSettings() {
 
                 <Heading className={Margins.top20}>{t("Client Settings")}</Heading>
                 <Paragraph className={Margins.bottom16}>
-                    {t("Configure how Nightcord behaves and integrates with Discord. These settings affect the Discord client's appearance and behavior.")}
+                    {t("Configure how Fcord behaves and integrates with Discord. These settings affect the Discord client's appearance and behavior.")}
                 </Paragraph>
                 <Notice.Info className={Margins.bottom20} style={{ width: "100%" }}>
                     {t("You can customize where this settings section appears in Discord's settings menu by configuring the")} {" "}
@@ -427,7 +427,7 @@ function EquicordSettings() {
 
                 <Heading className={Margins.top20}>{t("Notifications")}</Heading>
                 <Paragraph className={Margins.bottom16}>
-                    {t("Configure how Nightcord handles notifications. You can customize when and how you receive alerts, or view a history of past notifications.")}
+                    {t("Configure how Fcord handles notifications. You can customize when and how you receive alerts, or view a history of past notifications.")}
                 </Paragraph>
 
                 <Flex gap="16px">
@@ -445,7 +445,7 @@ function EquicordSettings() {
 
             <Heading className={Margins.top20}>{t("Compact Mode")}</Heading>
             <Paragraph className={Margins.bottom16}>
-                {t("Replaces all Nightcord buttons with a single compact toggle icon. Click the icon in the header bar, channel toolbar, or chat bar to restore all buttons.")}
+                {t("Replaces all Fcord buttons with a single compact toggle icon. Click the icon in the header bar, channel toolbar, or chat bar to restore all buttons.")}
             </Paragraph>
             <Button
                 onClick={toggleCompactMode}
@@ -458,7 +458,7 @@ function EquicordSettings() {
 
             <Heading className={Margins.top20}>{t("Stealth Mode")}</Heading>
             <Paragraph className={Margins.bottom16}>
-                {t("Hides all Nightcord visual elements without disabling plugins. Shortcut: Ctrl+Shift+H")}
+                {t("Hides all Fcord visual elements without disabling plugins. Shortcut: Ctrl+Shift+H")}
             </Paragraph>
             <StealthModeButton />
 
@@ -466,7 +466,7 @@ function EquicordSettings() {
     );
 }
 
-export default wrapTab(EquicordSettings, "Nightcord Settings");
+export default wrapTab(EquicordSettings, "Fcord Settings");
 
 
 

@@ -209,11 +209,11 @@
     "ru": "Добавляет кнопку рядом с отключением звука, чтобы присоединиться к случайному голосовому каналу.",
     "zh": "在静音附近添加一个按钮以加入随机语音频道。"
   },
-  "Adds a button next to the inbox button in the channel header that houses Nightcord quick actions": {
-    "fr": "Ajoute un bouton à côté du bouton de la boîte de réception dans l'en-tête de la chaîne qui héberge les actions rapides de Nightcord.",
-    "es": "Agrega un botón al lado del botón de la bandeja de entrada en el encabezado del canal que alberga acciones rápidas de Nightcord",
-    "ru": "Добавляет кнопку рядом с кнопкой «Входящие» в заголовке канала, которая содержит быстрые действия Nightcord.",
-    "zh": "在频道标题中的收件箱按钮旁边添加一个按钮，用于容纳 Nightcord 快速操作"
+  "Adds a button next to the inbox button in the channel header that houses Fcord quick actions": {
+    "fr": "Ajoute un bouton à côté du bouton de la boîte de réception dans l'en-tête de la chaîne qui héberge les actions rapides de Fcord.",
+    "es": "Agrega un botón al lado del botón de la bandeja de entrada en el encabezado del canal que alberga acciones rápidas de Fcord",
+    "ru": "Добавляет кнопку рядом с кнопкой «Входящие» в заголовке канала, которая содержит быстрые действия Fcord.",
+    "zh": "在频道标题中的收件箱按钮旁边添加一个按钮，用于容纳 Fcord 快速操作"
   },
   "Adds a button next to the mic and deafen button to toggle game activity.": {
     "fr": "Ajoute un bouton à côté du bouton micro et sourd pour basculer l'activité de jeu.",
@@ -1085,11 +1085,11 @@
     "ru": "Автоматический отпечаток пальца/конечный текст",
     "zh": "自动指纹/结束文本"
   },
-  "Automatic translation for Nightcord.": {
-    "fr": "Traduction automatique pour Nightcord.",
-    "es": "Traducción automática para Nightcord.",
-    "ru": "Автоматический перевод Nightcord.",
-    "zh": "Nightcord 的自动翻译。"
+  "Automatic translation for Fcord.": {
+    "fr": "Traduction automatique pour Fcord.",
+    "es": "Traducción automática para Fcord.",
+    "ru": "Автоматический перевод Fcord.",
+    "zh": "Fcord 的自动翻译。"
   },
   "Automatically blocks Nitro upsell/gift popups that Discord keeps showing.": {
     "fr": "Bloque automatiquement les popups de vente incitative/cadeaux Nitro que Discord continue d'afficher.",
@@ -1115,11 +1115,11 @@
     "ru": "Автоматически нажимайте кнопку в сообщениях бота внутри категории заявок.",
     "zh": "自动单击工单类别内机器人消息上的按钮。"
   },
-  "Automatically corrects spelling and grammar before sending. Requires a free Groq API key configured in NightcordAI.": {
-    "fr": "Corrige automatiquement l'orthographe et la grammaire avant l'envoi. Nécessite une clé API Groq gratuite configurée dans NightcordAI.",
-    "es": "Corrige automáticamente la ortografía y la gramática antes de enviar. Requiere una clave API de Groq gratuita configurada en NightcordAI.",
-    "ru": "Автоматически исправляет орфографию и грамматику перед отправкой. Требуется бесплатный ключ API Groq, настроенный в NightcordAI.",
-    "zh": "发送前自动更正拼写和语法。需要在 NightcordAI 中配置的免费 G​​roq API 密钥。"
+  "Automatically corrects spelling and grammar before sending. Requires a free Groq API key configured in FcordAI.": {
+    "fr": "Corrige automatiquement l'orthographe et la grammaire avant l'envoi. Nécessite une clé API Groq gratuite configurée dans FcordAI.",
+    "es": "Corrige automáticamente la ortografía y la gramática antes de enviar. Requiere una clave API de Groq gratuita configurada en FcordAI.",
+    "ru": "Автоматически исправляет орфографию и грамматику перед отправкой. Требуется бесплатный ключ API Groq, настроенный в FcordAI.",
+    "zh": "发送前自动更正拼写和语法。需要在 FcordAI 中配置的免费 G​​roq API 密钥。"
   },
   "Automatically deafems your mic when joining voice-channel.": {
     "fr": "Désactive automatiquement votre micro lorsque vous rejoignez le canal vocal.",
@@ -1859,11 +1859,11 @@
     "ru": "Создайте собственные причины для использования в модальном окне запрета Discord и/или покажите текстовый ввод по умолчанию вместо опций.",
     "zh": "创建在 Discord 禁止模式中使用的自定义原因，和/或默认显示文本输入而不是选项。"
   },
-  "Creates an elegant floating dock for Nightcord plugins using pure CSS, preventing overlap and crashes.": {
-    "fr": "Crée un élégant dock flottant pour les plugins Nightcord en utilisant du CSS pur, évitant les chevauchements et les plantages.",
-    "es": "Crea un elegante muelle flotante para complementos de Nightcord utilizando CSS puro, evitando superposiciones y fallas.",
-    "ru": "Создает элегантную плавающую док-станцию ​​для плагинов Nightcord с использованием чистого CSS, предотвращая перекрытие и сбои.",
-    "zh": "使用纯 CSS 为 Nightcord 插件创建优雅的浮动底座，防止重叠和崩溃。"
+  "Creates an elegant floating dock for Fcord plugins using pure CSS, preventing overlap and crashes.": {
+    "fr": "Crée un élégant dock flottant pour les plugins Fcord en utilisant du CSS pur, évitant les chevauchements et les plantages.",
+    "es": "Crea un elegante muelle flotante para complementos de Fcord utilizando CSS puro, evitando superposiciones y fallas.",
+    "ru": "Создает элегантную плавающую док-станцию ​​для плагинов Fcord с использованием чистого CSS, предотвращая перекрытие и сбои.",
+    "zh": "使用纯 CSS 为 Fcord 插件创建优雅的浮动底座，防止重叠和崩溃。"
   },
   "Crossant every specified amount of clicks :trolley:": {
     "fr": "Traversant chaque nombre de clics spécifié :trolley:",
@@ -3023,11 +3023,11 @@
     "ru": "Скрывает уведомления DM и Group DM, а также элементы боковой панели во время потоковой передачи.",
     "zh": "在直播时隐藏 DM 和群组 DM 通知以及侧边栏项目"
   },
-  "Hides all Nightcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons.": {
-    "fr": "Masque tous les boutons du plugin Nightcord et les remplace par une seule icône à bascule compacte. Cliquez sur l'icône pour restaurer tous les boutons.",
-    "es": "Oculta todos los botones del complemento Nightcord y los reemplaza con un único ícono de alternancia compacto. Haga clic en el icono para restaurar todos los botones.",
-    "ru": "Скрывает все кнопки плагина Nightcord и заменяет их одним компактным значком переключателя. Нажмите значок, чтобы восстановить все кнопки.",
-    "zh": "隐藏所有 Nightcord 插件按钮并用一个紧凑的切换图标替换它们。单击该图标可恢复所有按钮。"
+  "Hides all Fcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons.": {
+    "fr": "Masque tous les boutons du plugin Fcord et les remplace par une seule icône à bascule compacte. Cliquez sur l'icône pour restaurer tous les boutons.",
+    "es": "Oculta todos los botones del complemento Fcord y los reemplaza con un único ícono de alternancia compacto. Haga clic en el icono para restaurar todos los botones.",
+    "ru": "Скрывает все кнопки плагина Fcord и заменяет их одним компактным значком переключателя. Нажмите значок, чтобы восстановить все кнопки.",
+    "zh": "隐藏所有 Fcord 插件按钮并用一个紧凑的切换图标替换它们。单击该图标可恢复所有按钮。"
   },
   "Hides all channels in collapsed categories, even if they have unread messages.": {
     "fr": "Masque toutes les chaînes dans les catégories réduites, même si elles contiennent des messages non lus.",
@@ -3035,11 +3035,11 @@
     "ru": "Скрывает все каналы в свернутых категориях, даже если в них есть непрочитанные сообщения.",
     "zh": "隐藏折叠类别中的所有频道，即使它们有未读消息。"
   },
-  "Hides all plugin buttons without disabling them. Shortcut: Ctrl+Shift+H. The toggle is in Nightcord Settings.": {
-    "fr": "Masque tous les boutons du plugin sans les désactiver. Raccourci : Ctrl+Maj+H. La bascule se trouve dans les paramètres Nightcord.",
-    "es": "Oculta todos los botones de complementos sin deshabilitarlos. Atajo: Ctrl+Mayús+H. La palanca está en Configuración de Nightcord.",
-    "ru": "Скрывает все кнопки плагина, не отключая их. Ярлык: Ctrl+Shift+H. Переключатель находится в настройках Nightcord.",
-    "zh": "隐藏所有插件按钮而不禁用它们。快捷键：Ctrl+Shift+H。切换位于 Nightcord 设置中。"
+  "Hides all plugin buttons without disabling them. Shortcut: Ctrl+Shift+H. The toggle is in Fcord Settings.": {
+    "fr": "Masque tous les boutons du plugin sans les désactiver. Raccourci : Ctrl+Maj+H. La bascule se trouve dans les paramètres Fcord.",
+    "es": "Oculta todos los botones de complementos sin deshabilitarlos. Atajo: Ctrl+Mayús+H. La palanca está en Configuración de Fcord.",
+    "ru": "Скрывает все кнопки плагина, не отключая их. Ярлык: Ctrl+Shift+H. Переключатель находится в настройках Fcord.",
+    "zh": "隐藏所有插件按钮而不禁用它们。快捷键：Ctrl+Shift+H。切换位于 Fcord 设置中。"
   },
   "Hides messages, links, images, DMs, but not the screen share/voice grid. Toggle via chat bar button.": {
     "fr": "Masque les messages, les liens, les images, les DM, mais pas le partage d'écran/la grille vocale. Basculer via le bouton de la barre de discussion.",
@@ -3659,11 +3659,11 @@
     "ru": "Бюджетный режим ПК: более частый сбор мусора и более низкий фоновый FPS",
     "zh": "低端PC模式：更频繁的GC和更低的后台FPS"
   },
-  "Main Nightcord plugin: fixes Discord crashes, adds UI options and manages internal commands.": {
-    "fr": "Plugin Main Nightcord : corrige les crashs de Discord, ajoute des options d'interface utilisateur et gère les commandes internes.",
-    "es": "Complemento principal de Nightcord: corrige fallas de Discord, agrega opciones de interfaz de usuario y administra comandos internos.",
-    "ru": "Основной плагин Nightcord: исправляет сбои Discord, добавляет параметры пользовательского интерфейса и управляет внутренними командами.",
-    "zh": "主要 Nightcord 插件：修复 Discord 崩溃、添加 UI 选项并管理内部命令。"
+  "Main Fcord plugin: fixes Discord crashes, adds UI options and manages internal commands.": {
+    "fr": "Plugin Main Fcord : corrige les crashs de Discord, ajoute des options d'interface utilisateur et gère les commandes internes.",
+    "es": "Complemento principal de Fcord: corrige fallas de Discord, agrega opciones de interfaz de usuario y administra comandos internos.",
+    "ru": "Основной плагин Fcord: исправляет сбои Discord, добавляет параметры пользовательского интерфейса и управляет внутренними командами.",
+    "zh": "主要 Fcord 插件：修复 Discord 崩溃、添加 UI 选项并管理内部命令。"
   },
   "Make Discord not consider using AV1 for streaming.": {
     "fr": "Faites en sorte que Discord n'envisage pas d'utiliser AV1 pour le streaming.",
@@ -4571,11 +4571,11 @@
     "ru": "Скорость реакции (мс) — ниже = более реактивная",
     "zh": "反应速度 (ms) — 较低 = 反应性更强"
   },
-  "Real-time voice dictation via Groq Whisper (free). API key shared with NightcordAI.": {
-    "fr": "Dictée vocale en temps réel via Groq Whisper (gratuit). Clé API partagée avec NightcordAI.",
-    "es": "Dictado de voz en tiempo real a través de Groq Whisper (gratis). Clave API compartida con NightcordAI.",
-    "ru": "Голосовая диктовка в реальном времени через Groq Whisper (бесплатно). Ключ API используется совместно с NightcordAI.",
-    "zh": "通过 Groq Whisper（免费）进行实时语音听写。与 NightcordAI 共享 API 密钥。"
+  "Real-time voice dictation via Groq Whisper (free). API key shared with FcordAI.": {
+    "fr": "Dictée vocale en temps réel via Groq Whisper (gratuit). Clé API partagée avec FcordAI.",
+    "es": "Dictado de voz en tiempo real a través de Groq Whisper (gratis). Clave API compartida con FcordAI.",
+    "ru": "Голосовая диктовка в реальном времени через Groq Whisper (бесплатно). Ключ API используется совместно с FcordAI.",
+    "zh": "通过 Groq Whisper（免费）进行实时语音听写。与 FcordAI 共享 API 密钥。"
   },
   "Receive audio pings for @everyone and @here in group DMs": {
     "fr": "Recevez des pings audio pour @everyone et @here dans les DM de groupe",
@@ -5873,11 +5873,11 @@
     "ru": "Покажите свой часовой пояс в профилях и заголовках сообщений",
     "zh": "在个人资料和消息标题中显示您自己的时区"
   },
-  "Shows a banner when a new Nightcord version is available. Click Update to install.": {
-    "fr": "Affiche une bannière lorsqu'une nouvelle version de Nightcord est disponible. Cliquez sur Mettre à jour pour installer.",
-    "es": "Muestra un banner cuando hay disponible una nueva versión de Nightcord. Haga clic en Actualizar para instalar.",
-    "ru": "Показывает баннер, когда доступна новая версия Nightcord. Нажмите «Обновить», чтобы установить.",
-    "zh": "当有新的 Nightcord 版本可用时显示横幅。单击更新进行安装。"
+  "Shows a banner when a new Fcord version is available. Click Update to install.": {
+    "fr": "Affiche une bannière lorsqu'une nouvelle version de Fcord est disponible. Cliquez sur Mettre à jour pour installer.",
+    "es": "Muestra un banner cuando hay disponible una nueva versión de Fcord. Haga clic en Actualizar para instalar.",
+    "ru": "Показывает баннер, когда доступна новая версия Fcord. Нажмите «Обновить», чтобы установить.",
+    "zh": "当有新的 Fcord 版本可用时显示横幅。单击更新进行安装。"
   },
   "Shows a streak next to a user when you exchange DMs with them on consecutive days.": {
     "fr": "Affiche une séquence à côté d'un utilisateur lorsque vous échangez des DM avec lui plusieurs jours consécutifs.",
@@ -6215,11 +6215,11 @@
     "ru": "Подавить уведомления при замене сообщения (предотвращает пингование упомянутых пользователей).",
     "zh": "替换消息时禁止通知（防止对提到的用户进行 ping 操作）。"
   },
-  "Sync wallpapers with Nightcord friends in DMs.": {
-    "fr": "Synchronisez les fonds d'écran avec vos amis Nightcord dans les DM.",
-    "es": "Sincroniza fondos de pantalla con amigos de Nightcord en mensajes directos.",
-    "ru": "Синхронизируйте обои с друзьями Nightcord в личных сообщениях.",
-    "zh": "在 DM 中与 Nightcord 好友同步壁纸。"
+  "Sync wallpapers with Fcord friends in DMs.": {
+    "fr": "Synchronisez les fonds d'écran avec vos amis Fcord dans les DM.",
+    "es": "Sincroniza fondos de pantalla con amigos de Fcord en mensajes directos.",
+    "ru": "Синхронизируйте обои с друзьями Fcord в личных сообщениях.",
+    "zh": "在 DM 中与 Fcord 好友同步壁纸。"
   },
   "Sync your status to Steam! (Online, Away, Invisible, or Offline.)": {
     "fr": "Synchronisez votre statut avec Steam ! (En ligne, Absent, Invisible ou Hors ligne.)",
@@ -8081,10 +8081,10 @@
     "ru": "Автоответчик",
     "zh": "自动回复"
   },
-  "AutoTranslateNightcord": {
-    "fr": "AutoTranslateNightcord",
-    "es": "Traducción automáticaNightcord",
-    "ru": "АвтопереводNightcord",
+  "AutoTranslateFcord": {
+    "fr": "AutoTranslateFcord",
+    "es": "Traducción automáticaFcord",
+    "ru": "АвтопереводFcord",
     "zh": "自动翻译夜线"
   },
   "AutoUnmute": {
@@ -11741,22 +11741,22 @@
     "ru": "Цвет псевдонима",
     "zh": "昵称颜色"
   },
-  "NightcordAI": {
+  "FcordAI": {
     "fr": "Cordon de nuitAI",
     "es": "Cordón nocturnoAI",
     "ru": "Ночной шнурAI",
     "zh": "夜线人工智能"
   },
-  "NightcordHelper": {
+  "FcordHelper": {
     "fr": "Aide-cordon de nuit",
     "es": "Ayudante de cable nocturno",
     "ru": "Ночной шнурПомощник",
     "zh": "夜线助手"
   },
-  "NightcordUpdater": {
-    "fr": "NightcordUpdater",
-    "es": "Actualizador Nightcord",
-    "ru": "NightcordUpdater",
+  "FcordUpdater": {
+    "fr": "FcordUpdater",
+    "es": "Actualizador Fcord",
+    "ru": "FcordUpdater",
     "zh": "夜线更新程序"
   },
   "Nitro First": {

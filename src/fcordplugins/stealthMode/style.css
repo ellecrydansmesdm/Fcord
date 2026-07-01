@@ -1,0 +1,16 @@
+/* Stealth Mode - hide Fcord plugin UI (but NOT settings access) */
+
+/* Plugin buttons: header bar, channel toolbar, chat bar, user area */
+body.fcord-stealth .vc-header-bar-btns,
+body.fcord-stealth .vc-channel-toolbar-btns,
+body.fcord-stealth .vc-chat-bar-btns,
+body.fcord-stealth .vc-user-area-btns,
+
+/* Titlebar injected elements */
+body.fcord-stealth #fcord-titlebar-btn,
+body.fcord-stealth #fcord-titlebar-link-style,
+
+/* FcordAI nav button */
+body.fcord-stealth .nai-nav-item {
+    display: none !important;
+}

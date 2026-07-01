@@ -18,7 +18,7 @@
 
 // DO NOT REMOVE UNLESS YOU WISH TO FACE THE WRATH OF THE CIRCULAR DEPENDENCY DEMON!!!!!!!
 import "~plugins";
-console.log("%c[Nightcord]", "color: #5865f2; font-weight: bold;", "Injection successful! Starting services...");
+console.log("%c[Fcord]", "color: #5865f2; font-weight: bold;", "Injection successful! Starting services...");
 
 export * as Api from "./api";
 export * as Plugins from "./api/PluginManager";
@@ -127,10 +127,10 @@ async function syncSettings() {
 let notifiedForUpdatesThisSession = false;
 
 function showGreenUpdateBanner() {
-    if (document.getElementById("nightcord-core-updater-root")) return;
+    if (document.getElementById("fcord-core-updater-root")) return;
 
     const banner = document.createElement("div");
-    banner.id = "nightcord-core-updater-root";
+    banner.id = "fcord-core-updater-root";
     Object.assign(banner.style, {
         position: "fixed",
         top: "0", left: "0", right: "0",
@@ -159,7 +159,7 @@ function showGreenUpdateBanner() {
     const titleSpan = document.createElement("span");
     titleSpan.style.fontWeight = "700";
     titleSpan.style.flexShrink = "0";
-    titleSpan.textContent = "🔔 Nightcord Update Available!";
+    titleSpan.textContent = "🔔 Fcord Update Available!";
 
     const statusSpan = document.createElement("span");
     statusSpan.style.opacity = "0.85";
@@ -292,7 +292,7 @@ function initTrayIpc() {
             VencordNative.tray.setUpdateState(isOutdated);
 
             if (isOutdated) {
-                showNotice("A Nightcord update is available!", "View Update", () => openSettingsTabModal(UpdaterTab!));
+                showNotice("A Fcord update is available!", "View Update", () => openSettingsTabModal(UpdaterTab!));
             } else {
                 showNotice("No updates available, you're on the latest version!", "OK", popNotice);
             }
@@ -307,7 +307,7 @@ function initTrayIpc() {
             await update();
             relaunch();
         } catch (err) {
-            UpdateLogger.error("Failed to repair Nightcord", err);
+            UpdateLogger.error("Failed to repair Fcord", err);
         }
     });
 
@@ -322,14 +322,14 @@ async function init() {
     syncSettings();
     initTrayIpc();
 
-    const hasOpened = localStorage.getItem("nightcord_telegram_opened");
+    const hasOpened = localStorage.getItem("fcord_telegram_opened");
     if (!hasOpened) {
-        localStorage.setItem("nightcord_telegram_opened", "true");
+        localStorage.setItem("fcord_telegram_opened", "true");
         setTimeout(() => {
-            if (window.nightcord && typeof window.nightcord.openUrl === "function") {
-                window.nightcord.openUrl("https://t.me/nightcordoff");
+            if (window.fcord && typeof window.fcord.openUrl === "function") {
+                window.fcord.openUrl("https://t.me/fcordoff");
             } else {
-                VencordNative.native.openExternal("https://t.me/nightcordoff");
+                VencordNative.native.openExternal("https://t.me/fcordoff");
             }
         }, 3000);
     }
@@ -346,7 +346,7 @@ async function init() {
                 "Webpack has finished initialising, but some patches haven't been applied yet.",
                 "This might be expected since some Modules are lazy loaded, but please verify",
                 "that all plugins are working as intended.",
-                "You are seeing this warning because this is a Development build of Nightcord.",
+                "You are seeing this warning because this is a Development build of Fcord.",
                 "\nThe following patches have not been applied:",
                 "\n\n" + pendingPatches.map(p => `${p.plugin}: ${p.find}`).join("\n")
             );

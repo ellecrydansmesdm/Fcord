@@ -1,10 +1,10 @@
 {
     "manifest_version": 3,
     "minimum_chrome_version": "111",
-    "name": "Nightcord Web",
+    "name": "Fcord Web",
     "description": "The other cutest Discord mod now in your browser",
-    "author": "Nightcord",
-    "homepage_url": "https://gitea.nightcord.st/nightcord/nightcord",
+    "author": "Fcord",
+    "homepage_url": "https://gitea.fcord.st/fcord/fcord",
     "icons": {
         "128": "icon.png"
     },

@@ -49,11 +49,11 @@ if (!IS_COMPANION_TEST && process.argv.includes("--companion-test"))
     console.error("--companion-test must be run with --reporter for any effect");
 
 export const IS_UPDATER_DISABLED = process.argv.includes("--disable-updater");
-export const gitHash = process.env.NIGHTCORD_HASH || execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
+export const gitHash = process.env.FCORD_HASH || execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
 
 export const banner = {
     js: `
-// Nightcord ${gitHash}
+// Fcord ${gitHash}
 // Standalone: ${IS_STANDALONE}
 // Platform: ${IS_STANDALONE === false ? process.platform : "Universal"}
 // Updater Disabled: ${IS_UPDATER_DISABLED}
@@ -147,7 +147,7 @@ export const globPlugins = kind => ({
         });
 
         build.onLoad({ filter, namespace: "import-plugins" }, async () => {
-            const pluginDirs = ["plugins/_api", "plugins/_core", "plugins", "userplugins", "nightcordplugins", "nightcordplugins/_api"];
+            const pluginDirs = ["plugins/_api", "plugins/_core", "plugins", "userplugins", "fcordplugins", "fcordplugins/_api"];
             
             let blacklist = [];
             try {
@@ -219,9 +219,9 @@ export const globPlugins = kind => ({
             }
             code += `export default {${pluginsCode}};export const PluginMeta={${metaCode}};export const ExcludedPlugins={${excludedCode}};`;
 
-            // ─── External User Plugins (~/Documents/Nightcord/userplugins/) ───────────
+            // ─── External User Plugins (~/Documents/Fcord/userplugins/) ───────────
             // Scan and auto-create the external userplugins directory.
-            const externalUserPluginsDir = join(homedir(), "Documents", "Nightcord", "userplugins");
+            const externalUserPluginsDir = join(homedir(), "Documents", "Fcord", "userplugins");
             try {
                 await mkdir(externalUserPluginsDir, { recursive: true });
             } catch { /* already exists or permission error — silently skip */ }
@@ -314,7 +314,7 @@ export const gitRemotePlugin = {
             namespace: "git-remote", path: args.path
         }));
         build.onLoad({ filter, namespace: "git-remote" }, async () => {
-            let remote = process.env.NIGHTCORD_REMOTE;
+            let remote = process.env.FCORD_REMOTE;
             if (!remote) {
                 const res = await promisify(exec)("git remote get-url origin", { encoding: "utf-8" });
                 remote = res.stdout.trim()
@@ -455,7 +455,7 @@ export const commonOpts = {
         "@webpack/common": "./src/webpack/common",
         "@webpack/patcher": "./src/webpack/patchWebpack",
         "@webpack": "./src/webpack/webpack",
-        "@nightcordplugins": "./src/nightcordplugins",
+        "@fcordplugins": "./src/fcordplugins",
     }
 };
 

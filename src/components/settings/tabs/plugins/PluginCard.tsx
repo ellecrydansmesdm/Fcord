@@ -128,7 +128,7 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
 
     const openTutorialVideo = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const videoUrl = `https://git.${domain}/nightcord/nightcord-tutorials/raw/branch/main/videos/${plugin.name}.mp4`;
+        const videoUrl = `https://git.${domain}/fcord/fcord-tutorials/raw/branch/main/videos/${plugin.name}.mp4`;
         openModal(props => (
             <ModalRoot {...props} size={ModalSize.DYNAMIC} className="nc-tutorial-modal">
                 <ModalHeader separator={false}>
@@ -203,8 +203,8 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
     );
 
     const tooltip = t("Show Tutorial");
-    const isNightcord = !PluginMeta[plugin.name]?.userPlugin;
-    const iconType = isNightcord ? "nightcord" : "other";
+    const isFcord = !PluginMeta[plugin.name]?.userPlugin;
+    const iconType = isFcord ? "fcord" : "other";
 
     function openCreditsModal() {
         openModal(props => (
@@ -214,10 +214,10 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
                     <ModalCloseButton onClick={props.onClose} />
                 </ModalHeader>
                 <ModalContent style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px", alignItems: "center" } as any}>
-                    {isNightcord ? (
-                        <a href="https://gitea.nightcord.st/nightcord/nightcord" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none", color: "var(--text-normal)", fontSize: "20px", fontWeight: 600 }}>
-                            <img src="https://gitea.nightcord.st/assets/img/logo.svg" alt="Nightcord" style={{ width: 64, height: 64, borderRadius: "50%" }} />
-                            Nightcord
+                    {isFcord ? (
+                        <a href="https://gitea.fcord.st/fcord/fcord" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none", color: "var(--text-normal)", fontSize: "20px", fontWeight: 600 }}>
+                            <img src="https://gitea.fcord.st/assets/img/logo.svg" alt="Fcord" style={{ width: 64, height: 64, borderRadius: "50%" }} />
+                            Fcord
                         </a>
                     ) : (
                         plugin.authors?.map(a => {

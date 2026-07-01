@@ -8,8 +8,8 @@
  */
 
 /**
- * Set of plugin names that have a tutorial video available in nightcord-tutorials.
- * Using a static list avoids CORS issues when fetching from gitea.nightcord.st at runtime.
+ * Set of plugin names that have a tutorial video available in fcord-tutorials.
+ * Using a static list avoids CORS issues when fetching from gitea.fcord.st at runtime.
  */
 export const TUTORIAL_PLUGIN_NAMES: ReadonlySet<string> = new Set([
     "Abbreviation",

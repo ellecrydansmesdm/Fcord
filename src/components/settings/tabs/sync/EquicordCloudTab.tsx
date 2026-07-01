@@ -59,7 +59,7 @@ function validateUrl(url: string) {
 }
 
 const cloudBackendOptions = [
-    { label: "Nightcord Cloud", value: "https://api.nightcord.st/" },
+    { label: "Fcord Cloud", value: "https://api.fcord.st/" },
     { label: "Equicord Cloud", value: "https://cloud.equicord.org/" },
     { label: "Vencord Cloud", value: "https://api.vencord.dev/" }
 ];

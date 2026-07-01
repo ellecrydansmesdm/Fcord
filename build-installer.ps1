@@ -1,14 +1,14 @@
-# build-installer.ps1 — Build Nightcord-Installer.exe (Electron + electron-builder)
+# build-installer.ps1 — Build Fcord-Installer.exe (Electron + electron-builder)
 # Usage: .\build-installer.ps1
 
 $ErrorActionPreference = "Stop"
 $Root      = $PSScriptRoot
 $SrcDir    = Join-Path $Root "installer-src"
 $OutDir    = Join-Path $Root "release\installer"
-$OutExe    = Join-Path $OutDir "Nightcord-Installer.exe"
+$OutExe    = Join-Path $OutDir "Fcord-Installer.exe"
 
 Write-Host ""
-Write-Host "  [Nightcord] Building Electron installer..." -ForegroundColor Cyan
+Write-Host "  [Fcord] Building Electron installer..." -ForegroundColor Cyan
 
 # ── Prerequis ───────────────────────────────────────────────────────────────
 $nodeOk = $null
@@ -67,10 +67,10 @@ Write-Host "  [3/3] Packaging OK." -ForegroundColor Green
 if (Test-Path $OutExe) {
     $size = [math]::Round((Get-Item $OutExe).Length / 1KB, 0)
     Write-Host ""
-    Write-Host "  OK  Nightcord-Installer.exe compile ($size KB)" -ForegroundColor Green
+    Write-Host "  OK  Fcord-Installer.exe compile ($size KB)" -ForegroundColor Green
     Write-Host "    -> $OutExe" -ForegroundColor DarkGray
     Write-Host ""
 } else {
-    Write-Host "  [ERREUR] Nightcord-Installer.exe introuvable apres compilation." -ForegroundColor Red
+    Write-Host "  [ERREUR] Fcord-Installer.exe introuvable apres compilation." -ForegroundColor Red
     exit 1
 }

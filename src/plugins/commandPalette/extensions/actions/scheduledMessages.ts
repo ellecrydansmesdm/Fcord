@@ -5,7 +5,7 @@
  */
 
 import { isPluginEnabled, plugins } from "@api/PluginManager";
-import { toggleEnabled } from "@nightcordplugins/equicordHelper/utils";
+import { toggleEnabled } from "@fcordplugins/equicordHelper/utils";
 import { openViewScheduledModal } from "@plugins/scheduledMessages/components/ViewScheduledModal";
 import { Toasts } from "@webpack/common";
 

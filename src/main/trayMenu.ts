@@ -91,21 +91,21 @@ function openAboutWindow() {
     });
 }
 
-function createNightcordMenuItems(): MenuItemConstructorOptions[] {
+function createFcordMenuItems(): MenuItemConstructorOptions[] {
     return [
         {
-            label: "Nightcord",
+            label: "Fcord",
             submenu: [
                 {
-                    label: "About Nightcord",
+                    label: "About Fcord",
                     click: () => openAboutWindow()
                 },
                 {
-                    label: cachedUpdateAvailable ? "Update Nightcord" : "Check for Updates",
+                    label: cachedUpdateAvailable ? "Update Fcord" : "Check for Updates",
                     click: () => sendToRenderer(IpcEvents.TRAY_CHECK_UPDATES)
                 },
                 {
-                    label: "Repair Nightcord",
+                    label: "Repair Fcord",
                     click: () => sendToRenderer(IpcEvents.TRAY_REPAIR)
                 },
                 { type: "separator" },
@@ -124,5 +124,5 @@ function createNightcordMenuItems(): MenuItemConstructorOptions[] {
 }
 
 export function patchTrayMenu(): void {
-    // No longer patching tray menu — Nightcord manages its own tray in patcher.ts
+    // No longer patching tray menu — Fcord manages its own tray in patcher.ts
 }

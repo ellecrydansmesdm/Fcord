@@ -42,7 +42,7 @@ interface Props {
     infoButton?: ReactNode;
     footer?: ReactNode;
     author?: ReactNode;
-    iconType?: "nightcord" | "other";
+    iconType?: "fcord" | "other";
     customIcon?: ComponentType<any>;
 }
 

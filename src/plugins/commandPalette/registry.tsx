@@ -10,7 +10,7 @@ import { Settings, SettingsStore } from "@api/Settings";
 import { getUserSettingLazy } from "@api/UserSettings";
 import { HeadphonesIcon } from "@components/Icons";
 import { openPluginModal } from "@components/settings/tabs";
-import { toggleEnabled } from "@nightcordplugins/equicordHelper/utils";
+import { toggleEnabled } from "@fcordplugins/equicordHelper/utils";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import type { Plugin } from "@utils/types";

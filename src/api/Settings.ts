@@ -170,8 +170,8 @@ const DefaultSettings: Settings = {
 const settings = !IS_REPORTER ? VencordNative.settings.get() : {} as Settings;
 mergeDefaults(settings, DefaultSettings);
 
-// Nightcord native defaults — defaultPlugins is always enabled, no external prefs file
-const NIGHTCORD_PREFS = { defaultPlugins: true, autoUpdate: true } as const;
+// Fcord native defaults — defaultPlugins is always enabled, no external prefs file
+const FCORD_PREFS = { defaultPlugins: true, autoUpdate: true } as const;
 
 // Force enabledByDefault plugins to be enabled, even if they were previously saved as disabled.
 // This runs at load time so it works even for plugins already present in the settings file.

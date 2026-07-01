@@ -17,7 +17,7 @@ const names: Record<string, string> = {
 
 export default globalExternalsWithRegExp({
     getModuleInfo(modulePath) {
-        const path = modulePath.replace(/@Nightcord\/types\/|@nightcord\/types\//i, "");
+        const path = modulePath.replace(/@Fcord\/types\/|@fcord\/types\//i, "");
         let varName = names[path] as string | undefined;
         if (!varName) {
             const altMapping = names[path.split("/")[0]] as string | undefined;

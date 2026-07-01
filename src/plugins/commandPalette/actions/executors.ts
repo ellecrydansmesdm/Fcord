@@ -6,7 +6,7 @@
 
 import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { NotesIcon } from "@components/Icons";
-import { toggleEnabled } from "@nightcordplugins/equicordHelper/utils";
+import { toggleEnabled } from "@fcordplugins/equicordHelper/utils";
 import type { ScheduledMessage } from "@plugins/scheduledMessages/types";
 import { addScheduledMessage, getChannelDisplayInfo, getScheduledMessages, removeScheduledMessage, sendScheduledMessageNow, updateScheduledMessageTime } from "@plugins/scheduledMessages/utils";
 import { sleep } from "@utils/misc";

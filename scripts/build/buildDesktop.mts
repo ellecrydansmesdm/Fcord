@@ -1,5 +1,5 @@
 /*
- * Nightcord, a desktop app aiming to give you a snappier Discord Experience
+ * Fcord, a desktop app aiming to give you a snappier Discord Experience
  * Copyright (c) 2023 Vendicated and Vencord contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -53,26 +53,26 @@ await Promise.all([
     // Main process
     createContext({
         ...NodeCommonOpts,
-        entryPoints: ["src/nightcord/main/index.ts"],
+        entryPoints: ["src/fcord/main/index.ts"],
         outfile: "dist/js/main.js",
         footer: { js: "//# sourceURL=VesktopMain" }
     }),
     // Preloads
     createContext({
         ...NodeCommonOpts,
-        entryPoints: ["src/nightcord/preload/index.ts"],
+        entryPoints: ["src/fcord/preload/index.ts"],
         outfile: "dist/js/preload.js",
         footer: { js: "//# sourceURL=VesktopPreload" }
     }),
     createContext({
         ...NodeCommonOpts,
-        entryPoints: ["src/nightcord/preload/splash.ts"],
+        entryPoints: ["src/fcord/preload/splash.ts"],
         outfile: "dist/js/splashPreload.js",
         footer: { js: "//# sourceURL=VesktopSplashPreload" }
     }),
     createContext({
         ...NodeCommonOpts,
-        entryPoints: ["src/nightcord/preload/updater.ts"],
+        entryPoints: ["src/fcord/preload/updater.ts"],
         outfile: "dist/js/updaterPreload.js",
         footer: { js: "//# sourceURL=VesktopUpdaterPreload" }
     }),
@@ -80,14 +80,14 @@ await Promise.all([
     createContext({
         ...CommonOpts,
         globalName: "Equibop",
-        entryPoints: ["src/nightcord/renderer/index.ts"],
+        entryPoints: ["src/fcord/renderer/index.ts"],
         outfile: "dist/js/renderer.js",
         format: "iife",
         inject: ["./scripts/build/injectReact.mjs"],
         jsxFactory: "VencordCreateElement",
         jsxFragment: "VencordFragment",
-        external: ["@Nightcord/types/*", "@nightcord/types/*"],
-        plugins: [vencordDep, includeDirPlugin("patches", "src/nightcord/renderer/patches")],
+        external: ["@Fcord/types/*", "@fcord/types/*"],
+        plugins: [vencordDep, includeDirPlugin("patches", "src/fcord/renderer/patches")],
         footer: { js: "//# sourceURL=VesktopRenderer" }
     })
 ]);

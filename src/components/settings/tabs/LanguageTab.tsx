@@ -1,6 +1,6 @@
 /*
- * Nightcord, a Discord client mod
- * Copyright (c) 2026 Nightcord contributors
+ * Fcord, a Discord client mod
+ * Copyright (c) 2026 Fcord contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -65,11 +65,11 @@ function LanguageTab() {
         <SettingsTab>
             <Heading className={Margins.top16}>{t("Interface Language")}</Heading>
             <Paragraph className={Margins.bottom16}>
-                {t("Choose the language for Nightcord's interface. Plugin names and Discord's own UI are not affected.")}
+                {t("Choose the language for Fcord's interface. Plugin names and Discord's own UI are not affected.")}
             </Paragraph>
 
             <Notice.Info className={Margins.bottom20}>
-                {t("Translations are community-maintained and may be incomplete. If you'd like to help translate Nightcord, contributions are welcome!")}
+                {t("Translations are community-maintained and may be incomplete. If you'd like to help translate Fcord, contributions are welcome!")}
             </Notice.Info>
 
             {/* Dropdown sélectif — même composant/pattern que "Cloud Backend" dans CloudTab */}

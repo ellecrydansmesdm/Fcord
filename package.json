@@ -1,16 +1,16 @@
 {
-    "name": "nightcord",
+    "name": "fcord",
     "private": "true",
     "version": "1.20.6",
     "description": "Everything Discord doesn't build, we create",
     "main": "dist/js/main.js",
-    "homepage": "https://gitea.nightcord.st/nightcord/nightcord",
+    "homepage": "https://gitea.fcord.st/fcord/fcord",
     "bugs": {
-        "url": "https://gitea.nightcord.st/nightcord/nightcord/issues"
+        "url": "https://gitea.fcord.st/fcord/fcord/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://gitea.nightcord.st/nightcord/nightcord.git"
+        "url": "https://gitea.fcord.st/fcord/fcord.git"
     },
     "license": "GPL-3.0-or-later",
     "author": "Equicord",

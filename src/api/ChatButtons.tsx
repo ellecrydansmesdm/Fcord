@@ -111,14 +111,14 @@ function VencordChatBarButtons(props: ChatBarProps) {
         const listener = () => forceUpdate(n => n + 1);
         addStealthListener(listener);
         addCompactListener(listener);
-        window.addEventListener("nightcord-stealth-change", listener);
-        window.addEventListener("nightcord-compact-change", listener);
+        window.addEventListener("fcord-stealth-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
         backpackListeners.add(listener);
         return () => {
             removeStealthListener(listener);
             removeCompactListener(listener);
-            window.removeEventListener("nightcord-stealth-change", listener);
-            window.removeEventListener("nightcord-compact-change", listener);
+            window.removeEventListener("fcord-stealth-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
             backpackListeners.delete(listener);
         };
     }, []);
@@ -230,10 +230,10 @@ function CompactChatBarToggle({ chatBarProps }: any) {
     useEffect(() => {
         const listener = () => forceUpdate(n => n + 1);
         addCompactListener(listener);
-        window.addEventListener("nightcord-compact-change", listener);
+        window.addEventListener("fcord-compact-change", listener);
         return () => {
             removeCompactListener(listener);
-            window.removeEventListener("nightcord-compact-change", listener);
+            window.removeEventListener("fcord-compact-change", listener);
         };
     }, []);
 

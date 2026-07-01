@@ -3698,7 +3698,7 @@
         "Case Sensitive",
         "Abbreviations"
       ],
-      "file": "\\src\\nightcordplugins\\abreviation\\index.tsx"
+      "file": "\\src\\fcordplugins\\abreviation\\index.tsx"
     },
     {
       "name": "AlwaysTrust",
@@ -3715,7 +3715,7 @@
         "No Delete Safety",
         "Confirm Modal"
       ],
-      "file": "\\src\\nightcordplugins\\alwaysTrust\\index.tsx"
+      "file": "\\src\\fcordplugins\\alwaysTrust\\index.tsx"
     },
     {
       "name": "AntiDeleteMessage",
@@ -3732,7 +3732,7 @@
         "Max Cache Size",
         "Server Blacklist"
       ],
-      "file": "\\src\\nightcordplugins\\antiDeleteMessage\\index.ts"
+      "file": "\\src\\fcordplugins\\antiDeleteMessage\\index.ts"
     },
     {
       "name": "AntiMoveDeco",
@@ -3740,7 +3740,7 @@
         "Adds a button to prevent being moved or disconnected from a voice channel."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\antiMoveDeco\\index.tsx"
+      "file": "\\src\\fcordplugins\\antiMoveDeco\\index.tsx"
     },
     {
       "name": "AntiNickname",
@@ -3751,7 +3751,7 @@
       "settingKeys": [
         "Show Toast"
       ],
-      "file": "\\src\\nightcordplugins\\antiNickname\\index.ts"
+      "file": "\\src\\fcordplugins\\antiNickname\\index.ts"
     },
     {
       "name": "AudioLimiter",
@@ -3766,7 +3766,7 @@
         "Max Volume",
         "Attack"
       ],
-      "file": "\\src\\nightcordplugins\\audioLimiter\\index.ts"
+      "file": "\\src\\fcordplugins\\audioLimiter\\index.ts"
     },
     {
       "name": "AutoClaim",
@@ -3789,7 +3789,7 @@
         "Enable Auto Move",
         "Source SV Channel Id"
       ],
-      "file": "\\src\\nightcordplugins\\autoClaim\\index.tsx"
+      "file": "\\src\\fcordplugins\\autoClaim\\index.tsx"
     },
     {
       "name": "AutoCorrect",
@@ -3797,14 +3797,14 @@
         "Enable automatic correction",
         "Correction language",
         "Correction level",
-        "Automatically corrects spelling and grammar before sending. Requires a free Groq API key configured in NightcordAI."
+        "Automatically corrects spelling and grammar before sending. Requires a free Groq API key configured in FcordAI."
       ],
       "settingKeys": [
         "Is Active",
         "Language",
         "Aggressiveness"
       ],
-      "file": "\\src\\nightcordplugins\\autoCorrect\\index.tsx"
+      "file": "\\src\\fcordplugins\\autoCorrect\\index.tsx"
     },
     {
       "name": "AutoReply",
@@ -3835,7 +3835,7 @@
         "Min Delay Ms",
         "Max Delay Ms"
       ],
-      "file": "\\src\\nightcordplugins\\autoReply\\index.tsx"
+      "file": "\\src\\fcordplugins\\autoReply\\index.tsx"
     },
     {
       "name": "AutoResponder",
@@ -3861,16 +3861,16 @@
         "Delay Min",
         "Delay Max"
       ],
-      "file": "\\src\\nightcordplugins\\autoResponder\\index.tsx"
+      "file": "\\src\\fcordplugins\\autoResponder\\index.tsx"
     },
     {
-      "name": "AutoTranslateNightcord",
+      "name": "AutoTranslateFcord",
       "descriptions": [
-        "Automatic translation for Nightcord.",
+        "Automatic translation for Fcord.",
         "Automatically translate strings"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\autoTranslateNightcord\\index.ts"
+      "file": "\\src\\fcordplugins\\autoTranslateFcord\\index.ts"
     },
     {
       "name": "AutoUnmute",
@@ -3878,7 +3878,7 @@
         "Automatically unmutes and undeafens when you are server muted/deafened, if you have permissions"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\autoUnmute\\index.ts"
+      "file": "\\src\\fcordplugins\\autoUnmute\\index.ts"
     },
     {
       "name": "Backpack",
@@ -3886,7 +3886,7 @@
         "Organize chat bar buttons into a backpack. Left-click to use packed buttons, right-click to pack/unpack buttons."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\backpack\\index.tsx"
+      "file": "\\src\\fcordplugins\\backpack\\index.tsx"
     },
     {
       "name": "BetterRoleContext",
@@ -3897,7 +3897,7 @@
       "settingKeys": [
         "Role Icon File Format"
       ],
-      "file": "\\src\\nightcordplugins\\betterRoleContext\\index.tsx"
+      "file": "\\src\\fcordplugins\\betterRoleContext\\index.tsx"
     },
     {
       "name": "BetterSessions",
@@ -3910,7 +3910,7 @@
         "Background Check",
         "Check Interval"
       ],
-      "file": "\\src\\nightcordplugins\\betterSessions\\index.tsx"
+      "file": "\\src\\fcordplugins\\betterSessions\\index.tsx"
     },
     {
       "name": "BigFileUpload",
@@ -3939,7 +3939,7 @@
         "Custom Uploader Args",
         "Custom Settings"
       ],
-      "file": "\\src\\nightcordplugins\\bigFileUpload\\index.tsx"
+      "file": "\\src\\fcordplugins\\bigFileUpload\\index.tsx"
     },
     {
       "name": "BulkFriendRemove",
@@ -3947,7 +3947,7 @@
         "Delete multiple friends at once."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\bulkFriendRemove\\index.tsx"
+      "file": "\\src\\fcordplugins\\bulkFriendRemove\\index.tsx"
     },
     {
       "name": "CallTimer",
@@ -3970,7 +3970,7 @@
         "Show Seconds",
         "Watch Large Guilds"
       ],
-      "file": "\\src\\nightcordplugins\\callTimer\\index.tsx"
+      "file": "\\src\\fcordplugins\\callTimer\\index.tsx"
     },
     {
       "name": "ChannelWallpaper",
@@ -3979,7 +3979,7 @@
         "Wallpaper opacity (0 = invisible, 1 = full)",
         "Wallpaper blur (px)",
         "Default wallpaper URL (for channels without a custom one). Empty = none.",
-        "Sync wallpapers with Nightcord friends in DMs.",
+        "Sync wallpapers with Fcord friends in DMs.",
         "VPS URL (e.g. ws://your-vps:3000). Empty = use hidden messages.",
         "Password for the sync server.",
         "Allows for custom backgrounds for every individual channel."
@@ -3993,15 +3993,15 @@
         "Vps Url",
         "Vps Password"
       ],
-      "file": "\\src\\nightcordplugins\\channelWallpaper\\index.tsx"
+      "file": "\\src\\fcordplugins\\channelWallpaper\\index.tsx"
     },
     {
       "name": "CompactMode",
       "descriptions": [
-        "Hides all Nightcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons."
+        "Hides all Fcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\compactMode\\index.tsx"
+      "file": "\\src\\fcordplugins\\compactMode\\index.tsx"
     },
     {
       "name": "CrashHandler",
@@ -4014,7 +4014,7 @@
         "Attempt To Prevent Crashes",
         "Attempt To Navigate To Home"
       ],
-      "file": "\\src\\nightcordplugins\\crashHandler\\index.ts"
+      "file": "\\src\\fcordplugins\\crashHandler\\index.ts"
     },
     {
       "name": "CreateTheme",
@@ -4022,7 +4022,7 @@
         "Create Theme UI — registered via settings.tsx"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\createTheme\\index.tsx"
+      "file": "\\src\\fcordplugins\\createTheme\\index.tsx"
     },
     {
       "name": "CursorMacOS",
@@ -4035,13 +4035,13 @@
         "Style",
         "Size"
       ],
-      "file": "\\src\\nightcordplugins\\cursorMacOS\\index.ts"
+      "file": "\\src\\fcordplugins\\cursorMacOS\\index.ts"
     },
     {
       "name": "CustomProfile",
       "descriptions": [],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\customProfile\\index.tsx"
+      "file": "\\src\\fcordplugins\\customProfile\\index.tsx"
     },
     {
       "name": "DisableCallIdle",
@@ -4049,7 +4049,7 @@
         "Disables automatically getting kicked from a DM voice call after 3 minutes and being moved to an AFK voice channel."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\disableCallIdle\\index.tsx"
+      "file": "\\src\\fcordplugins\\disableCallIdle\\index.tsx"
     },
     {
       "name": "DMBomb",
@@ -4057,7 +4057,7 @@
         "Sends an aggressive message to ALL server members or a specific role via right click."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\DMBomb\\index.tsx"
+      "file": "\\src\\fcordplugins\\DMBomb\\index.tsx"
     },
     {
       "name": "DoubleEmoji",
@@ -4065,7 +4065,7 @@
         "Keeps the emoji picker open on click and highlights selected emojis with a blue border."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\doubleEmoji\\index.tsx"
+      "file": "\\src\\fcordplugins\\doubleEmoji\\index.tsx"
     },
     {
       "name": "EncryptedMessage",
@@ -4073,10 +4073,10 @@
         "Encrypts your messages with 400 unique techniques (0–399). Only those who know the key can decrypt."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\encryptedMessage\\index.tsx"
+      "file": "\\src\\fcordplugins\\encryptedMessage\\index.tsx"
     },
     {
-      "name": "NightcordHelper",
+      "name": "FcordHelper",
       "descriptions": [
         "Prevents the camera from being mirrored on your screen",
         "Removes the activity section above member list",
@@ -4087,7 +4087,7 @@
         "Adds back the Download button at the top right corner of files",
         "Stops you from typing markdown bullet points (stinky)",
         "Remove the 300ms long animation when opening or closing modals",
-        "Main Nightcord plugin: fixes Discord crashes, adds UI options and manages internal commands.",
+        "Main Fcord plugin: fixes Discord crashes, adds UI options and manages internal commands.",
         "Refresh Slash Commands"
       ],
       "settingKeys": [
@@ -4101,18 +4101,18 @@
         "No Bullet Points",
         "No Modal Animation"
       ],
-      "file": "\\src\\nightcordplugins\\equicordHelper\\index.tsx"
+      "file": "\\src\\fcordplugins\\equicordHelper\\index.tsx"
     },
     {
       "name": "EquicordToolbox",
       "descriptions": [
         "Show the plugins menu in the toolbox",
-        "Adds a button next to the inbox button in the channel header that houses Nightcord quick actions"
+        "Adds a button next to the inbox button in the channel header that houses Fcord quick actions"
       ],
       "settingKeys": [
         "Show Plugin Menu"
       ],
-      "file": "\\src\\nightcordplugins\\equicordToolbox\\index.tsx"
+      "file": "\\src\\fcordplugins\\equicordToolbox\\index.tsx"
     },
     {
       "name": "EventLogs",
@@ -4120,7 +4120,7 @@
         "Logs: deleted/edited messages, voice, friends, servers."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\eventLogs\\index.tsx"
+      "file": "\\src\\fcordplugins\\eventLogs\\index.tsx"
     },
     {
       "name": "ExportDM",
@@ -4128,7 +4128,7 @@
         "Exports your DMs with messages, images, videos, audio, links, embeds, stickers, reactions in TXT/JSON/CSV/MD/HTML."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\exportDM\\index.tsx"
+      "file": "\\src\\fcordplugins\\exportDM\\index.tsx"
     },
     {
       "name": "FakeSwitcher",
@@ -4136,7 +4136,7 @@
         "Right-click → add a user to the switcher. Click in the switcher → your profile takes their appearance locally."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\fakeAccount\\index.tsx"
+      "file": "\\src\\fcordplugins\\fakeAccount\\index.tsx"
     },
     {
       "name": "FakeDM",
@@ -4144,7 +4144,7 @@
         "Injects fake local messages into a DM or group DM. Button in the text bar. Persists across restarts."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\fakeDM\\index.tsx"
+      "file": "\\src\\fcordplugins\\fakeDM\\index.tsx"
     },
     {
       "name": "FakeFriends",
@@ -4152,7 +4152,7 @@
         "Locally simulates Discord friends and requests. Persistent between reloads."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\fakeFriends\\index.tsx"
+      "file": "\\src\\fcordplugins\\fakeFriends\\index.tsx"
     },
     {
       "name": "FakePerm",
@@ -4163,7 +4163,7 @@
       "settingKeys": [
         "Replacement"
       ],
-      "file": "\\src\\nightcordplugins\\fakePerm\\index.tsx"
+      "file": "\\src\\fcordplugins\\fakePerm\\index.tsx"
     },
     {
       "name": "FakeVoice",
@@ -4174,7 +4174,7 @@
         "Toggle Fake Deafen & Mute simultaneously"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\FakeVoice\\index.tsx"
+      "file": "\\src\\fcordplugins\\FakeVoice\\index.tsx"
     },
     {
       "name": "FastDiscord",
@@ -4211,7 +4211,7 @@
         "Throttle Presence",
         "Low End Mode"
       ],
-      "file": "\\src\\nightcordplugins\\fastDiscord\\index.tsx"
+      "file": "\\src\\fcordplugins\\fastDiscord\\index.tsx"
     },
     {
       "name": "FixScreenshare",
@@ -4219,7 +4219,7 @@
         "Fixes infinite loading and crashes on screenshare after reload (Ctrl+R) by forcing module re-initialization."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\fixScreenshare\\index.tsx"
+      "file": "\\src\\fcordplugins\\fixScreenshare\\index.tsx"
     },
     {
       "name": "FloodPanel",
@@ -4232,7 +4232,7 @@
         "Default Delay",
         "Default Shuffle"
       ],
-      "file": "\\src\\nightcordplugins\\floodPanel\\index.tsx"
+      "file": "\\src\\fcordplugins\\floodPanel\\index.tsx"
     },
     {
       "name": "FollowMe",
@@ -4240,7 +4240,7 @@
         "Forces a user to follow you in voice channels (if you have permissions). Right-click a user -> Follow Me."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\followMe\\index.tsx"
+      "file": "\\src\\fcordplugins\\followMe\\index.tsx"
     },
     {
       "name": "FollowUser",
@@ -4248,7 +4248,7 @@
         "Suit un user en vocal. Clic droit → Follow User. Coeur blanc = suivi actif (clic gauche = rejoindre, clic droit = unfollow). Auto-unfollow apres 30min d'inactivite."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\followUser\\index.tsx"
+      "file": "\\src\\fcordplugins\\followUser\\index.tsx"
     },
     {
       "name": "GifConvertor",
@@ -4256,7 +4256,7 @@
         "Converts an image or video to GIF and sends it in the current channel."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\gifConvertor\\index.tsx"
+      "file": "\\src\\fcordplugins\\gifConvertor\\index.tsx"
     },
     {
       "name": "HideMedia",
@@ -4264,7 +4264,7 @@
         "Hide attachments and embeds for individual messages via hover button"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\hideAttachments\\index.tsx"
+      "file": "\\src\\fcordplugins\\hideAttachments\\index.tsx"
     },
     {
       "name": "IconViewer",
@@ -4272,7 +4272,7 @@
         "Adds a new tab to settings to preview all icons."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\iconViewer\\index.tsx"
+      "file": "\\src\\fcordplugins\\iconViewer\\index.tsx"
     },
     {
       "name": "IgnoreCalls",
@@ -4283,7 +4283,7 @@
       "settingKeys": [
         "Permanently Ignored Users"
       ],
-      "file": "\\src\\nightcordplugins\\ignoreCalls\\index.tsx"
+      "file": "\\src\\fcordplugins\\ignoreCalls\\index.tsx"
     },
     {
       "name": "ImageLink",
@@ -4291,7 +4291,7 @@
         "Never hide image links in messages, even if it's the only content"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\imageLink\\index.ts"
+      "file": "\\src\\fcordplugins\\imageLink\\index.ts"
     },
     {
       "name": "ImageZoom",
@@ -4314,7 +4314,7 @@
         "Size",
         "Zoom Speed"
       ],
-      "file": "\\src\\nightcordplugins\\imageZoom\\index.tsx"
+      "file": "\\src\\fcordplugins\\imageZoom\\index.tsx"
     },
     {
       "name": "Impersonate",
@@ -4328,7 +4328,7 @@
         "Image to attach to the impersonated message."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\impersonate\\index.ts"
+      "file": "\\src\\fcordplugins\\impersonate\\index.ts"
     },
     {
       "name": "InRole",
@@ -4338,7 +4338,7 @@
         "The role"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\inRole\\index.tsx"
+      "file": "\\src\\fcordplugins\\inRole\\index.tsx"
     },
     {
       "name": "LastSeen",
@@ -4349,7 +4349,7 @@
       "settingKeys": [
         "Language"
       ],
-      "file": "\\src\\nightcordplugins\\lastSeen\\index.tsx"
+      "file": "\\src\\fcordplugins\\lastSeen\\index.tsx"
     },
     {
       "name": "LeaveAllServers",
@@ -4360,7 +4360,7 @@
       "settingKeys": [
         "Safe Mode"
       ],
-      "file": "\\src\\nightcordplugins\\leaveAllServers\\index.tsx"
+      "file": "\\src\\fcordplugins\\leaveAllServers\\index.tsx"
     },
     {
       "name": "LiveWallpaper",
@@ -4380,7 +4380,7 @@
         "Muted",
         "Volume"
       ],
-      "file": "\\src\\nightcordplugins\\liveWallpaper\\index.tsx"
+      "file": "\\src\\fcordplugins\\liveWallpaper\\index.tsx"
     },
     {
       "name": "LockGroup",
@@ -4393,7 +4393,7 @@
         "Show Notifications",
         "Debug Mode"
       ],
-      "file": "\\src\\nightcordplugins\\lockGroup\\index.tsx"
+      "file": "\\src\\fcordplugins\\lockGroup\\index.tsx"
     },
     {
       "name": "LoginWithToken",
@@ -4401,7 +4401,7 @@
         "Adds a 'Login with Token' button on the Discord login page."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\loginWithToken\\index.tsx"
+      "file": "\\src\\fcordplugins\\loginWithToken\\index.tsx"
     },
     {
       "name": "MacOsButtons",
@@ -4409,7 +4409,7 @@
         "Replaces Windows buttons with macOS-style buttons — red, yellow, green."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\macOsButtons\\index.tsx"
+      "file": "\\src\\fcordplugins\\macOsButtons\\index.tsx"
     },
     {
       "name": "MassDM",
@@ -4417,7 +4417,7 @@
         "Sends a message to all your friends with an anti-rate-limit delay."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\massDM\\index.tsx"
+      "file": "\\src\\fcordplugins\\massDM\\index.tsx"
     },
     {
       "name": "MemberCount",
@@ -4432,7 +4432,7 @@
         "Member List",
         "Voice Activity"
       ],
-      "file": "\\src\\nightcordplugins\\memberCount\\index.tsx"
+      "file": "\\src\\fcordplugins\\memberCount\\index.tsx"
     },
     {
       "name": "MessageCleaner",
@@ -4459,7 +4459,7 @@
         "Skip Replies",
         "Max Age"
       ],
-      "file": "\\src\\nightcordplugins\\messageCleaner\\index.tsx"
+      "file": "\\src\\fcordplugins\\messageCleaner\\index.tsx"
     },
     {
       "name": "MessageLogger",
@@ -4494,7 +4494,7 @@
         "Show Edit Diffs",
         "Separated Diffs"
       ],
-      "file": "\\src\\nightcordplugins\\messageLogger\\index.tsx"
+      "file": "\\src\\fcordplugins\\messageLogger\\index.tsx"
     },
     {
       "name": "MessageLoggerEnhanced",
@@ -4502,7 +4502,7 @@
         "Improves MessageLogger with edited message history, ghost ping detection and more"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\messageLoggerEnhanced\\index.tsx"
+      "file": "\\src\\fcordplugins\\messageLoggerEnhanced\\index.tsx"
     },
     {
       "name": "SecureDNS",
@@ -4535,7 +4535,7 @@
         "Auto Start",
         "Log Level"
       ],
-      "file": "\\src\\nightcordplugins\\mullvadDNS\\index.tsx"
+      "file": "\\src\\fcordplugins\\mullvadDNS\\index.tsx"
     },
     {
       "name": "MultiInstance",
@@ -4543,7 +4543,7 @@
         "Opens a 2nd Discord (new window or split screen) with another account."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\multiInstance\\index.tsx"
+      "file": "\\src\\fcordplugins\\multiInstance\\index.tsx"
     },
     {
       "name": "MuteAllServers",
@@ -4551,10 +4551,10 @@
         "Right-click a server → mute all servers and mark all as read in one click."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\muteAllServers\\index.tsx"
+      "file": "\\src\\fcordplugins\\muteAllServers\\index.tsx"
     },
     {
-      "name": "NightcordAI",
+      "name": "FcordAI",
       "descriptions": [
         "Groq API Key (console.groq.com/keys) — shared with AutoCorrect and VoiceDictation",
         "Custom model (empty = default)",
@@ -4570,15 +4570,15 @@
         "Provider",
         "Temperature"
       ],
-      "file": "\\src\\nightcordplugins\\nightcordAI\\index.tsx"
+      "file": "\\src\\fcordplugins\\fcordAI\\index.tsx"
     },
     {
-      "name": "NightcordUpdater",
+      "name": "FcordUpdater",
       "descriptions": [
-        "Shows a banner when a new Nightcord version is available. Click Update to install."
+        "Shows a banner when a new Fcord version is available. Click Update to install."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\nightcordUpdater\\index.tsx"
+      "file": "\\src\\fcordplugins\\fcordUpdater\\index.tsx"
     },
     {
       "name": "NoDMWhileStreaming",
@@ -4591,7 +4591,7 @@
         "Hide Groups",
         "Debug Mode"
       ],
-      "file": "\\src\\nightcordplugins\\noDMWhileStreaming\\index.tsx"
+      "file": "\\src\\fcordplugins\\noDMWhileStreaming\\index.tsx"
     },
     {
       "name": "NoNitroUpsell",
@@ -4599,7 +4599,7 @@
         "Automatically blocks Nitro upsell/gift popups that Discord keeps showing."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\noNitroUpsell\\index.ts"
+      "file": "\\src\\fcordplugins\\noNitroUpsell\\index.ts"
     },
     {
       "name": "UI Optimisations",
@@ -4628,7 +4628,7 @@
         "Limit Msg Cache",
         "Reduce Fps Background"
       ],
-      "file": "\\src\\nightcordplugins\\optimisations\\index.tsx"
+      "file": "\\src\\fcordplugins\\optimisations\\index.tsx"
     },
     {
       "name": "OverlayFix",
@@ -4636,7 +4636,7 @@
         "Attempts to fix the overlay by tricking Discord about the process name (masquerades as discord.exe)."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\overlayFix\\index.tsx"
+      "file": "\\src\\fcordplugins\\overlayFix\\index.tsx"
     },
     {
       "name": "PinDMs",
@@ -4652,7 +4652,7 @@
         "Dm Section Collapsed",
         "User Based Category List"
       ],
-      "file": "\\src\\nightcordplugins\\pinDms\\index.tsx"
+      "file": "\\src\\fcordplugins\\pinDms\\index.tsx"
     },
     {
       "name": "PlatformIndicators",
@@ -4673,7 +4673,7 @@
         "Show Bots",
         "Console Icon"
       ],
-      "file": "\\src\\nightcordplugins\\platformIndicators\\index.tsx"
+      "file": "\\src\\fcordplugins\\platformIndicators\\index.tsx"
     },
     {
       "name": "PlatformSpoofer",
@@ -4684,7 +4684,7 @@
       "settingKeys": [
         "Platform"
       ],
-      "file": "\\src\\nightcordplugins\\platformSpoofer\\index.tsx"
+      "file": "\\src\\fcordplugins\\platformSpoofer\\index.tsx"
     },
     {
       "name": "PrevNames",
@@ -4692,7 +4692,7 @@
         "Shows the username history of a user. Right-click → PrevNames."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\PrevNames\\index.tsx"
+      "file": "\\src\\fcordplugins\\PrevNames\\index.tsx"
     },
     {
       "name": "RealtimeTimestamps",
@@ -4707,7 +4707,7 @@
         "Show In Tooltip",
         "Show In Compact"
       ],
-      "file": "\\src\\nightcordplugins\\realtimeTimestamps\\index.tsx"
+      "file": "\\src\\fcordplugins\\realtimeTimestamps\\index.tsx"
     },
     {
       "name": "ReverseImageSearch",
@@ -4715,7 +4715,7 @@
         "Adds ImageSearch to image context menus"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\reverseImageSearch\\index.tsx"
+      "file": "\\src\\fcordplugins\\reverseImageSearch\\index.tsx"
     },
     {
       "name": "SelfDestruct",
@@ -4728,7 +4728,7 @@
         "Active",
         "Delay"
       ],
-      "file": "\\src\\nightcordplugins\\selfDestruct\\index.tsx"
+      "file": "\\src\\fcordplugins\\selfDestruct\\index.tsx"
     },
     {
       "name": "ServerCloner",
@@ -4738,7 +4738,7 @@
       "settingKeys": [
         "Headers"
       ],
-      "file": "\\src\\nightcordplugins\\serverCloner\\index.tsx"
+      "file": "\\src\\fcordplugins\\serverCloner\\index.tsx"
     },
     {
       "name": "SharePerms",
@@ -4751,7 +4751,7 @@
         "Shared Users",
         "Logs"
       ],
-      "file": "\\src\\nightcordplugins\\sharePerms\\index.tsx"
+      "file": "\\src\\fcordplugins\\sharePerms\\index.tsx"
     },
     {
       "name": "ShowHiddenChannels",
@@ -4766,7 +4766,7 @@
         "Show Mode",
         "Default Allowed Users And Roles Dropdown State"
       ],
-      "file": "\\src\\nightcordplugins\\showHiddenChannels\\index.tsx"
+      "file": "\\src\\fcordplugins\\showHiddenChannels\\index.tsx"
     },
     {
       "name": "ShowHiddenThings",
@@ -4774,7 +4774,7 @@
         "Displays various hidden & moderator-only things regardless of permissions."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\showHiddenThings\\index.ts"
+      "file": "\\src\\fcordplugins\\showHiddenThings\\index.ts"
     },
     {
       "name": "ShowID",
@@ -4782,7 +4782,7 @@
         "Shows the user ID in Discord profiles, below the 'Member Since' section."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\showID\\index.tsx"
+      "file": "\\src\\fcordplugins\\showID\\index.tsx"
     },
     {
       "name": "SilentDelete",
@@ -4804,7 +4804,7 @@
         "Purge Interval",
         "Accent Color"
       ],
-      "file": "\\src\\nightcordplugins\\silentDelete\\index.tsx"
+      "file": "\\src\\fcordplugins\\silentDelete\\index.tsx"
     },
     {
       "name": "SmoothType",
@@ -4819,7 +4819,7 @@
         "Animation Type",
         "Caret Color"
       ],
-      "file": "\\src\\nightcordplugins\\SmoothType\\index.tsx"
+      "file": "\\src\\fcordplugins\\SmoothType\\index.tsx"
     },
     {
       "name": "SoundCordPlayer",
@@ -4827,7 +4827,7 @@
         "Integrated SoundCord player. Client ID is automatically fetched via native Electron process — no account required."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\soundcloudPlayer\\index.tsx"
+      "file": "\\src\\fcordplugins\\soundcloudPlayer\\index.tsx"
     },
     {
       "name": "SpotifyCrack",
@@ -4840,15 +4840,15 @@
         "No Spotify Auto Pause",
         "Keep Spotify Activity On Idle"
       ],
-      "file": "\\src\\nightcordplugins\\spotifyCrack\\index.ts"
+      "file": "\\src\\fcordplugins\\spotifyCrack\\index.ts"
     },
     {
       "name": "StealthMode",
       "descriptions": [
-        "Hides all plugin buttons without disabling them. Shortcut: Ctrl+Shift+H. The toggle is in Nightcord Settings."
+        "Hides all plugin buttons without disabling them. Shortcut: Ctrl+Shift+H. The toggle is in Fcord Settings."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\stealthMode\\index.tsx"
+      "file": "\\src\\fcordplugins\\stealthMode\\index.tsx"
     },
     {
       "name": "StreamProof",
@@ -4859,7 +4859,7 @@
       "settingKeys": [
         "Auto Stream Proof"
       ],
-      "file": "\\src\\nightcordplugins\\streamProof\\index.tsx"
+      "file": "\\src\\fcordplugins\\streamProof\\index.tsx"
     },
     {
       "name": "ThemeLibrary",
@@ -4867,13 +4867,13 @@
         "A library of themes for Vencord."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\themeLibrary\\index.tsx"
+      "file": "\\src\\fcordplugins\\themeLibrary\\index.tsx"
     },
     {
       "name": "TitlebarLink",
       "descriptions": [],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\titlebarLink\\index.tsx"
+      "file": "\\src\\fcordplugins\\titlebarLink\\index.tsx"
     },
     {
       "name": "TokenImporter",
@@ -4884,7 +4884,7 @@
       "settingKeys": [
         "Auto Scan On Startup"
       ],
-      "file": "\\src\\nightcordplugins\\tokenImporter\\index.tsx"
+      "file": "\\src\\fcordplugins\\tokenImporter\\index.tsx"
     },
     {
       "name": "Translate",
@@ -4892,7 +4892,7 @@
         "Translate messages with Google Translate or DeepL"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\translate\\index.tsx"
+      "file": "\\src\\fcordplugins\\translate\\index.tsx"
     },
     {
       "name": "UnlimitedAccounts",
@@ -4903,7 +4903,7 @@
       "settingKeys": [
         "Max Accounts"
       ],
-      "file": "\\src\\nightcordplugins\\unlimitedAccounts\\index.ts"
+      "file": "\\src\\fcordplugins\\unlimitedAccounts\\index.ts"
     },
     {
       "name": "FakeNitro",
@@ -4934,15 +4934,15 @@
         "Hyper Link Text",
         "Disable Embed Permission Check"
       ],
-      "file": "\\src\\nightcordplugins\\unlockEmoji\\index.tsx"
+      "file": "\\src\\fcordplugins\\unlockEmoji\\index.tsx"
     },
     {
       "name": "UserAreaTweaks",
       "descriptions": [
-        "Creates an elegant floating dock for Nightcord plugins using pure CSS, preventing overlap and crashes."
+        "Creates an elegant floating dock for Fcord plugins using pure CSS, preventing overlap and crashes."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\userAreaTweaks\\index.tsx"
+      "file": "\\src\\fcordplugins\\userAreaTweaks\\index.tsx"
     },
     {
       "name": "UserVoiceShow",
@@ -4957,7 +4957,7 @@
         "Show In Member List",
         "Show In Messages"
       ],
-      "file": "\\src\\nightcordplugins\\userVoiceShow\\index.tsx"
+      "file": "\\src\\fcordplugins\\userVoiceShow\\index.tsx"
     },
     {
       "name": "ValidUser",
@@ -4965,7 +4965,7 @@
         "Fix mentions for unknown users showing up as '@unknown-user' (hover over a mention to fix it)"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\validUser\\index.tsx"
+      "file": "\\src\\fcordplugins\\validUser\\index.tsx"
     },
     {
       "name": "ViewIcons",
@@ -4978,7 +4978,7 @@
         "Format",
         "Img Size"
       ],
-      "file": "\\src\\nightcordplugins\\viewIcons\\index.tsx"
+      "file": "\\src\\fcordplugins\\viewIcons\\index.tsx"
     },
     {
       "name": "VoiceChannelSearch",
@@ -4986,20 +4986,20 @@
         "Search and join any voice channel across all your servers."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\voiceChannelSearch\\index.tsx"
+      "file": "\\src\\fcordplugins\\voiceChannelSearch\\index.tsx"
     },
     {
       "name": "VoiceDictation",
       "descriptions": [
         "Transcription language. Auto-detect may occasionally hallucinate English.",
         "Audio segment duration (seconds). Shorter = more reactive but less precise.",
-        "Real-time voice dictation via Groq Whisper (free). API key shared with NightcordAI."
+        "Real-time voice dictation via Groq Whisper (free). API key shared with FcordAI."
       ],
       "settingKeys": [
         "Language",
         "Chunk Seconds"
       ],
-      "file": "\\src\\nightcordplugins\\voiceDictation\\index.tsx"
+      "file": "\\src\\fcordplugins\\voiceDictation\\index.tsx"
     },
     {
       "name": "VoiceDownload",
@@ -5007,7 +5007,7 @@
         "Adds a download to voice messages. (Opens a new browser tab)"
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\voiceDownload\\index.tsx"
+      "file": "\\src\\fcordplugins\\voiceDownload\\index.tsx"
     },
     {
       "name": "VoiceMessages",
@@ -5020,7 +5020,7 @@
         "Noise Suppression",
         "Echo Cancellation"
       ],
-      "file": "\\src\\nightcordplugins\\voiceMessages\\index.tsx"
+      "file": "\\src\\fcordplugins\\voiceMessages\\index.tsx"
     },
     {
       "name": "VolumeBooster",
@@ -5031,7 +5031,7 @@
       "settingKeys": [
         "Multiplier"
       ],
-      "file": "\\src\\nightcordplugins\\VolumeBooster\\index.ts"
+      "file": "\\src\\fcordplugins\\VolumeBooster\\index.ts"
     },
     {
       "name": "WhosWatching",
@@ -5042,7 +5042,7 @@
       "settingKeys": [
         "Show Panel"
       ],
-      "file": "\\src\\nightcordplugins\\whosWatching\\index.tsx"
+      "file": "\\src\\fcordplugins\\whosWatching\\index.tsx"
     },
     {
       "name": "WordBomb",
@@ -5050,7 +5050,7 @@
         "Assistant BombParty/WordBomb avec overlay persistant, IA intégrée et alphabet track."
       ],
       "settingKeys": [],
-      "file": "\\src\\nightcordplugins\\wordBomb\\index.tsx"
+      "file": "\\src\\fcordplugins\\wordBomb\\index.tsx"
     },
     {
       "name": "SilentEdit",
@@ -5066,7 +5066,7 @@
         "Suppress Notifications",
         "Accent Color"
       ],
-      "file": "\\src\\nightcordplugins\\silentEdit.tsx"
+      "file": "\\src\\fcordplugins\\silentEdit.tsx"
     }
   ],
   "allDescriptions": [
@@ -5122,7 +5122,7 @@
     "Adds a 'Login with Token' button on the Discord login page.",
     "Adds a /petpet slash command to create headpet gifs from any image",
     "Adds a button near mute to join a random voice channel.",
-    "Adds a button next to the inbox button in the channel header that houses Nightcord quick actions",
+    "Adds a button next to the inbox button in the channel header that houses Fcord quick actions",
     "Adds a button next to the mic and deafen button to toggle game activity.",
     "Adds a button to copy user's mention on the user context menu, works best with ValidUser.",
     "Adds a button to prevent being moved or disconnected from a voice channel.",
@@ -5325,16 +5325,16 @@
     "AutoReply",
     "AutoResponder",
     "AutoResponder functional status",
-    "AutoTranslateNightcord",
+    "AutoTranslateFcord",
     "AutoUnmute",
     "AutoZipper",
     "Automated fingerprint/end text",
-    "Automatic translation for Nightcord.",
+    "Automatic translation for Fcord.",
     "Automatically blocks Nitro upsell/gift popups that Discord keeps showing.",
     "Automatically caps the volume of other users — no more screaming or loud noises that pierce your ears.",
     "Automatically claim tickets by clicking bot message buttons, and auto-move users from a source voice channel into yours.",
     "Automatically click a button on bot messages inside a ticket category.",
-    "Automatically corrects spelling and grammar before sending. Requires a free Groq API key configured in NightcordAI.",
+    "Automatically corrects spelling and grammar before sending. Requires a free Groq API key configured in FcordAI.",
     "Automatically deafems your mic when joining voice-channel.",
     "Automatically disable the silent message toggle again after sending one",
     "Automatically enable StreamProof when you start streaming",
@@ -5590,7 +5590,7 @@
     "Create and use your own custom avatar decorations, or pick your favorite from the presets.",
     "Create custom reasons to use in the Discord ban modal, and/or show a text input by default instead of the options.",
     "CreateTheme",
-    "Creates an elegant floating dock for Nightcord plugins using pure CSS, preventing overlap and crashes.",
+    "Creates an elegant floating dock for Fcord plugins using pure CSS, preventing overlap and crashes.",
     "Crossant every specified amount of clicks :trolley:",
     "Ctrl+Tab between most recently used DMs (Ctrl+Shift+Tab reverse)",
     "Currently selected font",
@@ -6025,9 +6025,9 @@
     "HideMessages",
     "HideServers",
     "Hides DM and Group DM notifications and sidebar items while you are streaming",
-    "Hides all Nightcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons.",
+    "Hides all Fcord plugin buttons and replaces them with a single compact toggle icon. Click the icon to restore all buttons.",
     "Hides all channels in collapsed categories, even if they have unread messages.",
-    "Hides all plugin buttons without disabling them. Shortcut: Ctrl+Shift+H. The toggle is in Nightcord Settings.",
+    "Hides all plugin buttons without disabling them. Shortcut: Ctrl+Shift+H. The toggle is in Fcord Settings.",
     "Hides messages, links, images, DMs, but not the screen share/voice grid. Toggle via chat bar button.",
     "Hides the Dearrow button from YouTube embeds",
     "Hides the button if there are no replies to the message",
@@ -6264,7 +6264,7 @@
     "Low-end PC mode: more frequent GC and lower background FPS",
     "MacOsButtons",
     "Main",
-    "Main Nightcord plugin: fixes Discord crashes, adds UI options and manages internal commands.",
+    "Main Fcord plugin: fixes Discord crashes, adds UI options and manages internal commands.",
     "Make Discord not consider using AV1 for streaming.",
     "Make Discord not consider using H264 for streaming.",
     "Make Discord not consider using H265 for streaming.",
@@ -6403,9 +6403,9 @@
     "NeverPausePreviews",
     "NewGuildSettings",
     "Nickname Color",
-    "NightcordAI",
-    "NightcordHelper",
-    "NightcordUpdater",
+    "FcordAI",
+    "FcordHelper",
+    "FcordUpdater",
     "Nitro First",
     "No Activities",
     "No Animated Emoji",
@@ -6622,7 +6622,7 @@
     "Reaction speed (ms) — lower = more reactive",
     "Reactions",
     "Reactors List",
-    "Real-time voice dictation via Groq Whisper (free). API key shared with NightcordAI.",
+    "Real-time voice dictation via Groq Whisper (free). API key shared with FcordAI.",
     "RealtimeTimestamps",
     "Reasons",
     "Receive audio pings for @everyone and @here in group DMs",
@@ -7014,7 +7014,7 @@
     "ShowSongName",
     "ShowTimeoutDuration",
     "Shown Emojis",
-    "Shows a banner when a new Nightcord version is available. Click Update to install.",
+    "Shows a banner when a new Fcord version is available. Click Update to install.",
     "Shows a streak next to a user when you exchange DMs with them on consecutive days.",
     "Shows a text input instead of a select menu by default. (Equivalent to clicking the \"Other\" option)",
     "Shows a timestamp on replied-message previews",
@@ -7139,7 +7139,7 @@
     "Suppress Notifications",
     "Suppress notifications when replacing the message (prevents pinging mentioned users).",
     "Sync With Friends",
-    "Sync wallpapers with Nightcord friends in DMs.",
+    "Sync wallpapers with Fcord friends in DMs.",
     "Sync your status to Steam! (Online, Away, Invisible, or Offline.)",
     "System Prompt",
     "TEXT TO UPPERCASE",

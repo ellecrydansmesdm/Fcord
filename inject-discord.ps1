@@ -1,6 +1,6 @@
 # ==============================================================================
-#  Nightcord — Script d'injection Post-Installation
-#  Utilisé par l'installateur Inno Setup pour injecter Nightcord dans Discord.
+#  Fcord — Script d'injection Post-Installation
+#  Utilisé par l'installateur Inno Setup pour injecter Fcord dans Discord.
 # ==============================================================================
 
 param(
@@ -38,20 +38,20 @@ $PackageJson = @{
 Set-Content -Path (Join-Path $InjectDir "package.json") -Value $PackageJson
 
 # Générer le index.js d'injection
-# On pointe vers le patcher.js dans le dossier d'installation de Nightcord
-$NightcordPatcher = Join-Path $AppDir "dist\desktop\patcher.js"
-$NightcordPatcher = $NightcordPatcher.Replace("\", "\\")
+# On pointe vers le patcher.js dans le dossier d'installation de Fcord
+$FcordPatcher = Join-Path $AppDir "dist\desktop\patcher.js"
+$FcordPatcher = $FcordPatcher.Replace("\", "\\")
 
 $IndexJs = @"
 \"use strict\";
 const path = require(\"path\");
 const fs = require(\"fs\");
 
-// Injection Nightcord
+// Injection Fcord
 try {
-    require(\"$NightcordPatcher\");
+    require(\"$FcordPatcher\");
 } catch (e) {
-    console.error(\"Nightcord injection failed:\", e);
+    console.error(\"Fcord injection failed:\", e);
     // Fallback sur Discord original si possible
     const originalAsar = path.join(__dirname, \"..\", \"_app.asar\");
     if (fs.existsSync(originalAsar)) {
