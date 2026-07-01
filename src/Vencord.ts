@@ -322,17 +322,6 @@ async function init() {
     syncSettings();
     initTrayIpc();
 
-    const hasOpened = localStorage.getItem("fcord_telegram_opened");
-    if (!hasOpened) {
-        localStorage.setItem("fcord_telegram_opened", "true");
-        setTimeout(() => {
-            if (window.fcord && typeof window.fcord.openUrl === "function") {
-                window.fcord.openUrl("https://t.me/fcordoff");
-            } else {
-                VencordNative.native.openExternal("https://t.me/fcordoff");
-            }
-        }, 3000);
-    }
 
     if (!IS_WEB && !IS_UPDATER_DISABLED) {
         runUpdateCheck();
