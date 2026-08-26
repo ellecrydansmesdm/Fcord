@@ -1,0 +1,5 @@
+# Ignore everything except README.md and LICENSE
+*
+!README.md
+!LICENSE
+!.gitignore
