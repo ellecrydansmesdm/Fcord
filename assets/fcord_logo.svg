@@ -1,0 +1,14 @@
+<svg width="400" height="320" viewBox="0 0 400 320" role="img" xmlns="http://www.w3.org/2000/svg">
+  <!-- Centered Icon (150x150) at x=125, y=20 -->
+  <rect x="125" y="20" width="150" height="150" rx="34" fill="#7f77dd"/>
+  <rect x="168" y="40" width="17" height="74" rx="3" fill="#ffffff"/>
+  <rect x="168" y="40" width="58" height="16" rx="3" fill="#ffffff"/>
+  <rect x="168" y="78" width="42" height="14" rx="3" fill="#ffffff"/>
+  <path stroke="white" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M176,110 L176,124 Q176,133 185,133 Q194,133 194,142 L194,152"/>
+  <circle cx="194" cy="156" r="6" fill="#ffffff"/>
+  
+  <!-- Centered Wordmark 'Fcord' -->
+  <text x="200" y="270" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="78" font-weight="700" letter-spacing="-1.5">
+    <tspan fill="#afa9ec">F</tspan><tspan fill="#7f77dd">cord</tspan>
+  </text>
+</svg>
