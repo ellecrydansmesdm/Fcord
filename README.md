@@ -29,7 +29,7 @@ FCord is developed and maintained by Fahd ([@ellecrydansmesdm](https://github.co
 
 ## Features
 
-- **Hundreds of included plugins.** Customize chat, appearance, notifications, servers, voice, media, privacy, and shortcuts. The generated [plugin list](./plugins.json) reflects the current source tree.
+- **Hundreds of included plugins.** Customize chat, appearance, notifications, servers, voice, media, privacy, and shortcuts.
 - **Themes and profiles.** Use QuickCSS, local themes, the theme library, and FCord profile options for banners, badges, decorations, effects, and bios.
 - **Account and privacy tools.** Manage additional account sessions and protect account data saved on your computer with FCord's encrypted storage.
 - **Voice and media tools.** Access voice utilities, integrated players, recording tools, SoundPad, and desktop media features from Discord.
@@ -56,39 +56,14 @@ Use the updater in FCord settings when an update is available. Restart Discord a
 
 To remove FCord, run the installer again and choose **Uninstall**. The installer removes the FCord loader and restores Discord's backed-up application archive when available.
 
-## Development
+## Security and Privacy
 
-You need Windows, [Node.js 20](https://nodejs.org/), and the pnpm version recorded in [`package.json`](./package.json).
+FCord is built with strong security boundaries and privacy-first engineering:
 
-```powershell
-git clone https://github.com/ellecrydansmesdm/Fcord.git
-cd Fcord
-pnpm install --frozen-lockfile
-pnpm build:quick
-pnpm inject
-```
-
-Useful commands:
-
-| Command | Purpose |
-| --- | --- |
-| `pnpm build:quick` | Build the injected desktop bundles for local development |
-| `pnpm dev` | Rebuild files in watch mode |
-| `pnpm testTsc` | Type-check the TypeScript project |
-| `pnpm lint` | Run ESLint |
-| `pnpm lint-styles` | Run Stylelint on source CSS |
-| `pnpm generatePluginJson` | Regenerate `plugins.json` |
-| `pnpm inject` | Inject the local build into Discord |
-| `pnpm uninject` | Restore the Discord installation |
-| `pnpm build` | Create the production desktop bundle and updater payload |
-
-Build the Windows installer after `pnpm build`:
-
-```powershell
-.\build-installer.ps1
-```
-
-Production commands generate release files. Use `pnpm build:quick` for ordinary plugin and interface development.
+- **Hardware-Backed Encryption**: Tokens, credentials, and sensitive configurations are secured locally using Windows DPAPI and Electron `safeStorage`. Plaintext credentials never touch disk storage unencrypted.
+- **Process & Storage Isolation**: Multi-account sessions run with separated local cache boundaries, avoiding token cross-contamination between accounts or client channels (Stable, PTB, Canary).
+- **Anti-Log & Telemetry Control**: Built-in options to block tracking endpoints, mute unwanted typing indicators, and silently remove sent messages with zero trace in remote loggers.
+- **Offline Reliability**: The installer and updater payloads run self-contained without downloading uncontrolled third-party scripts at runtime.
 
 ## Support
 
