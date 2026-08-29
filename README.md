@@ -1,118 +1,104 @@
-<div align="center">
+<p align="center">
+  <img src="./logo.png" alt="FCord" width="544">
+</p>
 
-# FCord
+<h1 align="center">FCord</h1>
 
-**High-performance desktop client modification engineered for Discord.**
+<p align="center">
+  A customizable Discord desktop client mod for Windows, with hundreds of plugins and FCord-exclusive features.
+</p>
 
-[![Release](https://img.shields.io/github/v/release/ellecrydansmesdm/Fcord?color=5865F2&label=Release&style=flat-square)](https://github.com/ellecrydansmesdm/Fcord/releases/latest)
-[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011%20(x64)-informational?style=flat-square)](https://github.com/ellecrydansmesdm/Fcord/releases/latest)
-[![Security](https://img.shields.io/badge/Payload-ASAR%20Hardened-success?style=flat-square)](https://github.com/ellecrydansmesdm/Fcord/releases/latest)
-[![Discord](https://img.shields.io/badge/Community-Discord%20Server-5865F2?style=flat-square)](https://discord.gg/W2YgEStqJ4)
-[![License](https://img.shields.io/badge/License-GPL--3.0-lightgrey?style=flat-square)](LICENSE)
+<p align="center">
+  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">Download</a>
+  ·
+  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">Releases</a>
+  ·
+  <a href="./plugins.json">Plugin list</a>
+  ·
+  <a href="https://discord.gg/W2YgEStqJ4">Community</a>
+</p>
 
-<br />
+## About
 
-[Download Installer (.exe)](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/Fcord-Installer.exe) &nbsp;•&nbsp; [Offline Bundle (.zip)](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) &nbsp;•&nbsp; [Discord Server](https://discord.gg/W2YgEStqJ4) &nbsp;•&nbsp; [Releases](https://github.com/ellecrydansmesdm/Fcord/releases)
+FCord extends the official Discord desktop app with a large plugin catalog, themes, profile customization, account tools, media controls, and optional cloud synchronization. You can manage the available features from the FCord settings page and disable the ones you do not need.
 
-<br />
+FCord builds on work from Vencord, Equicord, and Vesktop while maintaining its own features and Windows installer.
 
-</div>
+## Features
 
----
+- **Hundreds of included plugins.** Customize chat, appearance, notifications, servers, voice, media, privacy, and shortcuts. The generated [plugin list](./plugins.json) reflects the current source tree.
+- **Themes and profiles.** Use QuickCSS, local themes, the theme library, and FCord profile options for banners, badges, decorations, effects, and bios.
+- **Account and privacy tools.** Manage additional account sessions and protect account data saved on your computer with FCord's encrypted storage.
+- **Voice and media tools.** Access voice utilities, integrated players, recording tools, SoundPad, and desktop media features from Discord.
+- **Backup and synchronization.** Export settings locally or use the optional cloud service to synchronize settings, QuickCSS, and FCord profiles.
+- **Built-in updates.** Install published FCord updates from the client and restart Discord to load the new desktop bundle.
 
-## Overview
+Some plugins use external services, additional Discord accounts, or audio devices and require their own setup. Plugin availability and compatibility can change when Discord updates its desktop client.
 
-FCord is an advanced, local-first client modification for Discord designed for performance enthusiasts, power users, and developers. Built on top of a zero-overhead runtime hook architecture, FCord extends the desktop Discord client with studio-grade audio processing, deep privacy evasion, multi-instance account management, and a modular ecosystem of over 770 integrated plugins.
+## Installation
 
----
+FCord supports **Windows x64** with Discord **Stable, PTB, and Canary**.
 
-## Core Architecture & Features
+1. Install and open your preferred Discord desktop channel at least once.
+2. Download [FCord-Installer.exe](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe).
+3. Close Discord and run the installer.
+4. Select the Discord installations you want to modify, then install FCord.
+5. Start Discord and open **User Settings → FCord**.
 
-### 1. High-Fidelity DSP Soundpad & Audio Engine
-- **In-Memory Audio Processing**: Native Web Audio API and Opus streaming pipeline with sub-millisecond audio playback latency.
-- **Dynamic AGC & Anti-Clipping**: Real-time automatic gain control and acoustic peak limiting to prevent distortion and ear fatigue.
-- **Flexible Output Routing**: Instant multi-mode switching between Microphone + Headset, Live Preview, or Dedicated Virtual Mic Channel.
-- **Global Keybinding System**: System-level low-latency hooks for instant audio triggers across any full-screen application.
+Discord updates can replace the application directory used by FCord. Run the latest installer again if FCord disappears after a Discord update.
 
-### 2. Stealth Evasion & Telemetry Isolation
-- **Event Filtering Pipeline**: Dynamic interception and elimination of Discord telemetry dispatchers (`Science`, `Tracking`, `Sentry`, `Crashpad`).
-- **Encrypted Local Vault**: Credentials and tokens stored with DPAPI / AES-256-GCM local encryption.
-- **Zero Remote Dependencies**: Operates strictly within the local client runtime without remote proxying or external metric collection.
+## Updating and uninstalling
 
-### 3. Multi-Instance & Account Session Manager
-- **Parallel Discord Instances**: Run multiple independent Discord sessions concurrently on the same machine without process collisions.
-- **Custom Instance Identity**: Distinct taskbar icons, window titles, and isolated user data directories per account.
-- **Seamless Profile Hot-Swapping**: Switch active profiles without restarting or re-authenticating.
+Use the updater in FCord settings when an update is available. Restart Discord after the update finishes.
 
-### 4. Client-Side Nitro & Customization Suite
-- **Stream Quality Unlocked**: High-bitrate 1080p / 60 FPS screen sharing and streaming.
-- **Media & Asset Enhancements**: Full support for custom external emojis, stickers, animated avatars, banners, and profile decorations.
-- **High-Resolution Media Viewer**: Native image zooming, lossless audio previewing, and zip archive inspection.
+To remove FCord, run the installer again and choose **Uninstall**. The installer removes the FCord loader and restores Discord's backed-up application archive when available.
 
-### 5. Modular Plugin Matrix (770+ Plugins)
-- **Zero-Latency In-Memory Patches**: Webpack module interception executed during module initialization with negligible startup overhead.
-- **Deleted & Edited Message Logger**: Local-only persistent message audit log with diff highlighting.
-- **Granular Settings Interface**: Fully responsive, searchable configuration interface with live reload.
+## Development
 
----
+You need Windows, [Node.js 20](https://nodejs.org/), and the pnpm version recorded in [`package.json`](./package.json).
 
-## Downloads & Verification
+```powershell
+git clone https://github.com/ellecrydansmesdm/Fcord.git
+cd Fcord
+pnpm install --frozen-lockfile
+pnpm build:quick
+pnpm inject
+```
 
-The official releases are cryptographically verified and packaged in a standalone installer.
+Useful commands:
 
-| File | Target Architecture | Size | Checksum (SHA-256) |
-| :--- | :--- | :--- | :--- |
-| **`Fcord-Installer.exe`** | Windows x64 (10 / 11) | 77.0 MB | `da96db71f6fb98ce3bd8446c9d297bd43d72d5887dcab36de0f0bcf6022e62c3` |
-| **`fcord-dist.zip`** | Windows x64 (Offline) | 20.7 MB | `23ff13c859027920ca939e14f40ea94849566286f22552f3fc0b3964aa1c7b5f` |
+| Command | Purpose |
+| --- | --- |
+| `pnpm build:quick` | Build the injected desktop bundles for local development |
+| `pnpm dev` | Rebuild files in watch mode |
+| `pnpm testTsc` | Type-check the TypeScript project |
+| `pnpm lint` | Run ESLint |
+| `pnpm lint-styles` | Run Stylelint on source CSS |
+| `pnpm generatePluginJson` | Regenerate `plugins.json` |
+| `pnpm inject` | Inject the local build into Discord |
+| `pnpm uninject` | Restore the Discord installation |
+| `pnpm build` | Create the production desktop bundle and updater payload |
 
----
+Build the Windows installer after `pnpm build`:
 
-## Installation Guide
+```powershell
+.\build-installer.ps1
+```
 
-### Prerequisites
-- **Operating System**: Windows 10 / Windows 11 (64-bit)
-- **Supported Discord Channels**: Discord Stable, Discord PTB, Discord Canary, Discord Development
+Production commands generate release files. Use `pnpm build:quick` for ordinary plugin and interface development.
 
-### Quick Installation
-1. Download **[`Fcord-Installer.exe`](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/Fcord-Installer.exe)** from the latest release.
-2. Launch the installer.
-3. Select your installed Discord channel (*Stable*, *PTB*, *Canary*, or *Development*).
-4. Click **Install**. Discord will automatically restart with FCord activated.
+## Support
 
-### Uninstallation & Clean Restore
-FCord maintains a non-destructive injection model. To revert Discord to its default state at any time:
-1. Open **`Fcord-Installer.exe`**.
-2. Select your Discord channel and click **Uninstall**.
-3. The original Discord bootstrap is restored immediately with zero residual file modifications.
+- Join the [FCord community](https://discord.gg/W2YgEStqJ4) for help and discussion.
+- Report reproducible problems through [GitHub Issues](https://github.com/ellecrydansmesdm/Fcord/issues).
+- Include your Discord channel, FCord version, and relevant logs when reporting a bug. Do not share account tokens or credentials.
 
----
+## Credits and license
 
-## Technical Specifications
+FCord includes work derived from [Vencord](https://github.com/Vendicated/Vencord), [Equicord](https://github.com/Equicord/Equicord), and [Vesktop](https://github.com/Vencord/Vesktop), plus FCord-specific systems and plugins. The Windows installer derives from the [BetterDiscord installer](https://github.com/BetterDiscord/Installer).
 
-| Parameter | Specification |
-| :--- | :--- |
-| **Runtime Environment** | Electron 34 / Chromium 132 / Node.js 20+ |
-| **UI Framework** | React 19 / TypeScript 5.7 / Svelte 3 (Installer) |
-| **Packaging & Format** | ASAR archive with custom integrity verification |
-| **Memory Overhead** | < 15 MB additional RSS over baseline Discord |
-| **Injection Mechanism** | In-process module patcher (`app_bootstrap` hook) |
+The main repository uses the [GNU General Public License v3.0 or later](./LICENSE). Individual components retain their original copyright notices and licenses.
 
----
+## Disclaimer
 
-## Security Disclosures & Privacy
-
-- **Local Execution**: FCord executes entirely within your local Electron renderer and Node.js runtime. No tokens, messages, or keystrokes are transmitted to any third-party server.
-- **Safety Best Practices**: Only download FCord from the official repository (`ellecrydansmesdm/Fcord`) to ensure file integrity and authentic SHA-256 signatures.
-
----
-
-## Community & Contributing
-
-- **Discord Server**: [Join the official community](https://discord.gg/W2YgEStqJ4) for support, announcements, and plugin discussions.
-- **Issue Tracker**: For bug reports and technical feedback, submit an [Issue](https://github.com/ellecrydansmesdm/Fcord/issues).
-
----
-
-## License
-
-FCord is released under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for terms and conditions.
+FCord is an independent project and has no affiliation with Discord Inc. Client modifications may conflict with Discord's Terms of Service, and Discord updates can break compatibility. You use FCord at your own risk. Discord and related marks belong to their respective owners.
