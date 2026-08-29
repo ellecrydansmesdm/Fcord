@@ -1,104 +1,97 @@
 <p align="center">
-  <img src="./assets/logo.png" alt="FCord" width="544">
+  <img src="./assets/logo.png" alt="FCord" width="560">
 </p>
 
 <h1 align="center">FCord</h1>
 
 <p align="center">
-  A customizable Discord desktop client mod for Windows, with hundreds of plugins and FCord-exclusive features.
+  <strong>The Ultimate Next-Generation Discord Client Mod for Windows</strong><br>
+  Engineered and maintained with precision by <strong>Fahd (<a href="https://github.com/ellecrydansmesdm">@ellecrydansmesdm</a>)</strong>.
 </p>
 
 <p align="center">
-  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">Download</a>
-  ·
-  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">Releases</a>
-  ·
-  <a href="./plugins.json">Plugin list</a>
-  ·
-  <a href="https://discord.gg/W2YgEStqJ4">Community</a>
+  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">
+    <img src="https://img.shields.io/badge/Download-Installer.exe-6366f1?style=for-the-badge&logo=windows&logoColor=white" alt="Download">
+  </a>
+  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
+    <img src="https://img.shields.io/badge/Release-v1.0.2-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Release">
+  </a>
+  <a href="https://discord.gg/W2YgEStqJ4">
+    <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Community">
+  </a>
 </p>
 
-## About
+---
 
-FCord extends the official Discord desktop app with a large plugin catalog, themes, profile customization, account tools, media controls, and optional cloud synchronization. You can manage the available features from the FCord settings page and disable the ones you do not need.
+## ⚡ Overview
 
-FCord builds on work from Vencord, Equicord, and Vesktop while maintaining its own features and Windows installer.
+**FCord** is a cutting-edge, standalone & injected Discord desktop client mod designed for power users, developers, and customization enthusiasts on Windows. Engineered from the ground up to push the boundaries of what Discord can do, FCord offers an all-in-one ecosystem combining high-performance client modifications, privacy hardening, hardware-backed credential protection, and an extensive catalog of exclusive features.
 
-## Features
+<p align="center">
+  <img src="./assets/splash.webp" alt="FCord Showcase" width="720" style="border-radius: 10px;">
+</p>
 
-- **Hundreds of included plugins.** Customize chat, appearance, notifications, servers, voice, media, privacy, and shortcuts. The generated [plugin list](./plugins.json) reflects the current source tree.
-- **Themes and profiles.** Use QuickCSS, local themes, the theme library, and FCord profile options for banners, badges, decorations, effects, and bios.
-- **Account and privacy tools.** Manage additional account sessions and protect account data saved on your computer with FCord's encrypted storage.
-- **Voice and media tools.** Access voice utilities, integrated players, recording tools, SoundPad, and desktop media features from Discord.
-- **Backup and synchronization.** Export settings locally or use the optional cloud service to synchronize settings, QuickCSS, and FCord profiles.
-- **Built-in updates.** Install published FCord updates from the client and restart Discord to load the new desktop bundle.
+---
 
-Some plugins use external services, additional Discord accounts, or audio devices and require their own setup. Plugin availability and compatibility can change when Discord updates its desktop client.
+## ✨ Core Features & Highlights
 
-## Installation
+### 🎨 Custom Profile & Cosmetics Ecosystem
+* **Full Customization**: Set custom animated banners, unique community badges, personal decorations, bio styling, and avatar effects.
+* **Global Network Sync**: Your custom cosmetics and profile enhancements are saved and seamlessly displayed to all other FCord users in real time.
 
-FCord supports **Windows x64** with Discord **Stable, PTB, and Canary**.
+### 🧩 Massive Plugin Library (800+ Available, 230+ Pre-Configured)
+* **Chat & Messaging**: MessageLogger (temporary deleted & edited message recovery with diff view), SilentDelete (ghost deletion with timeline cleanup), mass actions, quick translate, and custom formatting.
+* **OSINT & Intelligence**: Real-time connected accounts resolution (Steam, GitHub, Twitter, Spotify, YouTube, etc.), user badge viewer, mutual servers & message scanner.
+* **Voice & Audio Suite**: Integrated SoundCloud Smart Fallback player, virtual microphone SoundPad, voice channel diagnostic tools, and high-bitrate WebRTC audio streaming.
+* **Automation & Utility**: Multi-Instance switcher, auto-redeem, session manager, anti-move deco, and extensive keyboard shortcut enhancements.
 
-1. Install and open your preferred Discord desktop channel at least once.
-2. Download [FCord-Installer.exe](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe).
-3. Close Discord and run the installer.
-4. Select the Discord installations you want to modify, then install FCord.
-5. Start Discord and open **User Settings → FCord**.
+### 🔒 Hardware-Grade Security & Account Vault
+* **Zero Plaintext Tokens**: Tokens and sensitive account credentials never reside in plaintext on disk. They are shielded using Windows DPAPI and Electron `safeStorage`.
+* **Multi-Account & Ghost Client**: Switch between multiple Discord sessions and accounts with isolated storage, dedicated proxy routing, and independent vocal presence.
 
-Discord updates can replace the application directory used by FCord. Run the latest installer again if FCord disappears after a Discord update.
+### ☁️ FCord Cloud Sync
+* **Instant Backup**: Synchronize your plugin settings, QuickCSS styles, and custom profiles to the cloud.
+* **One-Click Restore**: Restore your entire workspace and customized experience instantly on any new computer.
 
-## Updating and uninstalling
+### 🔄 Silent In-Client Auto-Updater
+* **Zero Disruption**: Real-time update checks via the GitHub API with atomic background payload extraction (`fcord-dist.zip`).
+* **One-Click Upgrades**: Update in one click directly within Discord without having to re-download or re-run setup scripts manually.
 
-Use the updater in FCord settings when an update is available. Restart Discord after the update finishes.
+---
 
-To remove FCord, run the installer again and choose **Uninstall**. The installer removes the FCord loader and restores Discord's backed-up application archive when available.
+## 🚀 Installation
 
-## Development
+FCord supports **Windows 10 & Windows 11 (x64)** across all official Discord distribution channels (**Stable, PTB, and Canary**).
 
-You need Windows, [Node.js 20](https://nodejs.org/), and the pnpm version recorded in [`package.json`](./package.json).
+1. Ensure your preferred Discord client is installed and has been opened at least once.
+2. Download the latest **[FCord-Installer.exe](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe)**.
+3. Run the installer and click **Install**.
+4. Start Discord and open **User Settings → FCord** to access the complete configuration dashboard.
 
-```powershell
-git clone https://github.com/ellecrydansmesdm/Fcord.git
-cd Fcord
-pnpm install --frozen-lockfile
-pnpm build:quick
-pnpm inject
-```
+---
 
-Useful commands:
+## 🛠️ Management & Uninstallation
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm build:quick` | Build the injected desktop bundles for local development |
-| `pnpm dev` | Rebuild files in watch mode |
-| `pnpm testTsc` | Type-check the TypeScript project |
-| `pnpm lint` | Run ESLint |
-| `pnpm lint-styles` | Run Stylelint on source CSS |
-| `pnpm generatePluginJson` | Regenerate `plugins.json` |
-| `pnpm inject` | Inject the local build into Discord |
-| `pnpm uninject` | Restore the Discord installation |
-| `pnpm build` | Create the production desktop bundle and updater payload |
+* **To Update**: When an update notification appears at the top of Discord, click **Update Now** or update via **User Settings → FCord → Updater**.
+* **To Uninstall**: Re-launch `FCord-Installer.exe`, select your Discord version, and click **Uninstall**. Your original Discord files are immediately restored intact.
 
-Build the Windows installer after `pnpm build`:
+---
 
-```powershell
-.\build-installer.ps1
-```
+## 🤝 Community & Support
 
-Production commands generate release files. Use `pnpm build:quick` for ordinary plugin and interface development.
+* **Official Discord Server**: [discord.gg/W2YgEStqJ4](https://discord.gg/W2YgEStqJ4)
+* **Releases & Updates**: [github.com/ellecrydansmesdm/Fcord/releases](https://github.com/ellecrydansmesdm/Fcord/releases)
+* **Bug Reports & Feedback**: Open an issue on our [GitHub Issues](https://github.com/ellecrydansmesdm/Fcord/issues) tracker.
 
-## Support
+---
 
-- Join the [FCord community](https://discord.gg/W2YgEStqJ4) for help and discussion.
-- Report reproducible problems through [GitHub Issues](https://github.com/ellecrydansmesdm/Fcord/issues).
-- Include your Discord channel, FCord version, and relevant logs when reporting a bug. Do not share account tokens or credentials.
+## 📜 Author & License
 
-## Credits and license
+* **Lead Architect & Creator**: **Fahd ([@ellecrydansmesdm](https://github.com/ellecrydansmesdm))**
+* **License**: Distributed under the **GNU General Public License v3.0 or later** ([LICENSE](./LICENSE)).
 
-FCord includes work derived from [Vencord](https://github.com/Vendicated/Vencord), [Equicord](https://github.com/Equicord/Equicord), and [Vesktop](https://github.com/Vencord/Vesktop), plus FCord-specific systems and plugins. The Windows installer derives from the [BetterDiscord installer](https://github.com/BetterDiscord/Installer).
+<br>
 
-The main repository uses the [GNU General Public License v3.0 or later](./LICENSE). Individual components retain their original copyright notices and licenses.
-
-## Disclaimer
-
-FCord is an independent project and has no affiliation with Discord Inc. Client modifications may conflict with Discord's Terms of Service, and Discord updates can break compatibility. You use FCord at your own risk. Discord and related marks belong to their respective owners.
+<p align="center">
+  <sub>FCord is an independent desktop enhancement project and is not affiliated with, sponsored, or endorsed by Discord Inc. Discord and its trademarks belong to their respective owners.</sub>
+</p>
