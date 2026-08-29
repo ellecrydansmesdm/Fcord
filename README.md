@@ -1,22 +1,25 @@
 <p align="center">
-  <img src="./assets/logo.png" alt="FCord" width="544">
-</p>
-
-<h1 align="center">FCord</h1>
-
-<p align="center">
-  A customizable Discord desktop client mod for Windows, with hundreds of plugins and FCord-exclusive features.
+  <img src="./assets/logo.png" alt="FCord" width="420">
 </p>
 
 <p align="center">
-  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">Download</a>
-  ·
-  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">Releases</a>
-  ·
-  <a href="./plugins.json">Plugin list</a>
-  ·
-  <a href="https://discord.gg/W2YgEStqJ4">Community</a>
+  A customizable Discord desktop client mod for Windows, with hundreds of plugins and FCord-exclusive features.<br>
+  Developed and maintained by <strong>Fahd (<a href="https://github.com/ellecrydansmesdm">@ellecrydansmesdm</a>)</strong>.
 </p>
+
+<p align="center">
+  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">
+    <img src="https://img.shields.io/badge/Download-Installer.exe-6366f1?style=for-the-badge&logo=windows&logoColor=white" alt="Download">
+  </a>
+  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
+    <img src="https://img.shields.io/badge/Release-v1.0.2-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Release">
+  </a>
+  <a href="https://discord.gg/W2YgEStqJ4">
+    <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Community">
+  </a>
+</p>
+
+---
 
 ## About
 
