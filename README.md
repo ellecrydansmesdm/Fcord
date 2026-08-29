@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/fcord_logo.png" alt="FCord" width="220">
+  <img src="./assets/logo.png" alt="FCord" width="180">
 </p>
 
 <p align="center">
