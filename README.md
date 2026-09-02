@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/badge/Download-Installer.exe-6366f1?style=for-the-badge&logo=windows&logoColor=white" alt="Download">
   </a>
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
-    <img src="https://img.shields.io/badge/Release-v1.0.2-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Release">
+    <img src="https://img.shields.io/github/v/release/ellecrydansmesdm/Fcord?style=for-the-badge&logo=github&logoColor=white&color=10b981&label=Release" alt="Release">
   </a>
   <a href="https://discord.gg/W2YgEStqJ4">
     <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Community">
