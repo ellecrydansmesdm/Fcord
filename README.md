@@ -12,12 +12,17 @@
     <img src="https://img.shields.io/badge/Download-Installer.exe-6366f1?style=for-the-badge&logo=windows&logoColor=white" alt="Download">
   </a>
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
-    <img src="https://img.shields.io/github/v/release/ellecrydansmesdm/Fcord?style=for-the-badge&logo=github&logoColor=white&color=10b981&label=Release" alt="Release">
+    <img src="https://img.shields.io/badge/Release-v1.0.7-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Release">
   </a>
   <a href="https://discord.gg/W2YgEStqJ4">
     <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Community">
   </a>
 </p>
+
+> [!TIP]
+> **Windows SmartScreen & Smart App Control (SAC)** :  
+> Si Windows affiche *« Windows a protégé votre ordinateur »* ou bloque l'installeur, **c'est normal** (mod open-source indépendant sans certificat commercial payant).  
+> Cliquez sur **Informations complémentaires** → **Exécuter quand même** (ou clic droit sur `FCord-Installer.exe` → **Propriétés** → cochez **Débloquer** → **Appliquer**). Voir la section [Installation](#installation) ci-dessous.
 
 ---
 
@@ -47,6 +52,26 @@ FCord supports **Windows x64** with Discord **Stable, PTB, and Canary**.
 3. Close Discord and run the installer.
 4. Select the Discord installations you want to modify, then install FCord.
 5. Start Discord and open **User Settings → FCord**.
+
+> [!IMPORTANT]
+> ### 🛡️ Windows SmartScreen & Smart App Control (SAC)
+>
+> **Français :**  
+> Lors du lancement de `FCord-Installer.exe`, Windows peut afficher un message d'alerte SmartScreen (*« Windows a protégé votre ordinateur »*) ou **Smart App Control (SAC)** sous Windows 11 peut bloquer l'exécutable.  
+> **C'est tout à fait normal** : FCord est un mod client indépendant et open-source développé par la communauté. Il est compilé sans certificat commercial payant (les certificats EV Authenticode coûtent des centaines d'euros par an), Windows ne reconnaît donc pas automatiquement sa signature binaire.
+> 
+> - **Si SmartScreen s'affiche** : Cliquez simplement sur **Informations complémentaires** puis sur **Exécuter quand même**.
+> - **Si Smart App Control (Windows 11) bloque le fichier** :
+>   1. Faites un clic droit sur `FCord-Installer.exe` → **Propriétés** → tout en bas cochez la case **Débloquer** puis cliquez sur **Appliquer**.
+>   2. Si Windows 11 continue de bloquer les applications non signées commercialement, ouvrez **Paramètres Windows** → **Confidentialité et sécurité** → **Sécurité Windows** → **Contrôle des applications et du navigateur** → **Paramètres du Contrôle intelligent des applications (Smart App Control)** et réglez-le sur **Désactivé**.
+> - Le code source complet est ouvert et auditable, et les sommes de contrôle SHA-256 sont publiées à chaque mise à jour.
+>
+> **English:**  
+> When launching `FCord-Installer.exe`, Windows SmartScreen (*"Windows protected your PC"*) or **Smart App Control (SAC)** on Windows 11 may flag or block the executable.  
+> **This is completely normal and expected**: FCord is an independent, community-driven open-source modification built without an expensive corporate Authenticode EV signing certificate.
+> - **SmartScreen popup**: Click **More info** → **Run anyway**.
+> - **Smart App Control (Windows 11)**: Right-click `FCord-Installer.exe` → **Properties** → check **Unblock** at the bottom → **Apply**. If SAC blocks execution entirely, open **Windows Settings** → **Privacy & security** → **Windows Security** → **App & browser control** → **Smart App Control settings** and toggle it to **Off**.
+> - Every release is verifiable against the published SHA-256 checksums.
 
 Discord updates can replace the application directory used by FCord. Run the latest installer again if FCord disappears after a Discord update.
 
