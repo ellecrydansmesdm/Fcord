@@ -11,6 +11,9 @@
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">
     <img src="https://img.shields.io/badge/Download-Installer.exe-6366f1?style=for-the-badge&logo=windows&logoColor=white" alt="Download">
   </a>
+  <a href="https://fhubdev.vercel.app/">
+    <img src="https://img.shields.io/badge/Website-fhubdev.vercel.app-0ea5e9?style=for-the-badge&logo=vercel&logoColor=white" alt="Website">
+  </a>
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
     <img src="https://img.shields.io/badge/Release-v1.0.7-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Release">
   </a>
@@ -92,6 +95,7 @@ FCord is built with strong security boundaries and privacy-first engineering:
 
 ## Support
 
+- Visit the official website: [**fhubdev.vercel.app**](https://fhubdev.vercel.app/)
 - Join the [FCord community](https://discord.gg/W2YgEStqJ4) for help and discussion.
 - Report reproducible problems through [GitHub Issues](https://github.com/ellecrydansmesdm/Fcord/issues).
 - Include your Discord channel, FCord version, and relevant logs when reporting a bug. Do not share account tokens or credentials.
