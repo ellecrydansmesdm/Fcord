@@ -45,18 +45,9 @@
   </a>
 </p>
 
-<p align="center">
-  <a href="#-downloads--artifacts"><b>📦 Downloads & Artifacts</b></a> &nbsp;•&nbsp;
-  <a href="#-installation"><b>🚀 Installation Guide</b></a> &nbsp;•&nbsp;
-  <a href="#features"><b>✨ Features</b></a> &nbsp;•&nbsp;
-  <a href="#-security-advisory-unsigned-open-source-binaries"><b>🛡️ SmartScreen & Gatekeeper</b></a> &nbsp;•&nbsp;
-  <a href="#-updating-and-uninstalling"><b>🔄 Updates</b></a> &nbsp;•&nbsp;
-  <a href="#-support"><b>💬 Support</b></a>
-</p>
-
 > [!TIP]
 > **Native Multi-OS Support (v1.0.9)** : FCord natively supports **Windows (x64)**, **macOS (Apple Silicon & Intel)**, and **Linux (x64 AppImage / tar.gz)** with autonomous installers, automated Discord channel detection, and zero external dependencies.  
-> Unsigned community binaries may trigger **Windows SmartScreen / SAC** or **macOS Gatekeeper**. Check the [Quick Installation Guide](#-installation) below for 1-click bypass steps.
+> Unsigned community binaries may trigger **Windows SmartScreen / SAC** or **macOS Gatekeeper**. Check the [Quick Installation Guide](#installation) below for 1-click bypass steps.
 
 ---
 
@@ -79,7 +70,7 @@ Some plugins use external services, additional Discord accounts, or audio device
 
 ---
 
-## 📦 Downloads & Artifacts
+## Downloads & Artifacts
 
 All binaries are compiled, hashed, and published on the [GitHub Releases](https://github.com/ellecrydansmesdm/Fcord/releases/latest) page. Choose the package tailored to your platform:
 
@@ -90,15 +81,15 @@ All binaries are compiled, hashed, and published on the [GitHub Releases](https:
 | 🍎 **macOS** | Intel (x64) | `.dmg` | [**FCord-Installer-macOS-x64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.dmg) | 223.9 MB | Drag-and-drop DMG package ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.zip) · 224.1 MB) |
 | 🐧 **Linux** | x64 (64-bit) | `.AppImage` | [**FCord-Installer-Linux-x64.AppImage**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.AppImage) | 217.6 MB | Self-contained portable executable for all major Linux distributions |
 | 🐧 **Linux** | x64 (64-bit) | `.tar.gz` | [**FCord-Installer-Linux-x64.tar.gz**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.tar.gz) | 133.0 MB | Standalone portable archive for headless/custom environments |
-| 📦 **Core Payload** | Universal | `.zip` | [**fcord-dist.zip**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) | 98.9 MB | Standalone mod runtime payload & in-client auto-updater engine |
-| 🛡️ **Verification** | All Binaries | `.txt` | [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt) | < 1 KB | Official SHA-256 cryptographic digest file |
+| **Core Payload** | Universal | `.zip` | [**fcord-dist.zip**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) | 98.9 MB | Standalone mod runtime payload & in-client auto-updater engine |
+| **Verification** | All Binaries | `.txt` | [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt) | < 1 KB | Official SHA-256 cryptographic digest file |
 
 > [!NOTE]
 > Every release artifact can be cryptographically verified against the official [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt) SHA-256 hash digest.
 
 ---
 
-## 🚀 Installation
+## Installation
 
 FCord supports Discord **Stable**, **PTB**, and **Canary** across Windows, macOS, and Linux.
 
@@ -165,7 +156,7 @@ The Linux installer automatically detects Discord across 7 standard system insta
 ---
 
 > [!IMPORTANT]
-> ### 🛡️ Security Advisory: Unsigned Open-Source Binaries
+> ### Security Advisory: Unsigned Open-Source Binaries
 >
 > **Français :**  
 > Les installateurs FCord sont distribués **sans certificat commercial payant** (les certificats d'entreprise EV Authenticode et Apple Developer coûtent plusieurs centaines d'euros par an). Les systèmes d'exploitation peuvent donc afficher un avertissement de sécurité standard au premier lancement :
@@ -202,7 +193,7 @@ The Linux installer automatically detects Discord across 7 standard system insta
 
 ---
 
-## 🔄 Updating and Uninstalling
+## Updating and Uninstalling
 
 ### Seamless In-Client Updates
 FCord includes an integrated atomic updater (`http.ts`). When an update is published:
@@ -222,7 +213,7 @@ To completely remove FCord:
 
 ---
 
-## 🔒 Security and Privacy
+## Security and Privacy
 
 FCord is built with strong security boundaries and privacy-first engineering:
 
@@ -233,7 +224,7 @@ FCord is built with strong security boundaries and privacy-first engineering:
 
 ---
 
-## 💬 Support
+## Support
 
 - Visit the official website: [**fhubdev.vercel.app**](https://fhubdev.vercel.app/)
 - Join the [FCord Discord community](https://discord.gg/W2YgEStqJ4) for help, announcements, and discussion.
@@ -242,7 +233,7 @@ FCord is built with strong security boundaries and privacy-first engineering:
 
 ---
 
-## 📜 Credits and License
+## Credits and License
 
 FCord is created and maintained by **Fahd** ([@ellecrydansmesdm](https://github.com/ellecrydansmesdm)).
 
@@ -250,6 +241,6 @@ The main repository is licensed under the [GNU General Public License v3.0 or la
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 FCord is an independent project and is not affiliated with, endorsed by, or associated with Discord Inc. Using third-party client modifications may technically violate Discord's Terms of Service. Use at your own discretion. Discord and all related trademarks belong to Discord Inc.
