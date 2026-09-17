@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
-    <img src="https://img.shields.io/badge/Release-v1.0.9-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Latest Release v1.0.9">
+    <img src="https://img.shields.io/github/v/release/ellecrydansmesdm/Fcord?style=for-the-badge&logo=github&logoColor=white&color=10b981&label=Release" alt="Latest Release">
   </a>
   <a href="https://fhubdev.vercel.app/" target="_blank">
     <img src="https://img.shields.io/badge/Website-fhubdev.vercel.app-0ea5e9?style=for-the-badge&logo=vercel&logoColor=white" alt="Official Website">
@@ -23,16 +23,13 @@
     <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Community">
   </a>
   <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge" alt="License GPL-3.0">
-  </a>
-  <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
-    <img src="https://img.shields.io/badge/Platforms-Windows_%7C_macOS_%7C_Linux-7c3aed?style=for-the-badge&logo=electron&logoColor=white" alt="Supported Platforms">
+    <img src="https://img.shields.io/badge/License-GPL%203.0-16a34a?style=for-the-badge&logo=gnu&logoColor=white" alt="License GPL-3.0">
   </a>
 </p>
 
 <p align="center">
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe">
-    <img src="https://img.shields.io/badge/Windows-Installer.exe-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows Installer">
+    <img src="https://img.shields.io/badge/Windows-.exe-0078D6?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDMuNDQ5TDkuNzUgMi4xdjkuNDUxSDBtMTAuOTQ5LTkuNjAyTDI0IDB2MTEuNEgxMC45NDlNMCAxMi42aDkuNzV2OS40NTFMMCAyMC42OTlNMTAuOTQ5IDEyLjZIMjRWMjRsLTEyLjkwMi0xLjgwMiIvPjwvc3ZnPg%3D%3D" alt="Download Windows Installer">
   </a>
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.dmg">
     <img src="https://img.shields.io/badge/macOS-Apple_Silicon-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download macOS Apple Silicon">
@@ -41,10 +38,10 @@
     <img src="https://img.shields.io/badge/macOS-Intel_x64-1f2937?style=for-the-badge&logo=apple&logoColor=white" alt="Download macOS Intel">
   </a>
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.AppImage">
-    <img src="https://img.shields.io/badge/Linux-AppImage_x64-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Download Linux AppImage">
+    <img src="https://img.shields.io/badge/Linux-AppImage-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Download Linux AppImage">
   </a>
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.tar.gz">
-    <img src="https://img.shields.io/badge/Linux-tar.gz_x64-334155?style=for-the-badge&logo=linux&logoColor=white" alt="Download Linux tar.gz">
+    <img src="https://img.shields.io/badge/Linux-tar.gz-334155?style=for-the-badge&logo=linux&logoColor=white" alt="Download Linux tar.gz">
   </a>
 </p>
 
@@ -86,14 +83,15 @@ Some plugins use external services, additional Discord accounts, or audio device
 
 All binaries are compiled, hashed, and published on the [GitHub Releases](https://github.com/ellecrydansmesdm/Fcord/releases/latest) page. Choose the package tailored to your platform:
 
-| Platform / OS | Architecture | Format | Download Link | Description / Notes |
-| :--- | :--- | :---: | :--- | :--- |
-| **Windows** | x64 (64-bit) | `.exe` | [**FCord-Installer.exe**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe) | NSIS standalone installer with atomic repair & clean uninstall |
-| **macOS** | Apple Silicon (M1/M2/M3/M4) | `.dmg` | [**FCord-Installer-macOS-arm64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.dmg) | Drag-and-drop installer for Apple Silicon ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.zip)) |
-| **macOS** | Intel | `.dmg` | [**FCord-Installer-macOS-x64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.dmg) | Drag-and-drop installer for Intel Macs ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.zip)) |
-| **Linux** | x64 (64-bit) | `.AppImage` | [**FCord-Installer-Linux-x64.AppImage**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.AppImage) | Portable, runs out-of-the-box on Ubuntu, Debian, Fedora, Arch |
-| **Linux** | x64 (64-bit) | `.tar.gz` | [**FCord-Installer-Linux-x64.tar.gz**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.tar.gz) | Standalone tarball for manual extraction & custom scripts |
-| **Core Payload** | Universal | `.zip` | [**fcord-dist.zip**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) | Offline payload & in-client auto-updater engine |
+| Platform / OS | Target Architecture | Format | Download Link | Size | Primary Description |
+| :--- | :--- | :---: | :--- | :---: | :--- |
+| 🪟 **Windows** | x64 (64-bit) | `.exe` | [**FCord-Installer.exe**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe) | 204.2 MB | NSIS standalone installer with atomic repair & clean uninstall |
+| 🍎 **macOS** | Apple Silicon (M1/M2/M3/M4) | `.dmg` | [**FCord-Installer-macOS-arm64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.dmg) | 220.4 MB | Drag-and-drop DMG package ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.zip) · 220.6 MB) |
+| 🍎 **macOS** | Intel (x64) | `.dmg` | [**FCord-Installer-macOS-x64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.dmg) | 223.9 MB | Drag-and-drop DMG package ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.zip) · 224.1 MB) |
+| 🐧 **Linux** | x64 (64-bit) | `.AppImage` | [**FCord-Installer-Linux-x64.AppImage**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.AppImage) | 217.6 MB | Self-contained portable executable for all major Linux distributions |
+| 🐧 **Linux** | x64 (64-bit) | `.tar.gz` | [**FCord-Installer-Linux-x64.tar.gz**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.tar.gz) | 133.0 MB | Standalone portable archive for headless/custom environments |
+| 📦 **Core Payload** | Universal | `.zip` | [**fcord-dist.zip**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) | 98.9 MB | Standalone mod runtime payload & in-client auto-updater engine |
+| 🛡️ **Verification** | All Binaries | `.txt` | [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt) | < 1 KB | Official SHA-256 cryptographic digest file |
 
 > [!NOTE]
 > Every release artifact can be cryptographically verified against the official [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt) SHA-256 hash digest.
@@ -126,9 +124,9 @@ FCord supports Discord **Stable**, **PTB**, and **Canary** across Windows, macOS
    - **GUI Method**: **Right-click** `FCord-Installer.app` → select **Open** → confirm by clicking **Open**.
    - **Terminal Command**: Clear the Gatekeeper quarantine attribute by running:
      ```bash
-     xattr -d com.apple.quarantine /Applications/FCord-Installer.app
+     xattr -cr /Applications/FCord*.app
      ```
-     *(Or recursively clear all quarantine flags: `xattr -cr /Applications/FCord-Installer.app`)*.
+     *(Or target the specific installer attribute: `xattr -d com.apple.quarantine /Applications/FCord-Installer.app`)*.
 5. Select your target Discord version (Stable, PTB, or Canary) and click **Install**.
 6. Restart Discord to load FCord.
 
@@ -160,8 +158,8 @@ The Linux installer automatically detects Discord across 7 standard system insta
    ```bash
    tar -xzf FCord-Installer-Linux-x64.tar.gz
    cd FCord-Installer-Linux-x64
-   chmod +x FCord-Installer
-   ./FCord-Installer
+   chmod +x fcord-installer
+   ./fcord-installer
    ```
 
 ---
@@ -181,7 +179,7 @@ The Linux installer automatically detects Discord across 7 standard system insta
 >   Faites un **clic droit** sur l'application → sélectionnez **Ouvrir** → confirmez en cliquant sur **Ouvrir**.  
 >   *Ou exécutez la commande suivante dans le Terminal :*
 >   ```bash
->   xattr -cr /Applications/FCord-Installer.app
+>   xattr -cr /Applications/FCord*.app
 >   ```
 > - Toutes les versions sont auditables et vérifiables avec le fichier de hachage officiel [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt).
 >
@@ -198,7 +196,7 @@ The Linux installer automatically detects Discord across 7 standard system insta
 >   **Right-click** the application → select **Open** → confirm by clicking **Open**.  
 >   *Or run the following command in Terminal:*
 >   ```bash
->   xattr -cr /Applications/FCord-Installer.app
+>   xattr -cr /Applications/FCord*.app
 >   ```
 > - Every binary is verifiable against published cryptographic SHA-256 signatures in [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt).
 
