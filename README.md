@@ -46,7 +46,7 @@
 </p>
 
 > [!TIP]
-> **Native Multi-OS Support (v1.0.9)** : FCord natively supports **Windows (x64)**, **macOS (Apple Silicon & Intel)**, and **Linux (x64 AppImage / tar.gz)** with autonomous installers, automated Discord channel detection, and zero external dependencies.  
+> **Native Multi-OS Support (v1.1.0 — Le Grand Rework)** : FCord natively supports **Windows (x64)**, **macOS (Apple Silicon & Intel)**, and **Linux (x64 AppImage / tar.gz)** with autonomous installers, automated Discord channel detection, and zero external dependencies.  
 > Unsigned community binaries may trigger **Windows SmartScreen / SAC** or **macOS Gatekeeper**. Check the [Quick Installation Guide](#installation) below for 1-click bypass steps.
 
 ---
@@ -76,12 +76,12 @@ All binaries are compiled, hashed, and published on the [GitHub Releases](https:
 
 | Platform / OS | Target Architecture | Format | Download Link | Size | Primary Description |
 | :--- | :--- | :---: | :--- | :---: | :--- |
-| 🪟 **Windows** | x64 (64-bit) | `.exe` | [**FCord-Installer.exe**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe) | 204.2 MB | NSIS standalone installer with atomic repair & clean uninstall |
+| 🪟 **Windows** | x64 (64-bit) | `.exe` | [**FCord-Installer.exe**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer.exe) | 568.2 MB | NSIS standalone installer with atomic repair & clean uninstall |
 | 🍎 **macOS** | Apple Silicon (M1/M2/M3/M4) | `.dmg` | [**FCord-Installer-macOS-arm64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.dmg) | 220.4 MB | Drag-and-drop DMG package ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-arm64.zip) · 220.6 MB) |
 | 🍎 **macOS** | Intel (x64) | `.dmg` | [**FCord-Installer-macOS-x64.dmg**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.dmg) | 223.9 MB | Drag-and-drop DMG package ([.zip](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-macOS-x64.zip) · 224.1 MB) |
 | 🐧 **Linux** | x64 (64-bit) | `.AppImage` | [**FCord-Installer-Linux-x64.AppImage**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.AppImage) | 217.6 MB | Self-contained portable executable for all major Linux distributions |
 | 🐧 **Linux** | x64 (64-bit) | `.tar.gz` | [**FCord-Installer-Linux-x64.tar.gz**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/FCord-Installer-Linux-x64.tar.gz) | 133.0 MB | Standalone portable archive for headless/custom environments |
-| **Core Payload** | Universal | `.zip` | [**fcord-dist.zip**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) | 98.9 MB | Standalone mod runtime payload & in-client auto-updater engine |
+| **Core Payload** | Universal | `.zip` | [**fcord-dist.zip**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/fcord-dist.zip) | 465.2 MB | Standalone mod runtime payload & in-client auto-updater engine |
 | **Verification** | All Binaries | `.txt` | [**checksums.txt**](https://github.com/ellecrydansmesdm/Fcord/releases/latest/download/checksums.txt) | < 1 KB | Official SHA-256 cryptographic digest file |
 
 > [!NOTE]
