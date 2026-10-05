@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://fhubdev.vercel.app/" target="_blank">
+  <a href="https://fhubcore.dev/" target="_blank">
     <img src="./assets/logo.png" alt="FCord" width="180">
   </a>
 </p>
@@ -16,15 +16,13 @@
   <a href="https://github.com/ellecrydansmesdm/Fcord/releases/latest">
     <img src="https://img.shields.io/github/v/release/ellecrydansmesdm/Fcord?style=for-the-badge&logo=github&logoColor=white&color=10b981&label=Release" alt="Latest Release">
   </a>
-  <a href="https://fhubdev.vercel.app/" target="_blank">
-    <img src="https://img.shields.io/badge/Website-fhubdev.vercel.app-0ea5e9?style=for-the-badge&logo=vercel&logoColor=white" alt="Official Website">
+  <a href="https://fhubcore.dev/" target="_blank">
+    <img src="https://img.shields.io/badge/Website-fhubcore.dev-0ea5e9?style=for-the-badge&logo=vercel&logoColor=white" alt="Official Website">
   </a>
   <a href="https://discord.gg/W2YgEStqJ4" target="_blank">
     <img src="https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Community">
   </a>
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/License-GPL%203.0-16a34a?style=for-the-badge&logo=gnu&logoColor=white" alt="License GPL-3.0">
-  </a>
+  <img src="https://img.shields.io/badge/License-Proprietary%20Freeware-blue?style=for-the-badge" alt="License Proprietary Freeware">
 </p>
 
 <p align="center">
@@ -156,7 +154,7 @@ The Linux installer automatically detects Discord across 7 standard system insta
 ---
 
 > [!IMPORTANT]
-> ### Security Advisory: Unsigned Open-Source Binaries
+> ### Security Advisory: Unsigned Standalone Binaries
 >
 > **Français :**  
 > Les installateurs FCord sont distribués **sans certificat commercial payant** (les certificats d'entreprise EV Authenticode et Apple Developer coûtent plusieurs centaines d'euros par an). Les systèmes d'exploitation peuvent donc afficher un avertissement de sécurité standard au premier lancement :
@@ -226,18 +224,28 @@ FCord is built with strong security boundaries and privacy-first engineering:
 
 ## Support
 
-- Visit the official website: [**fhubdev.vercel.app**](https://fhubdev.vercel.app/)
+- Visit the official website: [**fhubcore.dev**](https://fhubcore.dev/)
 - Join the [FCord Discord community](https://discord.gg/W2YgEStqJ4) for help, announcements, and discussion.
 - Report reproducible issues via [GitHub Issues](https://github.com/ellecrydansmesdm/Fcord/issues).
 - When reporting bugs, please include your OS, Discord channel (Stable/PTB/Canary), and relevant console logs. Never share account tokens or personal credentials.
 
 ---
 
-## Credits and License
+## Inspirations & Acknowledgments
 
-FCord is created and maintained by **Fahd** ([@ellecrydansmesdm](https://github.com/ellecrydansmesdm)).
+The development, architecture, and technical conception of FCord were inspired by the research, concepts, and pioneering work of the Discord client customization community, specifically:
+- [**Equicord**](https://github.com/Equicord/Equicord)
+- [**Vencord**](https://github.com/Vendicated/Vencord)
+- [**IllegalCord**](https://github.com/Illegal-Services/IllegalCord)
+- [**TestCord**](https://github.com/TestCord)
 
-The main repository is licensed under the [GNU General Public License v3.0 or later](./LICENSE). Individual components and upstream references retain their original copyright notices and licenses.
+---
+
+## License & Intellectual Property
+
+FCord is created and developed by **Fahd** ([@ellecrydansmesdm](https://github.com/ellecrydansmesdm)).
+
+FCord Desktop is distributed as free software for personal use. **FCord is not open source at this time**: all source code and built binaries remain private and protected under copyright law to safeguard the project's development and recognition. Reverse engineering, commercial redistribution, and unauthorized re-branding are strictly prohibited.
 
 ---
 
