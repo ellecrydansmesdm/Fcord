@@ -236,8 +236,8 @@ FCord is built with strong security boundaries and privacy-first engineering:
 The development, architecture, and technical conception of FCord were inspired by the research, concepts, and pioneering work of the Discord client customization community, specifically:
 - [**Equicord**](https://github.com/Equicord/Equicord)
 - [**Vencord**](https://github.com/Vendicated/Vencord)
-- [**IllegalCord**](https://github.com/Illegal-Services/IllegalCord)
-- [**TestCord**](https://github.com/TestCord)
+- [**Illegalcord**](https://github.com/ImHisako/Illegalcord)
+- [**TestCord**](https://github.com/TestcordDev/TestCord)
 
 ---
 
