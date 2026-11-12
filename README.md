@@ -4,23 +4,23 @@
 
 FCord adds a configurable plugin catalog, themes, profile customization and optional media tools to the official Discord desktop client on Windows. Developed by [Fahd](https://github.com/ellecrydansmesdm).
 
-[Download FCord 1.4.0 for Windows x64](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.0/FCord-Setup-1.4.0.exe) · [Release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.0) · [Website](https://fhubcore.dev/fcord) · [Community support](https://discord.gg/W2YgEStqJ4)
+[Download FCord 1.4.5 for Windows x64](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.5/FCord-Setup-1.4.5.exe) · [Release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.5) · [Website](https://fhubcore.dev/fcord) · [Community support](https://discord.gg/W2YgEStqJ4)
 
 ## Current release
 
-FCord **1.4.0** (November 9, 2026) brings back the update notification that recent Discord versions no longer displayed, makes **Restart** after an update really restart Discord, and halves the installer size (about 114 MB instead of 219 MB). The installer now only waits for the Discord channel it targets, not for the other ones. The FCord interface is available in French and follows Discord's language. Plugin styles load only when their plugin is enabled, and many plugins were fixed for the current Discord version.
+FCord **1.4.5** (November 12, 2026) is a stabilization release for Discord's November 2026 update. Every plugin patch applies again on the current Discord, the client no longer opens a debugging port at startup, and the official **Ciel** and **Ardoise** themes are built in (Settings → FCord → Themes). AntiDMAll now only acts on real DM-all spam, MoreAlts is replaced by UnlimitedAccounts automatically, and new installations enable a few more plugins by default without changing existing settings.
 
 | Available asset | Purpose |
 | --- | --- |
-| [FCord-Setup-1.4.0.exe](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.0/FCord-Setup-1.4.0.exe) | Windows x64 installer with Install, Repair and Uninstall |
-| [fcord-dist.zip](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.0/fcord-dist.zip) | Windows x64 payload used by the installer and the in-client updater |
-| [checksums.txt](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.0/checksums.txt) | SHA-256 hashes of the release files |
-| [release-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.0/release-manifest.json) | Ed25519-signed update metadata |
-| [download-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.0/download-manifest.json) | Machine-readable download selection |
+| [FCord-Setup-1.4.5.exe](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.5/FCord-Setup-1.4.5.exe) | Windows x64 installer with Install, Repair and Uninstall |
+| [fcord-dist.zip](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.5/fcord-dist.zip) | Windows x64 payload used by the installer and the in-client updater |
+| [checksums.txt](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.5/checksums.txt) | SHA-256 hashes of the release files |
+| [release-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.5/release-manifest.json) | Ed25519-signed update metadata |
+| [download-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.5/download-manifest.json) | Machine-readable download selection |
 
-SHA-256 of `FCord-Setup-1.4.0.exe`: `b3e941e7b7ac91d4395319a16aa088170298fb0141b766f6179c16ce6fe44f2e`
+SHA-256 of `FCord-Setup-1.4.5.exe`: `f4c8f981e6f1ff950b15a89ee3b5f30533e26cf16a8c16b73aed2b8c15447900`
 
-FCord 1.4.0 is published for Windows 10 and 11 (x64) only. No macOS, Linux, ARM64 or browser package is part of this release. Older packages remain attached to their original releases; they are not maintained.
+FCord 1.4.5 is published for Windows 10 and 11 (x64) only. No macOS, Linux, ARM64 or browser package is part of this release. Older packages remain attached to their original releases; they are not maintained.
 
 ## Install or repair
 
@@ -36,7 +36,9 @@ The installer requires Microsoft Edge WebView2. The release manifests are Ed2551
 
 From 1.4.0, FCord shows a notice when a new version is published and installs it from inside the client. A corrupt, incomplete, wrongly signed or older update is refused without changing anything.
 
-**Upgrading from 1.3.x:** close Discord and run `FCord-Setup-1.4.0.exe`. Settings, plugins and QuickCSS are kept. On 1.3.x the update notice no longer appears with the current Discord, and the built-in update can stop on "Atomic update failed: EPERM" while the FCord audio server is running; nothing is changed in that case, so use the installer.
+**Upgrading from 1.4.0:** select **Install** in the update notice, then **Restart**. Settings, plugins, themes and saved accounts are kept. On a very busy PC the 1.4.0 updater can stop on "runtime lock timed out"; nothing is changed in that case: select Retry, or close Discord and run `FCord-Setup-1.4.5.exe`, which installs over 1.4.0 and keeps everything.
+
+**Upgrading from 1.3.x:** close Discord and run `FCord-Setup-1.4.5.exe`. Settings, plugins and QuickCSS are kept; the 1.3.x in-client updater does not work with the current Discord.
 
 **Uninstall** restores Discord's original `app.asar` for the selected channel. Personal Discord data and FCord settings are kept. Do not manually remove `app.asar`, `_app.asar`, `build_info.json` or module folders.
 
@@ -46,7 +48,7 @@ Public release assets are immutable. A later correction receives a new public ve
 
 - Plugins rely on Discord's internal code and can stop working after a Discord update until FCord is updated. Some optional plugins are less tested than the default set.
 - Client modifications are not endorsed by Discord. Plugins that automate actions can put an account at risk; use them knowingly.
-- See the [release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.0) for the exact scope of this version.
+- See the [release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.5) for the exact scope of this version.
 
 ## Support
 
