@@ -4,23 +4,23 @@
 
 FCord adds a configurable plugin catalog, themes, profile customization and optional media tools to the official Discord desktop client on Windows. Developed by [Fahd](https://github.com/ellecrydansmesdm).
 
-[Download FCord 1.4.8 for Windows x64](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.8/FCord-Setup-1.4.8.exe) · [Release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.8) · [Website](https://fhubcore.dev/fcord) · [Community support](https://discord.gg/W2YgEStqJ4)
+[Download FCord 1.5.0 for Windows x64](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.5.0/FCord-Setup-1.5.0.exe) · [Release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.5.0) · [Website](https://fhubcore.dev/fcord) · [Community support](https://discord.gg/W2YgEStqJ4)
 
 ## Current release
 
-FCord **1.4.8** (November 16, 2026) fixes a crash when a bot has a custom nickname (AddNickname), stops MessageLoggerEnhanced from slowing Discord down, and brings CustomAppIcons and SearchUtility's server search button back after Discord's latest update. The official Ciel and Ardoise themes now keep everyone's banner and Nitro profile colours, color Discord's own buttons and switches, are lighter to render and get their own colours with five palettes each. Search ignores case and accents and also looks in authors, mentions, file names and embeds.
+FCord **1.5.0** (November 18, 2026) makes FCord Studio really process your microphone: the engine now loads, effects stay on when the window is closed, the editor is rebuilt in five tabs (parametric EQ, dynamics, effects, VST plugins, config), and VST3 plugins run live in a separate program so a plugin crash cannot cut your voice. It also fixes a crash in Settings > Connections with CustomProfile, a removed custom profile coming back from another PC, moving the Discord window by its title bar, and nine plugin patches broken by Discord's November 18 update (SortFriends, profile sections, Questify, BetterActivities and others). FCordSound plays paid SoundCloud tracks on every PC, and LoudMic Kit drops the files a security audit could not verify.
 
 | Available asset | Purpose |
 | --- | --- |
-| [FCord-Setup-1.4.8.exe](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.8/FCord-Setup-1.4.8.exe) | Windows x64 installer with Install, Repair and Uninstall |
-| [fcord-dist.zip](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.8/fcord-dist.zip) | Windows x64 payload used by the installer and the in-client updater |
-| [checksums.txt](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.8/checksums.txt) | SHA-256 hashes of the release files |
-| [release-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.8/release-manifest.json) | Ed25519-signed update metadata |
-| [download-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.4.8/download-manifest.json) | Machine-readable download selection |
+| [FCord-Setup-1.5.0.exe](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.5.0/FCord-Setup-1.5.0.exe) | Windows x64 installer with Install, Repair and Uninstall |
+| [fcord-dist.zip](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.5.0/fcord-dist.zip) | Windows x64 payload used by the installer and the in-client updater |
+| [checksums.txt](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.5.0/checksums.txt) | SHA-256 hashes of the release files |
+| [release-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.5.0/release-manifest.json) | Ed25519-signed update metadata |
+| [download-manifest.json](https://github.com/ellecrydansmesdm/Fcord/releases/download/v1.5.0/download-manifest.json) | Machine-readable download selection |
 
-SHA-256 of `FCord-Setup-1.4.8.exe`: `193a7f9c154ec142e61b6cd666607effe43c8d18e44ade712470943a9a8d6974`
+SHA-256 of `FCord-Setup-1.5.0.exe`: `178b906ac3a615785a4694c145c2ce019f11b4db61bd0f8502fe833c3aca5e6b`
 
-FCord 1.4.8 is published for Windows 10 and 11 (x64) only. No macOS, Linux, ARM64 or browser package is part of this release. Older packages remain attached to their original releases; they are not maintained.
+FCord 1.5.0 is published for Windows 10 and 11 (x64) only. No macOS, Linux, ARM64 or browser package is part of this release. Older packages remain attached to their original releases; they are not maintained.
 
 ## Install or repair
 
@@ -36,9 +36,9 @@ The installer requires Microsoft Edge WebView2. The release manifests are Ed2551
 
 From 1.4.0, FCord shows a notice when a new version is published and installs it from inside the client. A corrupt, incomplete, wrongly signed or older update is refused without changing anything.
 
-**Upgrading from 1.4.7, 1.4.6, 1.4.5 or 1.4.0:** select **Install** in the update notice, then **Restart**. Settings, plugins, themes and saved accounts are kept. On a very busy PC the 1.4.0 updater can stop on "runtime lock timed out"; nothing is changed in that case: select Retry, or close Discord and run `FCord-Setup-1.4.8.exe`, which installs over it and keeps everything. After going back from 1.4.6 to 1.4.5, sign in to FCord Cloud again.
+**Upgrading from 1.4.8, 1.4.7, 1.4.6, 1.4.5 or 1.4.0:** select **Install** in the update notice, then **Restart**. Settings, plugins, themes and saved accounts are kept. On a very busy PC the 1.4.0 updater can stop on "runtime lock timed out"; nothing is changed in that case: select Retry, or close Discord and run `FCord-Setup-1.5.0.exe`, which installs over it and keeps everything. After going back from 1.4.6 to 1.4.5, sign in to FCord Cloud again.
 
-**Upgrading from 1.3.x:** close Discord and run `FCord-Setup-1.4.8.exe`. Settings, plugins and QuickCSS are kept; the 1.3.x in-client updater does not work with the current Discord.
+**Upgrading from 1.3.x:** close Discord and run `FCord-Setup-1.5.0.exe`. Settings, plugins and QuickCSS are kept; the 1.3.x in-client updater does not work with the current Discord.
 
 **Uninstall** restores Discord's original `app.asar` for the selected channel. Personal Discord data and FCord settings are kept. Do not manually remove `app.asar`, `_app.asar`, `build_info.json` or module folders.
 
@@ -48,8 +48,8 @@ Public release assets are immutable. A later correction receives a new public ve
 
 - Plugins rely on Discord's internal code and can stop working after a Discord update until FCord is updated. Some optional plugins are less tested than the default set.
 - Client modifications are not endorsed by Discord. Plugins that automate actions can put an account at risk; use them knowingly.
-- Settings exports made with FCord 1.4.5 or older could contain account tokens. If you shared one, change the password of each Discord account it covered (this signs out every session) and sign in to FCord Cloud again. The [release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.8) give the details.
-- See the [release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.4.8) for the exact scope of this version.
+- Settings exports made with FCord 1.4.5 or older could contain account tokens. If you shared one, change the password of each Discord account it covered (this signs out every session) and sign in to FCord Cloud again. The [release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.5.0) give the details.
+- See the [release notes](https://github.com/ellecrydansmesdm/Fcord/releases/tag/v1.5.0) for the exact scope of this version.
 
 ## Support
 
