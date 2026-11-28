@@ -1,5 +1,6 @@
-# Ignore everything except README.md and LICENSE
+# Ignore everything except README.md, LICENSE and NOTICE.txt
 *
 !README.md
 !LICENSE
+!NOTICE.txt
 !.gitignore

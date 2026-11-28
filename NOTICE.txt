@@ -1,0 +1,25 @@
+FCORD - LICENSE AND SOURCE CODE NOTICE
+
+1. WHY THE DEVELOPMENT REPOSITORY IS PRIVATE
+FCord's development repository is private. This is the developer's choice: it protects the project's identity, discourages opportunistic copies, rebranded builds and distributions that pass themselves off as FCord, and lets development continue calmly. The repository may be opened to the public in the future; no date has been announced.
+
+2. LICENSE
+FCord's desktop runtime (the files installed into Discord) contains code from Vencord and other projects licensed under the GNU General Public License, version 3 or any later version (GPL-3.0-or-later). The runtime is therefore distributed under GPL-3.0-or-later: you may run, study, share and modify it under the terms of that license. The full license text is in LICENSE.txt, installed with FCord, and at https://www.gnu.org/licenses/gpl-3.0.html.
+
+3. SOURCE CODE OF EACH RELEASE
+The private development repository and the source code of releases are two different things. The development repository (its history, branches and work in progress) is not published. The GPL applies to what is distributed: for each FCord release, the corresponding source code of its runtime is provided on request to anyone who has that release, for at least three years after it was published. To request it, open an issue titled "Source code request" at https://github.com/ellecrydansmesdm/Fcord/issues and give the version number. You receive an archive of that release's source code with build instructions, without the development history or private branches.
+
+4. NAME, LOGO AND MASCOT
+The GPL does not grant any right to the FCord name, logo or mascot (GPL-3.0, section 7(e)). Modified or unofficial builds must not use them or present themselves as FCord. Official builds are published only at https://github.com/ellecrydansmesdm/Fcord/releases and https://fhubcore.dev, with signed manifests and SHA-256 checksums.
+
+5. THIRD-PARTY COMPONENTS
+FCord includes third-party software under its own licenses (MIT, Apache-2.0, BSD, ISC and others). Their notices are kept in the *.LEGAL.txt files and in the license files next to each component.
+
+6. PRIVACY
+FCord runs locally. Official builds contain no telemetry, token logging or remote surveillance code.
+
+7. NO WARRANTY
+FCord is provided "as is", without warranty of any kind, to the extent permitted by applicable law (GPL-3.0, sections 15 and 16).
+
+8. DISCORD
+FCord is not affiliated with, endorsed by or associated with Discord Inc. Client modifications may breach Discord's Terms of Service: use FCord at your own risk.
